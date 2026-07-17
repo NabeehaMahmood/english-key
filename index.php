@@ -4,9 +4,16 @@ require_once __DIR__ . '/includes/header.php';
 $db = getDb();
 $subjects = $db->query("SELECT * FROM courses WHERE category = 'subject' AND is_active = 1 ORDER BY sort_order LIMIT 4")->fetchAll();
 $achievers = $db->query('SELECT * FROM alumni WHERE is_active = 1 ORDER BY sort_order LIMIT 3')->fetchAll();
-$teachers = $db->query('SELECT * FROM teachers WHERE is_active = 1 ORDER BY sort_order LIMIT 2')->fetchAll();
-$testimonials = $db->query("SELECT * FROM testimonials WHERE is_active = 1 AND category != 'Parent' ORDER BY sort_order LIMIT 6")->fetchAll();
-$parentTestimonials = $db->query("SELECT * FROM testimonials WHERE is_active = 1 AND category = 'Parent' ORDER BY sort_order LIMIT 2")->fetchAll();
+
+// A3: single query, 3 testimonials total (parent quotes now live on testimonials.php only).
+// Use sort_order in admin -> Testimonials to control which 3 surface here.
+$testimonials = $db->query('SELECT * FROM testimonials WHERE is_active = 1 ORDER BY sort_order LIMIT 3')->fetchAll();
+
+// A4: the homepage popup shows the FIRST featured course.
+// courses.php now lists every featured course (its brief removed the limit),
+// so the popup deliberately keeps LIMIT 1 and takes the lowest sort_order.
+// Agreed with the courses/alumni teammate; see the PR description.
+$featured = $db->query("SELECT * FROM courses WHERE category = 'featured' AND is_active = 1 ORDER BY sort_order LIMIT 1")->fetch();
 
 $statLearners = getSetting('stat_learners');
 $statPositions = getSetting('stat_positions');
@@ -20,6 +27,13 @@ $aboutQuote = getContentBlock('about', 'quote');
 ?>
 
 <section class="hero">
+  <div class="floaties" aria-hidden="true">
+    <span class="fl fl1"></span><span class="fl fl2"></span><span class="fl fl3"></span><span class="fl fl4"></span>
+  </div>
+  <?php if ($googleRating): ?><span class="hb hb1" data-depth="20"><?= e($googleRating) ?><?= icon('star', 'icon star-icon') ?> Google</span><?php endif; ?>
+  <?php if ($statLearners): ?><span class="hb hb2" data-depth="-16"><?= e($statLearners) ?> learners</span><?php endif; ?>
+  <?php if ($statPositions): ?><span class="hb hb3" data-depth="12"><?= e($statPositions) ?> 1st position</span><?php endif; ?>
+
   <div class="wrap hg">
     <div class="reveal">
       <div class="kick"><?= e(getSetting('kicker')) ?></div>
@@ -30,22 +44,19 @@ $aboutQuote = getContentBlock('about', 'quote');
       ?>
       <h1><?= e(implode(' ', $heroWords)) ?> <span class="hl"><?= e($heroLastWord) ?></span></h1>
       <p class="sub"><?= e(getSetting('hero_subtitle')) ?></p>
+      <p class="micro"><?= e(getSetting('hero_micro')) ?></p>
       <div class="hctas">
         <a class="btn btn-o" href="courses.php">Explore Courses</a>
         <a class="btn btn-l" href="#results">See Our Results</a>
       </div>
-      <p class="micro"><?= e(getSetting('hero_micro')) ?></p>
-      <div class="hfacts">
-        <div class="hf"><b><?= e($statPositions) ?></b><span>HSSC 1st Positions</span></div>
-        <div class="hf"><b><?= e($statLearners) ?></b><span>Learners</span></div>
-        <div class="hf"><b><?= e($statYoutube) ?></b><span>YouTube Subscribers</span></div>
-        <div class="hf"><b>15+</b><span>Years of Transforming Minds</span></div>
-      </div>
     </div>
     <div class="reveal">
       <div class="pw">
-        <div class="pframe"><img src="<?= e(getSetting('hero_image')) ?>" alt="Lead Instructor"></div>
-        <div class="pr">Mr. Naeem Haider<small>Co-Founder &amp; Lead Instructor</small></div>
+        <div class="pdeco" aria-hidden="true">
+          <span class="sh sh1"></span><span class="sh sh2"></span><span class="sh sh3"></span><span class="sh sh4"></span>
+        </div>
+        <div class="pframe pframe-photo"><img src="<?= e(getSetting('hero_image')) ?>" alt="Mr. Naeem Haider"></div>
+        <div class="pr pr-orange">Mr. Naeem Haider<small>Co-Founder &amp; Lead Instructor</small></div>
       </div>
     </div>
   </div>
@@ -54,7 +65,7 @@ $aboutQuote = getContentBlock('about', 'quote');
 <div class="band">
   <div class="wrap bg4 reveal">
     <div class="bs"><b><?= e($statLearners) ?></b><span>Learners in our community</span></div>
-    <div class="bs"><b><?= e($statPositions) ?></b><span>Consecutive HSSC 1st positions</span></div>
+    <div class="bs"><b><?= e($statYoutube) ?></b><span>YouTube subscribers</span></div>
     <div class="bs"><b><?= e($statYears) ?></b><span>Teaching FBISE online</span></div>
     <div class="bs"><b><?= e($statSince) ?></b><span>Teaching languages since</span></div>
   </div>
@@ -71,7 +82,7 @@ $aboutQuote = getContentBlock('about', 'quote');
     <div class="g2 reveal">
       <?php foreach ($subjects as $s): ?>
         <div class="card scard" style="--c:<?= e($s['accent_color']) ?>">
-          <div class="num" style="color:<?= e($s['accent_color']) ?>">0<?= (int)$s['sort_order'] ?>, <?= e($s['level']) ?></div>
+          <div class="num">0<?= (int)$s['sort_order'] ?>, <?= e($s['level']) ?></div>
           <h3><?= e($s['title']) ?></h3>
           <p><?= e($s['description']) ?></p>
           <?php if ($s['tag_line']): ?>
@@ -114,57 +125,43 @@ $aboutQuote = getContentBlock('about', 'quote');
 </section>
 <?php endif; ?>
 
-<?php if ($teachers): ?>
-<section class="soft">
+<?php if ($aboutQuote['content']): ?>
+<section class="vision soft">
   <div class="wrap">
-    <div class="reveal" style="text-align:center;max-width:760px;margin:0 auto 14px">
-      <div class="kick" style="justify-content:center">The Founders</div>
-      <h2 class="t" style="margin-left:auto;margin-right:auto">One academy. <span class="hl">One family.</span></h2>
-      <p class="sub" style="text-align:center;margin:0 auto 18px">EnglishKeys Academy is founded and run by a husband and wife, a partnership of vision and teaching that treats every student like family.</p>
+    <div class="vquote reveal">
+      <div class="kick">Founders&rsquo; Vision</div>
+      <p>&ldquo;<?= e($aboutQuote['content']) ?>&rdquo;</p>
+      <div class="vby"><b>Mr. Naeem Haider &amp; Mrs. Naeem Haider</b><span>Founders, <?= e($siteName) ?></span></div>
     </div>
-    <?php if ($aboutQuote['content']): ?>
-      <div class="pquote reveal" style="max-width:720px;margin:0 auto 44px;text-align:center;border-left:none;border-top:5px solid var(--orange)">
-        <p style="font-style:italic;margin:0">&ldquo;<?= e($aboutQuote['content']) ?>&rdquo;</p>
-      </div>
-    <?php endif; ?>
-    <div class="g2 reveal" style="max-width:920px;margin:0 auto">
-      <?php foreach ($teachers as $t): ?>
-        <div class="bcard">
-          <?php if ($t['photo']): ?><div class="pcrop"><img src="<?= e($t['photo']) ?>" alt="<?= e($t['name']) ?>"></div><?php endif; ?>
-          <div class="bbody">
-            <span style="font-family:'Manrope',sans-serif;font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--purple)"><?= e($t['role_title']) ?></span>
-            <h3><?= e($t['name']) ?></h3>
-            <p><?= e($t['bio']) ?></p>
-          </div>
-        </div>
-      <?php endforeach; ?>
-    </div>
-    <p style="text-align:center;margin-top:36px" class="reveal"><a class="btn btn-n" href="about.php">Meet the founders</a></p>
   </div>
 </section>
 <?php endif; ?>
 
-<section>
+<section class="why">
   <div class="wrap">
-    <div class="reveal">
+    <div class="reveal" style="max-width:720px">
       <div class="kick">Why EnglishKeys</div>
-      <h2 class="t">A planned, year-round path from foundation to final paper.</h2>
+      <h2 class="t">A planned, year-round path from <span class="hl">foundation to final paper.</span></h2>
+      <p class="sub">One expert, one syllabus-mapped plan and a community that keeps you accountable, everything designed to move you toward first position.</p>
     </div>
-    <div class="g3 reveal" style="margin-top:34px">
-      <div class="card">
-        <?= icon('cap', 'icon feature-icon') ?>
-        <h3 style="font-size:18px;margin:12px 0 8px">Taught by one expert, not a rotating panel</h3>
-        <p style="color:var(--muted);font-size:14px">Every class is led by Mr. Naeem Haider himself, an M.Phil. English Linguistics scholar with 14+ years of teaching.</p>
+    <div class="g3 whygrid" style="margin-top:38px">
+      <div class="whycard reveal" style="--a:var(--orange)">
+        <span class="whyn">01</span>
+        <span class="whyi"><?= icon('cap', '') ?></span>
+        <h3>Taught by one expert, not a rotating panel</h3>
+        <p>Every class is led by Mr. Naeem Haider himself, an M.Phil. English Linguistics scholar with 14+ years of teaching.</p>
       </div>
-      <div class="card">
-        <?= icon('target', 'icon feature-icon') ?>
-        <h3 style="font-size:18px;margin:12px 0 8px">Mapped exactly to the FBISE syllabus</h3>
-        <p style="color:var(--muted);font-size:14px">Nothing wasted. Smart notes, model papers and MCQ banks built around the current board pattern.</p>
+      <div class="whycard reveal" style="--a:var(--purple)">
+        <span class="whyn">02</span>
+        <span class="whyi"><?= icon('target', '') ?></span>
+        <h3>Mapped exactly to the FBISE syllabus</h3>
+        <p>Nothing wasted. Smart notes, model papers and MCQ banks built around the current board pattern.</p>
       </div>
-      <div class="card">
-        <?= icon('people', 'icon feature-icon') ?>
-        <h3 style="font-size:18px;margin:12px 0 8px">A community of <?= e($statLearners) ?> learners</h3>
-        <p style="color:var(--muted);font-size:14px">Followed across Facebook, YouTube and Instagram, a proven, trusted place to prepare.</p>
+      <div class="whycard reveal" style="--a:var(--blue)">
+        <span class="whyn">03</span>
+        <span class="whyi"><?= icon('people', '') ?></span>
+        <h3>A community of <?= e($statLearners) ?> learners</h3>
+        <p>Followed across Facebook, YouTube and Instagram, a proven, trusted place to prepare.</p>
       </div>
     </div>
   </div>
@@ -187,17 +184,6 @@ $aboutQuote = getContentBlock('about', 'quote');
         </div>
       <?php endforeach; ?>
     </div>
-    <?php if ($parentTestimonials): ?>
-      <h3 class="mini reveal">From parents.</h3>
-      <div class="g2">
-        <?php foreach ($parentTestimonials as $t): ?>
-          <div class="pquote reveal">
-            <p style="font-style:italic;font-size:14.5px;margin-bottom:16px">&ldquo;<?= e($t['quote']) ?>&rdquo;</p>
-            <b><?= e($t['name']) ?></b><br><span style="color:var(--muted);font-size:12.5px"><?= e($t['source_label']) ?></span>
-          </div>
-        <?php endforeach; ?>
-      </div>
-    <?php endif; ?>
     <?php if ($googleUrl): ?>
       <p style="margin-top:34px" class="reveal"><a class="btn btn-n" href="<?= e($googleUrl) ?>" target="_blank" rel="noopener">See all reviews on Google</a></p>
     <?php endif; ?>
@@ -205,5 +191,42 @@ $aboutQuote = getContentBlock('about', 'quote');
 </section>
 <?php endif; ?>
 
-<?php require_once __DIR__ . '/includes/cta-banner.php'; ?>
+
+<?php if ($featured): ?>
+<!-- A4: featured-course popup. Rendered only when an active featured course exists,
+     so the JS in assets/js/site.js simply finds nothing on pages without it. -->
+<div class="fc-pop" id="fcPop" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="fcTitle">
+  <div class="fc-back" data-fc-close></div>
+  <div class="card fcard fc-card">
+    <button class="fc-x" type="button" data-fc-close aria-label="Close popup">&times;</button>
+    <span class="fbadge">Enrolling Now</span>
+    <h3 class="ptitle" id="fcTitle"><?= e($featured['title']) ?><?php if (!empty($featured['tag_line'])): ?>, <span class="hl"><?= e($featured['tag_line']) ?></span><?php endif; ?></h3>
+    <?php if (!empty($featured['description'])): ?>
+      <p class="pdesc"><?= e($featured['description']) ?></p>
+    <?php endif; ?>
+    <?php
+      // same detail order and icons as the featured card on courses.php
+      $fcRows = [
+        ['calendar', $featured['duration'] ?? ''],
+        ['person',   $featured['eligibility'] ?: ($featured['level'] ?? '')],
+        ['book',     $featured['mode'] ?? ''],
+        ['card',     $featured['price'] ?? ''],
+        ['ticket',   $featured['seats_info'] ?? ''],
+      ];
+      $fcMeta = '';
+      foreach ($fcRows as [$fcIcon, $fcVal]) {
+        if ($fcVal !== '' && $fcVal !== null) {
+          $fcMeta .= '<span>' . icon($fcIcon) . ' ' . e($fcVal) . '</span>';
+        }
+      }
+    ?>
+    <?php if ($fcMeta): ?><div class="meta"><?= $fcMeta ?></div><?php endif; ?>
+    <div class="fcta">
+      <a class="btn btn-o" href="enroll.php">Enrol Now</a>
+      <a class="btn btn-l" href="courses.php">See All Courses</a>
+    </div>
+  </div>
+</div>
+<?php endif; ?>
+
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

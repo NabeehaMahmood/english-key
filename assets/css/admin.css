@@ -1,44 +1,83 @@
-.admin-body { background: #f2f3f5; margin: 0; }
+.admin-body {
+  background: var(--bg, #f4f5f8); margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
 
 .admin-layout { display: flex; min-height: 100vh; }
 
 .admin-sidebar {
-  width: 220px;
-  background: #1f2937;
+  width: 230px;
+  background: linear-gradient(180deg, var(--navy-2, #26346F), color-mix(in srgb, var(--navy, #1B2A4A) 80%, black));
   color: #fff;
-  padding: 20px;
+  padding: 22px 18px;
   flex-shrink: 0;
 }
-.admin-sidebar h2 { margin-top: 0; }
-.admin-sidebar nav ul { list-style: none; padding: 0; margin: 0 0 30px; }
-.admin-sidebar nav li { margin-bottom: 4px; }
+.admin-sidebar h2 {
+  margin: 0 0 20px; padding-bottom: 16px;
+  font-family: 'Manrope', sans-serif; font-size: 1.3rem; letter-spacing: .01em;
+  color: var(--orange, #EA6C1F);
+  border-bottom: 1px solid rgba(255,255,255,.12);
+}
+.admin-sidebar nav ul { list-style: none; padding: 0; margin: 0 0 22px; }
+.admin-sidebar nav li { margin-bottom: 3px; }
 .admin-sidebar nav a {
   display: block;
-  padding: 8px 10px;
-  border-radius: 6px;
-  color: #d1d5db;
+  padding: 9px 12px;
+  border-radius: 8px;
+  color: #cfd8ec;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.3;
+  transition: background .2s ease, color .2s ease;
 }
 .admin-sidebar nav a:hover, .admin-sidebar nav a.active {
-  background: #374151;
+  background: var(--orange, #EA6C1F);
   color: #fff;
   text-decoration: none;
 }
-.logout-link { color: #f87171; display: inline-block; margin-top: 10px; }
+.admin-sidebar nav a:focus-visible,
+.logout-link:focus-visible {
+  outline: 2px solid var(--orange, #EA6C1F);
+  outline-offset: 2px;
+}
+.logout-link {
+  display: block;
+  margin-top: 14px;
+  padding: 9px 12px;
+  border-top: 1px solid rgba(255,255,255,.12);
+  color: #ff9f8f;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: 8px;
+  transition: background .2s ease, color .2s ease;
+}
+.logout-link:hover { background: rgba(255,159,143,.12); color: #ffb4a3; text-decoration: none; }
 
 .admin-content { flex: 1; padding: 30px; max-width: 1000px; }
+.admin-content h1 {
+  font-family: 'Manrope', sans-serif; color: var(--navy, #1B2A4A);
+  font-size: 1.7rem; font-weight: 800; margin: 0 0 6px;
+}
+.admin-content > p:first-of-type { color: var(--muted, #5D6678); font-size: 0.95rem; margin: 0 0 24px; max-width: 640px; }
 
 .admin-form {
   display: flex;
   flex-direction: column;
   gap: 16px;
   background: #fff;
-  border: 1px solid #e2e2e2;
-  border-radius: 8px;
+  border: 1px solid #e2e6ee;
+  border-radius: 12px;
   padding: 24px;
   margin-bottom: 30px;
   max-width: 640px;
+  box-shadow: 0 4px 16px rgba(30,42,102,.05);
 }
-.admin-form label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 0.9rem; }
+.admin-form h2 {
+  font-family: 'Manrope', sans-serif; color: var(--navy, #1B2A4A);
+  font-size: 1.1rem; margin: 0 0 4px; padding-bottom: 12px;
+  border-bottom: 1px solid #edf0f5;
+}
+.admin-form label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 0.9rem; color: var(--navy, #1B2A4A); }
 .admin-form input[type="text"],
 .admin-form input[type="email"],
 .admin-form input[type="tel"],
@@ -48,55 +87,99 @@
 .admin-form select,
 .admin-form textarea {
   font: inherit;
-  padding: 8px 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  padding: 9px 11px;
+  border: 1.5px solid #d8dce6;
+  border-radius: 8px;
+  background: #fff;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.admin-form input[type="color"] { padding: 4px; height: 40px; }
+.admin-form input:hover,
+.admin-form select:hover,
+.admin-form textarea:hover {
+  border-color: #c2c9d6;
+}
+.admin-form input:focus,
+.admin-form select:focus,
+.admin-form textarea:focus {
+  outline: none; border-color: var(--orange, #EA6C1F); box-shadow: 0 0 0 3px rgba(234,108,31,.15);
 }
 .checkbox-label { flex-direction: row !important; align-items: center; gap: 8px !important; }
 
 .admin-form button[type="submit"],
 .admin-body button[type="submit"] {
   align-self: flex-start;
-  background: #2f6f4f;
+  background: var(--orange, #EA6C1F);
   color: #fff;
   border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-weight: 600;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-weight: 700;
   cursor: pointer;
+  box-shadow: 0 4px 14px -6px rgba(234,108,31,.55);
+  transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+.admin-form button[type="submit"]:hover,
+.admin-body button[type="submit"]:hover {
+  background: color-mix(in srgb, var(--orange, #EA6C1F) 88%, black);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px -6px rgba(234,108,31,.6);
+}
+.admin-form button[type="submit"]:active,
+.admin-body button[type="submit"]:active { transform: translateY(0); }
+.admin-form button[type="submit"]:focus-visible,
+.admin-body button[type="submit"]:focus-visible {
+  outline: 2px solid var(--navy, #1B2A4A); outline-offset: 2px;
 }
 .button-secondary {
   align-self: flex-start;
-  color: #555;
+  color: var(--muted, #5D6678);
+  font-weight: 600;
+  padding: 10px 4px;
+  transition: color .2s ease;
 }
+.button-secondary:hover { color: var(--navy, #1B2A4A); }
 
 .admin-table {
   width: 100%;
   border-collapse: collapse;
   background: #fff;
-  border: 1px solid #e2e2e2;
-  border-radius: 8px;
+  border: 1px solid #e2e6ee;
+  border-radius: 12px;
   overflow: hidden;
+  box-shadow: 0 4px 16px rgba(30,42,102,.05);
 }
 .admin-table th, .admin-table td {
-  padding: 10px 12px;
-  border-bottom: 1px solid #eee;
+  padding: 12px 14px;
+  border-bottom: 1px solid #eef0f5;
   text-align: left;
   font-size: 0.9rem;
+  vertical-align: middle;
 }
-.admin-table th { background: #fafafa; }
-.unread-row { background: #fffbe6; }
+.admin-table th {
+  background: var(--bg, #f4f5f8); color: var(--navy, #1B2A4A);
+  font-weight: 700; font-size: 0.78rem; letter-spacing: .04em; text-transform: uppercase;
+}
+.admin-table tr:last-child td { border-bottom: none; }
+.admin-table tr:hover td { background: color-mix(in srgb, var(--orange, #EA6C1F) 4%, white); }
+.unread-row td { background: var(--orange-soft, #FDEEDF) !important; }
+.admin-table td a { font-weight: 600; }
+.admin-table td a:focus-visible { outline: 2px solid var(--orange, #EA6C1F); outline-offset: 2px; border-radius: 3px; }
 
-.inline-form { display: inline-block; margin: 0; }
+.inline-form { display: inline-block; margin: 0 0 0 10px; }
 .link-button {
   background: none;
   border: none;
-  color: #a1352a;
+  color: #b0392a;
   cursor: pointer;
   padding: 0;
   font: inherit;
+  font-weight: 600;
   text-decoration: underline;
+  transition: color .2s ease;
 }
+.link-button:hover { color: color-mix(in srgb, #b0392a 80%, black); }
+.link-button:focus-visible { outline: 2px solid #b0392a; outline-offset: 2px; border-radius: 3px; }
 
 .stat-grid {
   display: grid;
@@ -106,13 +189,15 @@
 }
 .stat-card {
   background: #fff;
-  border: 1px solid #e2e2e2;
-  border-radius: 8px;
+  border: 1px solid #e2e6ee;
+  border-radius: 12px;
   padding: 20px;
   text-align: center;
+  transition: transform .2s ease, box-shadow .2s ease;
 }
-.stat-value { font-size: 2rem; font-weight: 700; color: #2f6f4f; }
-.stat-label { color: #666; font-size: 0.9rem; margin-top: 4px; }
+.stat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px -16px rgba(30,42,102,.25); }
+.stat-value { font-family: 'Manrope', sans-serif; font-size: 2rem; font-weight: 800; color: var(--orange, #EA6C1F); }
+.stat-label { color: var(--muted, #5D6678); font-size: 0.9rem; margin-top: 4px; }
 
 .admin-gallery-grid {
   display: grid;
@@ -121,11 +206,13 @@
 }
 .admin-gallery-grid .gallery-item {
   background: #fff;
-  border: 1px solid #e2e2e2;
-  border-radius: 8px;
+  border: 1px solid #e2e6ee;
+  border-radius: 10px;
   padding: 12px;
   text-align: center;
+  transition: box-shadow .2s ease, border-color .2s ease;
 }
+.admin-gallery-grid .gallery-item:hover { border-color: #d8dce6; box-shadow: 0 8px 20px -14px rgba(30,42,102,.3); }
 .admin-gallery-grid img { width: 100%; height: 140px; object-fit: cover; border-radius: 6px; }
 
 .admin-login-page {
@@ -133,31 +220,101 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: #f2f3f5;
+  background: linear-gradient(150deg, var(--navy-2, #26346F), color-mix(in srgb, var(--navy, #1B2A4A) 80%, black));
   margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 .login-box {
   background: #fff;
-  border: 1px solid #e2e2e2;
-  border-radius: 8px;
+  border: 1px solid #e2e6ee;
+  border-radius: 14px;
   padding: 32px;
   width: 100%;
   max-width: 360px;
+  box-shadow: 0 30px 70px -25px rgba(0,0,0,.4);
 }
 .login-box form { display: flex; flex-direction: column; gap: 14px; }
-.login-box label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 0.9rem; }
+.login-box label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 0.9rem; color: var(--navy, #1B2A4A); }
 .login-box input {
   font: inherit;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  padding: 10px 12px;
+  border: 1.5px solid #d8dce6;
+  border-radius: 8px;
+  transition: border-color .2s ease, box-shadow .2s ease;
 }
+.login-box input:hover { border-color: #c2c9d6; }
+.login-box input:focus { outline: none; border-color: var(--orange, #EA6C1F); box-shadow: 0 0 0 3px rgba(234,108,31,.15); }
 .login-box button {
-  background: #2f6f4f;
+  background: var(--orange, #EA6C1F);
   color: #fff;
   border: none;
-  padding: 10px;
-  border-radius: 6px;
-  font-weight: 600;
+  padding: 11px;
+  border-radius: 8px;
+  font-weight: 700;
   cursor: pointer;
+  box-shadow: 0 4px 14px -6px rgba(234,108,31,.55);
+  transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+.login-box button:hover {
+  background: color-mix(in srgb, var(--orange, #EA6C1F) 88%, black);
+  transform: translateY(-1px);
+}
+.login-box button:active { transform: translateY(0); }
+.login-box button:focus-visible { outline: 2px solid var(--navy, #1B2A4A); outline-offset: 2px; }
+
+/* ============================================================
+   RESPONSIVE - admin panel only. Desktop layout above is untouched;
+   these queries only take effect at tablet/mobile widths.
+   ============================================================ */
+
+/* Tablet & mobile: the sidebar becomes a horizontal top bar instead of a
+   fixed 230px column, so content isn't crushed into a narrow strip and
+   the admin doesn't have to scroll past 13 stacked nav links to reach
+   the page content. Nav links become a swipeable row when they don't fit. */
+@media (max-width: 860px) {
+  .admin-layout { flex-direction: column; min-height: 0; }
+  .admin-sidebar {
+    width: 100%; padding: 14px 16px;
+    display: flex; align-items: center; flex-wrap: nowrap; gap: 16px;
+  }
+  .admin-sidebar h2 {
+    flex: none; margin: 0; padding: 0; border-bottom: none; font-size: 1.1rem;
+  }
+  .admin-sidebar nav {
+    flex: 1 1 auto; min-width: 0; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; -ms-overflow-style: none;
+  }
+  .admin-sidebar nav::-webkit-scrollbar { display: none; }
+  .admin-sidebar nav ul { display: flex; flex-wrap: nowrap; gap: 4px; margin: 0; }
+  .admin-sidebar nav li { margin: 0; flex: none; }
+  .admin-sidebar nav a { white-space: nowrap; padding: 8px 13px; font-size: 13.5px; }
+  .logout-link {
+    flex: none; margin: 0; padding: 8px 13px;
+    border-top: none; border-left: 1px solid rgba(255,255,255,.14);
+    border-radius: 8px; font-size: 13.5px;
+  }
+  .admin-content { padding: 20px; max-width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .admin-sidebar { padding: 12px 14px; gap: 12px; }
+  .admin-sidebar h2 { font-size: 1rem; }
+  .admin-content { padding: 16px; }
+  .admin-form { padding: 18px; }
+  .login-box { padding: 26px 20px; }
+}
+
+/* Tables: several admin screens list 5-6 columns, which won't fit a phone
+   width. Scroll the table itself horizontally rather than letting it
+   overflow the page or clip columns. */
+@media (max-width: 760px) {
+  .admin-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .admin-table th, .admin-table td { white-space: nowrap; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stat-card:hover,
+  .admin-form button[type="submit"]:hover,
+  .admin-body button[type="submit"]:hover,
+  .login-box button:hover { transform: none; }
 }

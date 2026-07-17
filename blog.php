@@ -31,5 +31,4 @@ $posts = getDb()->query('SELECT * FROM blog_posts WHERE is_active = 1 ORDER BY p
   </div>
 </section>
 
-<?php require_once __DIR__ . '/includes/cta-banner.php'; ?>
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
