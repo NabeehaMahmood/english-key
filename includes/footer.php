@@ -62,10 +62,10 @@ $programmeLinks = [
         </div>
       </div>
     </div>
-  </div>
-  <div class="fbase">
-    <span>&copy; <?= date('Y') ?> <?= e($siteName) ?>. <?= e($footerText) ?></span>
-    <span><?= e($footerNote) ?></span>
+    <div class="fbase">
+      <span>&copy; <?= date('Y') ?> <?= e($siteName) ?>. <?= e($footerText) ?></span>
+      <span><?= e($footerNote) ?></span>
+    </div>
   </div>
 </footer>
 <?php if ($whatsapp): ?>

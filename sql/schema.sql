@@ -50,6 +50,16 @@ INSERT INTO site_settings (setting_key, setting_value) VALUES
     ('hero_subtitle', 'Premium live coaching in English, Urdu, Islamiat & Tarjuma-tul-Quran for FBISE students, taught by Mr. Naeem Haider, the academy behind three consecutive HSSC top positions.'),
     ('hero_micro', 'Online - Pakistan Standard Time - 210,000+ learners in our community'),
     ('hero_image', 'assets/uploads/teachers/naeem-haider.jpeg'),
+    ('hero_cta1_label', 'Explore Courses'),
+    ('hero_cta1_link', 'courses.php'),
+    ('hero_cta2_label', 'See Our Results'),
+    ('hero_cta2_link', '#results'),
+    ('fc_popup_card_width', '430'),
+    ('fc_popup_btn1_label', 'Enrol Now'),
+    ('fc_popup_btn1_link', 'enroll.php'),
+    ('fc_popup_btn2_label', 'See All Courses'),
+    ('fc_popup_btn2_link', 'courses.php'),
+    ('hero_fact4_value', '15+'),
     ('accent_color', '#E56A19'),
     ('stat_learners', '210K+'),
     ('stat_positions', '3x'),
@@ -82,7 +92,46 @@ INSERT INTO content_blocks (page_slug, block_key, content) VALUES
     ('about', 'quote', 'We built this academy the way we run our home, with care, discipline, and the belief that every child deserves a first-class chance.'),
     ('about', 'uzma_bio', 'Uzma Arif is the Founder and CEO of EnglishKeys Academy, a leading online educational platform dedicated to transforming the way quality education reaches students across Pakistan. She holds an M.Sc. in Psychology from Quaid-i-Azam University, a B.Ed. from the Virtual University of Pakistan, and a Diploma in TEFL from Allama Iqbal Open University. Before establishing EnglishKeys Academy, she served as a Language Instructor and Section Head at some of Pakistan''s prestigious educational institutions, where she developed extensive experience in teaching, academic leadership, and curriculum development.\n\nDuring her professional journey, Ms. Uzma Arif realized that quality education should not remain confined to conventional classrooms. Driven by the vision of making education accessible beyond geographical and financial barriers, she co-founded EnglishKeys Academy with her husband, Mr. Naeem Haider, the Lead Instructor, on 18 July 2020. Their mission was to provide affordable, high-quality education to students, particularly those from underserved and underprivileged areas of Pakistan.\n\nWhat began as a small initiative has steadily grown into one of Pakistan''s most trusted online educational brands, earning the confidence of thousands of students and parents nationwide. Today, EnglishKeys Academy specializes exclusively in Federal Board (FBISE) education, offering comprehensive preparation for Grades 9-12 compulsory subjects. Beyond SSC and HSSC education, the academy also delivers professional and competitive exam preparation programs, including MDCAT, IELTS, TEFL, PTE, and English preparation for CSS and PMS aspirants.'),
     ('about', 'naeem_bio', 'Mr. Naeem Haider, Co-Founder, Director and Lead Instructor of EnglishKeys Academy, has taught languages since 2012, guiding over 100,000 students in the last five years alone. A distinguished scholar of English linguistics and literature, he built the academy''s teaching on a simple belief: a student who understands the examiner''s mind never fears the paper.\n\nEvery class is led by him personally, no rotating panel, no stock-photo instructors. The credentials are the product.'),
-    ('about', 'method_steps', 'Learn|Concepts taught live, from the ground up, in clear English or Urdu medium.\nPractise|Guided worksheets and MCQ banks that mirror the FBISE paper.\nSubmit|Written work handed in for personal marking, not self-assessment.\nFeedback|Answer-by-answer corrections that show exactly what the examiner wants.\nRevise|Smart capsule notes and model papers for focused, efficient revision.\nFinal Paper|A full-length attempt under exam conditions before the boards.');
+    ('about', 'method_steps', 'Learn|Concepts taught live, from the ground up, in clear English or Urdu medium.\nPractise|Guided worksheets and MCQ banks that mirror the FBISE paper.\nSubmit|Written work handed in for personal marking, not self-assessment.\nFeedback|Answer-by-answer corrections that show exactly what the examiner wants.\nRevise|Smart capsule notes and model papers for focused, efficient revision.\nFinal Paper|A full-length attempt under exam conditions before the boards.'),
+    ('home', 'track_record_heading', 'Three years. Three first positions.'),
+    ('home', 'track_record_description', 'Not testimonials, verifiable federal board results.'),
+    ('home', 'founders_heading', 'Founders’ Vision'),
+    ('home', 'why_heading', 'A planned, year-round path from foundation to final paper.');
+
+-- ---------------------------------------------------------------------
+-- Repeatable stat cards shown in the dark band below the hero. Admin
+-- manages these under Admin -> Homepage Stats (add/edit/delete/reorder).
+CREATE TABLE home_stats (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    value VARCHAR(40) NOT NULL,
+    label VARCHAR(160) NOT NULL,
+    sort_order INT NOT NULL DEFAULT 0,
+    is_active TINYINT(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB;
+
+INSERT INTO home_stats (value, label, sort_order) VALUES
+    ('210K+', 'Learners in our community', 1),
+    ('3×', 'Consecutive HSSC 1st positions', 2),
+    ('5 yrs', 'Teaching FBISE online', 3),
+    ('2012', 'Teaching languages since', 4),
+    ('147K+', 'YouTube Subscribers', 5);
+
+-- ---------------------------------------------------------------------
+-- "Why EnglishKeys" cards. Admin manages these under Admin -> Why Us Cards.
+-- icon must be one of the names defined in includes/icons.php.
+CREATE TABLE home_why_cards (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    icon VARCHAR(40) NOT NULL DEFAULT 'cap',
+    title VARCHAR(160) NOT NULL,
+    description TEXT,
+    sort_order INT NOT NULL DEFAULT 0,
+    is_active TINYINT(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB;
+
+INSERT INTO home_why_cards (icon, title, description, sort_order) VALUES
+    ('cap', 'Taught by one expert, not a rotating panel', 'Every class is led by Mr. Naeem Haider himself, an M.Phil. English Linguistics scholar with 14+ years of teaching.', 1),
+    ('target', 'Mapped exactly to the FBISE syllabus', 'Nothing wasted. Smart notes, model papers and MCQ banks built around the current board pattern.', 2),
+    ('people', 'A community of 210K+ learners', 'Followed across Facebook, YouTube and Instagram, a proven, trusted place to prepare.', 3);
 
 -- ---------------------------------------------------------------------
 -- category: 'subject' (4 core subjects), 'featured' (currently enrolling
@@ -92,6 +141,7 @@ CREATE TABLE courses (
     title VARCHAR(150) NOT NULL,
     slug VARCHAR(160) NOT NULL UNIQUE,
     category VARCHAR(20) NOT NULL DEFAULT 'programme',
+    programme_group VARCHAR(80),
     tag_line VARCHAR(200),
     description TEXT,
     image VARCHAR(255),
@@ -102,27 +152,33 @@ CREATE TABLE courses (
     mode VARCHAR(100),
     schedule_info TEXT,
     highlights TEXT,
+    modules TEXT,
     seats_info VARCHAR(100),
     accent_color VARCHAR(20),
     sort_order INT NOT NULL DEFAULT 0,
     is_active TINYINT(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB;
 
-INSERT INTO courses (title, slug, category, tag_line, description, duration, level, price, eligibility, mode, schedule_info, highlights, seats_info, accent_color, sort_order) VALUES
-('English', 'english', 'subject', 'Live Classes - Smart Notes - Model Papers', 'Grammar, comprehension, translation and composition, taught by an M.Phil. English Linguistics scholar.', NULL, 'Classes 9-12', NULL, 'Classes 9-12', NULL, NULL, NULL, NULL, '#1E2A66', 1),
-('Urdu', 'urdu', 'subject', 'Capsule Notes - MCQ Bank - Model Papers', 'Nazm, ghazal, mazmoon and grammar with full past-paper coverage and answer-writing technique.', NULL, 'Classes 9-12', NULL, 'Classes 9-12', NULL, NULL, NULL, NULL, '#E56A19', 2),
-('Islamiat', 'islamiat', 'subject', 'Both Mediums - Live Classes - Model Papers', 'Concept-first teaching of the full syllabus with smart revision notes in English and Urdu medium.', NULL, 'Classes 9-12', NULL, 'Classes 9-12', NULL, NULL, NULL, NULL, '#7A3FD0', 3),
-('Tarjuma-tul-Quran', 'tarjuma-tul-quran', 'subject', 'Surah-Wise - Both Mediums - MCQ Bank', 'Surah-wise translation, Shaan-e-Nuzul and MCQ preparation built around the FBISE exam format.', NULL, 'Classes 9-12', NULL, 'Classes 9-12', NULL, NULL, NULL, NULL, '#1B7FB4', 4),
-('English Language Summer Course', 'summer-intensive-2026', 'featured', 'Summer Intensive 2026', 'Equally beneficial for students of all boards from Class 8th onwards. It does not teach the syllabus of a specific class; instead it covers all essential topics of the broader curriculum to build a solid base in the language, focusing on Grammar and Creative Writing.', '20 live sessions - 2 hours each', 'All boards, Class 8th onwards', 'Rs. 5,000', 'All boards, Class 8th onwards', 'Online via Zoom', 'Starts 06 July 2026 - Ends 31 July 2026 - Monday-Friday - 07:00-09:00 PM (PKT)', 'All boards - Class 8th onwards\n20 live, interactive sessions\n2 hours per session\nGrammar foundation + advanced writing\nExpert feedback on all exercises\nTopic-wise assessment', 'Seats are strictly limited, register early.', '#E56A19', 5),
-('Summer Camp', 'summer-camp', 'programme', 'Jul 2026 - All boards', 'A foundation course focused on grammar and creative writing, one course for every student, Class 8th onwards. Twenty live 2-hour evening sessions (7:00-9:00 PM), building a solid base in the language before the academic year begins.', '6-31 Jul 2026', 'All levels - All boards', 'Rs. 5,000', 'All boards', 'Online', NULL, 'Grammar foundation + advanced writing\nExpert feedback on every exercise\nTopic-wise assessment', 'Limited seats', '#E56A19', 6),
-('MDCAT / NUMS English Prep', 'mdcat-nums-english-prep', 'programme', 'Jul 2026 - Medical', 'A concept- and practice-based intensive that targets the English portion of medical entry tests, vocabulary, grammar and comprehension tuned precisely to the exam.', '15 days - Jul 2026', 'Medical aspirants', NULL, 'Medical aspirants', 'Online', NULL, '15-day focused intensive\nConcept building + heavy practice\nExam-style questions throughout', 'Limited seats', '#1B7FB4', 7),
-('Bootcamp 01', 'bootcamp-01', 'programme', 'Aug-Sep 2026', 'Class-specific, complete-syllabus coverage for FBISE 9th-12th in English and Urdu. Two months of structured teaching with weekly assessments and one full-length paper under real exam conditions.', '2 months', 'Classes 9-12 - English & Urdu', NULL, 'Classes 9-12', 'Online', NULL, 'Complete syllabus, class by class\nWeekly assessments\nOne full-length paper', 'Limited seats', '#26346F', 8),
-('Bootcamp 02', 'bootcamp-02', 'programme', 'Oct-Nov 2026', 'The second full-syllabus cohort of the year for English and Urdu, Classes 9-12. Same rigorous format, learn, practise, submit, get feedback, revise, timed for the mid-year stretch.', '2 months', 'Classes 9-12 - English & Urdu', NULL, 'Classes 9-12', 'Online', NULL, 'Complete syllabus, class by class\nWeekly assessments\nOne full-length paper', 'Limited seats', '#26346F', 9),
-('Bootcamp 03 - Final Bootcamp', 'bootcamp-03', 'programme', 'Dec 2026 - Jan 2027', 'The last complete-syllabus bootcamp before annual exams for English and Urdu, Classes 9-12, the final chance to cover everything thoroughly with assessments and a full-length paper.', '2 months', 'Classes 9-12 - English & Urdu', NULL, 'Classes 9-12', 'Online', NULL, 'Complete syllabus, class by class\nWeekly assessments\nOne full-length paper', 'Limited seats', '#26346F', 10),
-('Deen Camp', 'deen-camp', 'programme', 'Jan 2027 - Islamiat & Quran', 'Specialised, class-specific coverage of Islamiat (9th & 11th) and Tarjuma-tul-Quran (9th-12th), taught with depth and clarity, complete with weekly assessments and a full-length paper.', '1 month', 'Classes 9-12 (FBISE)', NULL, 'Classes 9-12', 'Online', NULL, 'Islamiat: Classes 9 & 11\nTarjuma-tul-Quran: Classes 9-12\nWeekly assessments + full-length paper', 'Limited seats', '#7A3FD0', 11),
-('Full-Length Papers', 'full-length-papers', 'programme', 'Feb 2027', 'A month of full-length practice papers across all four subjects, English, Urdu, Islamiat and Tarjuma-tul-Quran, with detailed marking and feedback, so exam day feels familiar.', '1 month', 'Classes 9-12 (FBISE)', NULL, 'Classes 9-12', 'Online', NULL, 'All four subjects, Classes 9-12\nReal exam conditions & timing\nDetailed marking + feedback', 'Limited seats', '#1E2A66', 12),
-('Exam Marathons', 'exam-marathons', 'programme', 'Pre-Board - Marathons', 'Detailed-but-quick revision of the whole syllabus in the final stretch before papers, a 2nd-Annual Marathon in English and an Annual Marathon in English & Urdu. Revision-focused, no assessments.', '15 days', 'Classes 9-12 (FBISE)', NULL, 'Classes 9-12', 'Online', NULL, '2nd Annual: English - 15 days\nAnnual: English & Urdu - 15 days (Mar 2027)\nRevision only, no assessments', 'Open - unlimited', '#E56A19', 13),
-('Crash Courses', 'crash-courses', 'programme', 'Final Days - Crash', 'Short, high-intensity revision right before each paper. A 2-day 2nd-Annual crash in English, and a 1-day Annual crash across all four subjects, following the date sheet.', '1-2 days', 'Classes 9-12 (FBISE)', NULL, 'Classes 9-12', 'Online', NULL, '2nd Annual: English - 2 days\nAnnual: all 4 subjects - 1-day intensives\nHigh-yield topics & answer technique', 'Open - unlimited', '#7A3FD0', 14);
+INSERT INTO courses (title, slug, category, tag_line, description, duration, level, price, eligibility, mode, schedule_info, highlights, modules, seats_info, accent_color, sort_order) VALUES
+('English', 'english', 'subject', 'Live Classes - Smart Notes - Model Papers', 'Grammar, comprehension, translation and composition, taught by an M.Phil. English Linguistics scholar.', NULL, 'Classes 9-12', NULL, 'Classes 9-12', NULL, NULL, NULL, NULL, NULL, '#1E2A66', 1),
+('Urdu', 'urdu', 'subject', 'Capsule Notes - MCQ Bank - Model Papers', 'Nazm, ghazal, mazmoon and grammar with full past-paper coverage and answer-writing technique.', NULL, 'Classes 9-12', NULL, 'Classes 9-12', NULL, NULL, NULL, NULL, NULL, '#E56A19', 2),
+('Islamiat', 'islamiat', 'subject', 'Both Mediums - Live Classes - Model Papers', 'Concept-first teaching of the full syllabus with smart revision notes in English and Urdu medium.', NULL, 'Classes 9-12', NULL, 'Classes 9-12', NULL, NULL, NULL, NULL, NULL, '#7A3FD0', 3),
+('Tarjuma-tul-Quran', 'tarjuma-tul-quran', 'subject', 'Surah-Wise - Both Mediums - MCQ Bank', 'Surah-wise translation, Shaan-e-Nuzul and MCQ preparation built around the FBISE exam format.', NULL, 'Classes 9-12', NULL, 'Classes 9-12', NULL, NULL, NULL, NULL, NULL, '#1B7FB4', 4),
+('English Language Summer Course', 'summer-intensive-2026', 'featured', 'Summer Intensive 2026', 'Equally beneficial for students of all boards from Class 8th onwards. It does not teach the syllabus of a specific class; instead it covers all essential topics of the broader curriculum to build a solid base in the language, focusing on Grammar and Creative Writing.', '20 live sessions - 2 hours each', 'All boards, Class 8th onwards', 'Rs. 5,000', 'All boards, Class 8th onwards', 'Online via Zoom', 'Starts:06 July 2026|Ends:31 July 2026|Schedule:Monday-Friday|Time:07:00-09:00 PM (PKT)|Sessions:20 live, 2 hours each', 'All boards - Class 8th onwards\n20 live, interactive sessions\n2 hours per session\nGrammar foundation + advanced writing\nExpert feedback on all exercises\nTopic-wise assessment', 'Days 01-10 - Module 1|English Grammar|Nouns, Pronouns, Verbs & Verbals\nAdverbs, Adjectives, Prepositions\nArticles, Phrases & Clauses\nTenses, Narration, Voices\nError Correction\n---\nDays 11-20 - Module 2|Creative Writing|Paragraph, Essay & Narrative Writing\nReport, Application & Letter Writing\nComprehension & Poetry Analysis', 'Seats are strictly limited, register early.', '#E56A19', 5),
+('Summer Camp', 'summer-camp', 'programme', 'Jul 2026 - All boards', 'A foundation course focused on grammar and creative writing, one course for every student, Class 8th onwards. Twenty live 2-hour evening sessions (7:00-9:00 PM), building a solid base in the language before the academic year begins.', '6-31 Jul 2026', 'All levels - All boards', 'Rs. 5,000', 'All boards', 'Online', NULL, 'Grammar foundation + advanced writing\nExpert feedback on every exercise\nTopic-wise assessment', NULL, 'Limited seats', '#E56A19', 6),
+('MDCAT / NUMS English Prep', 'mdcat-nums-english-prep', 'programme', 'Jul 2026 - Medical', 'A concept- and practice-based intensive that targets the English portion of medical entry tests, vocabulary, grammar and comprehension tuned precisely to the exam.', '15 days - Jul 2026', 'Medical aspirants', NULL, 'Medical aspirants', 'Online', NULL, '15-day focused intensive\nConcept building + heavy practice\nExam-style questions throughout', NULL, 'Limited seats', '#1B7FB4', 7),
+('Bootcamp 01', 'bootcamp-01', 'programme', 'Aug-Sep 2026', 'Class-specific, complete-syllabus coverage for FBISE 9th-12th in English and Urdu. Two months of structured teaching with weekly assessments and one full-length paper under real exam conditions.', '2 months', 'Classes 9-12 - English & Urdu', NULL, 'Classes 9-12', 'Online', NULL, 'Complete syllabus, class by class\nWeekly assessments\nOne full-length paper', NULL, 'Limited seats', '#26346F', 8),
+('Bootcamp 02', 'bootcamp-02', 'programme', 'Oct-Nov 2026', 'The second full-syllabus cohort of the year for English and Urdu, Classes 9-12. Same rigorous format, learn, practise, submit, get feedback, revise, timed for the mid-year stretch.', '2 months', 'Classes 9-12 - English & Urdu', NULL, 'Classes 9-12', 'Online', NULL, 'Complete syllabus, class by class\nWeekly assessments\nOne full-length paper', NULL, 'Limited seats', '#26346F', 9),
+('Bootcamp 03 - Final Bootcamp', 'bootcamp-03', 'programme', 'Dec 2026 - Jan 2027', 'The last complete-syllabus bootcamp before annual exams for English and Urdu, Classes 9-12, the final chance to cover everything thoroughly with assessments and a full-length paper.', '2 months', 'Classes 9-12 - English & Urdu', NULL, 'Classes 9-12', 'Online', NULL, 'Complete syllabus, class by class\nWeekly assessments\nOne full-length paper', NULL, 'Limited seats', '#26346F', 10),
+('Deen Camp', 'deen-camp', 'programme', 'Jan 2027 - Islamiat & Quran', 'Specialised, class-specific coverage of Islamiat (9th & 11th) and Tarjuma-tul-Quran (9th-12th), taught with depth and clarity, complete with weekly assessments and a full-length paper.', '1 month', 'Classes 9-12 (FBISE)', NULL, 'Classes 9-12', 'Online', NULL, 'Islamiat: Classes 9 & 11\nTarjuma-tul-Quran: Classes 9-12\nWeekly assessments + full-length paper', NULL, 'Limited seats', '#7A3FD0', 11),
+('Full-Length Papers', 'full-length-papers', 'programme', 'Feb 2027', 'A month of full-length practice papers across all four subjects, English, Urdu, Islamiat and Tarjuma-tul-Quran, with detailed marking and feedback, so exam day feels familiar.', '1 month', 'Classes 9-12 (FBISE)', NULL, 'Classes 9-12', 'Online', NULL, 'All four subjects, Classes 9-12\nReal exam conditions & timing\nDetailed marking + feedback', NULL, 'Limited seats', '#1E2A66', 12),
+('Exam Marathons', 'exam-marathons', 'programme', 'Pre-Board - Marathons', 'Detailed-but-quick revision of the whole syllabus in the final stretch before papers, a 2nd-Annual Marathon in English and an Annual Marathon in English & Urdu. Revision-focused, no assessments.', '15 days', 'Classes 9-12 (FBISE)', NULL, 'Classes 9-12', 'Online', NULL, '2nd Annual: English - 15 days\nAnnual: English & Urdu - 15 days (Mar 2027)\nRevision only, no assessments', NULL, 'Open - unlimited', '#E56A19', 13),
+('Crash Courses', 'crash-courses', 'programme', 'Final Days - Crash', 'Short, high-intensity revision right before each paper. A 2-day 2nd-Annual crash in English, and a 1-day Annual crash across all four subjects, following the date sheet.', '1-2 days', 'Classes 9-12 (FBISE)', NULL, 'Classes 9-12', 'Online', NULL, '2nd Annual: English - 2 days\nAnnual: all 4 subjects - 1-day intensives\nHigh-yield topics & answer technique', NULL, 'Open - unlimited', '#7A3FD0', 14);
+
+UPDATE courses SET programme_group = 'Full Syllabus' WHERE slug IN ('summer-camp', 'bootcamp-01', 'bootcamp-02', 'bootcamp-03');
+UPDATE courses SET programme_group = 'Exam Prep' WHERE slug IN ('mdcat-nums-english-prep', 'full-length-papers');
+UPDATE courses SET programme_group = 'Islamiat & Quran' WHERE slug IN ('deen-camp');
+UPDATE courses SET programme_group = 'Marathons & Crash' WHERE slug IN ('exam-marathons', 'crash-courses');
 
 -- ---------------------------------------------------------------------
 CREATE TABLE teachers (
@@ -152,36 +208,68 @@ INSERT INTO teachers (name, photo, bio, detail_bio, subject, role_title, credent
  'M.Phil. English Linguistics, Distinction\nMS English, Distinction\nMA English Literature, Silver Medalist\nMA Urdu Literature\nMA Islamic Studies\nB.Ed. (Bachelor of Education)\nDiploma in TEFL\nEMI, University of Southampton\nTEYL, George Mason University, USA',
  2);
 
+-- Home page's Founders' Vision section shows one teacher's photo/name/title/
+-- credentials (admin-selectable in Homepage Content); defaults to Mr. Naeem
+-- Haider, the second row inserted above.
+INSERT INTO site_settings (setting_key, setting_value) VALUES
+    ('founders_vision_teacher_id', (SELECT id FROM teachers WHERE name LIKE '%Naeem%' ORDER BY sort_order, id LIMIT 1));
+
+-- ---------------------------------------------------------------------
+-- The 5 filter tabs on testimonials.php. card_style picks the card
+-- markup variant rendered by renderTestimonialCard() in includes/functions.php:
+-- 'standard' = stars only, 'marks' = orange marks badge (uses testimonials.course),
+-- 'parent' = left-border pull-quote card, 'tag' = navy subject/course badge.
+CREATE TABLE testimonial_categories (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(80) NOT NULL,
+    card_style VARCHAR(20) NOT NULL DEFAULT 'standard',
+    heading VARCHAR(180),
+    sub_text VARCHAR(300),
+    cta_label VARCHAR(80),
+    sort_order INT NOT NULL DEFAULT 0,
+    is_active TINYINT(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB;
+
+INSERT INTO testimonial_categories (id, name, card_style, heading, sub_text, cta_label, sort_order) VALUES
+    (1, 'Featured', 'standard', 'The reviews we''re proudest of.', 'Hand-picked stories from students whose journey changed at EnglishKeys, in their own words.', NULL, 1),
+    (2, 'Results & Marks', 'marks', 'The numbers speak first.', 'Quantified outcomes reported by students after their board papers, pre-boards and send-ups.', NULL, 2),
+    (3, 'From Parents', 'parent', 'Trusted by the people who trust us most.', NULL, NULL, 3),
+    (4, 'By Subject', 'tag', 'Pick your subject, hear from its students.', NULL, NULL, 4),
+    (5, 'By Course Type', 'tag', 'Crash courses to bootcamps, every format, reviewed.', NULL, 'See all reviews on Google', 5);
+
 -- ---------------------------------------------------------------------
 CREATE TABLE testimonials (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(150) NOT NULL,
     photo VARCHAR(255),
     quote TEXT NOT NULL,
-    category VARCHAR(60),
+    category_id INT NULL,
+    course VARCHAR(120),
+    rating TINYINT NOT NULL DEFAULT 5,
+    is_featured TINYINT(1) NOT NULL DEFAULT 0,
     source_label VARCHAR(100),
     sort_order INT NOT NULL DEFAULT 0,
     is_active TINYINT(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB;
 
-INSERT INTO testimonials (name, quote, category, source_label, sort_order) VALUES
-('Amjad Farooq', 'In my 12 years of school life I always had English teachers that were OK, not good, not bad. But my goodness, your way of teaching is superb. You don''t just dictate, you actually TAUGHT US and we ACTUALLY LEARNED.', 'English', 'Verified Google Review', 1),
-('Qasim Mustafa', 'SSC, 73/75 in English with Sir Naeem. HSSC, I was able to attempt my paper exceptionally, and I hope for the best.', 'English', 'SSC 73/75 English', 2),
-('Aashir Usman', 'I''ve been a regular student for two years and part of almost all its bootcamps. When I joined, I barely knew grammar. Today, due to Sir Naeem''s teaching, I''ve achieved 91 marks in part one and am aiming for more in part two.', 'Bootcamp', '2-year student - 91 marks', 3),
-('Tabu Khan', 'It''s the most authentic platform for studying arts subjects in Pakistan. Amazing notes for every section, grammar revision, crash courses for last-minute revision, and the FLP batch improved my presentation skills and time management.', 'Test Series / FLP', 'Verified Google Review', 4),
-('Muhammad Mueen', 'Learning from Sir Naeem has been nothing short of phenomenal. His ability to simplify complex concepts with unmatched clarity is remarkable.', 'English', 'Verified Google Review', 5),
-('Rubab Fatima', 'This was my first EKA course, for my 2nd-year preparation, now I regret not availing it earlier. You never feel the communication gap you usually feel in online classes.', 'Bootcamp', 'HSSC-II Student', 6),
-('Syed Adan Ali', 'My English was average, but then I joined Sir''s crash course, and it was totally worth it. It really helped me clear my concepts and confusions.', 'Crash Course', 'Verified Google Review', 7),
-('Atif', 'I love EnglishKeys Academy. Sir Naeem is very determined and works hard to make sure students understand well. Notes are very concise and it was so fun studying with him.', 'English', 'Verified Google Review', 8),
-('Ayan Awais', 'I took the Crash Course for 11th Urdu, and it was really helpful. The concepts were explained clearly and in a structured way.', 'Urdu', 'Class 11 Urdu', 9),
-('Syed Muhammad Muhaymin Ali', 'I took the Marathon course for Class 11 2nd-Annual Urdu, and the way Sir taught everything in four weeks, from grammar to letter/application writing, is exceptional.', 'Urdu', 'Urdu Marathon', 10),
-('Eshaal Azam', 'I was concerned about my Urdu MCQs, but Alhamdulillah I got them all right. In 10th I used to learn the MCQs Sir posted a day before the exam, it really helped.', 'Islamiat & TQ', 'Islamiat & Tarjuma-tul-Quran', 11),
-('Muhammad Hassan Asif Khan', 'The best crash-course experience I ever had. Study 10/10, fun 9/10, help 11/10. Sir is really helpful and thoughtful, and the notes really came in clutch.', 'Crash Course', 'Crash Course', 12),
-('Shamshad Ali', 'I joined the English Marathon by Sir Naeem, and it was a truly valuable experience. The Zoom sessions were well-structured and focused on important exam topics.', 'English', 'English Marathon', 13),
-('Hamza Sadique', 'I had a great experience. Sir explained every concept deeply and taught us more than the scheduled time. I saw a lot of improvement in English after completing the Marathon batch.', 'English', 'English Marathon', 14),
-('Raneen Falak', 'The test series provided three full-length papers with proper time extension, notes and assessment. I went from being unconfident about MCQs to writing a 3-page report and a well-written paragraph.', 'Test Series / FLP', 'Test Series / FLP', 15),
-('M. Amin', 'The one-pager grammar notes, where every topic is properly managed, are really helpful. It seemed impossible to complete whole-paper preparation in only two months, but EnglishKeys Academy made it possible.', 'Bootcamp', 'Bootcamp', 16),
-('Ayesha Umer', 'I was worried about my son''s preparation. Luckily I came across the academy and followed every post. I''m highly impressed by the devotion and dedication of Sir. My son is expecting around 93 in the exams.', 'Parent', 'Parent', 17);
+INSERT INTO testimonials (name, quote, category_id, course, source_label, sort_order, is_featured) VALUES
+('Amjad Farooq', 'In my 12 years of school life I always had English teachers that were OK, not good, not bad. But my goodness, your way of teaching is superb. You don''t just dictate, you actually TAUGHT US and we ACTUALLY LEARNED.', 1, NULL, 'Verified Google Review', 1, 1),
+('Qasim Mustafa', 'SSC, 73/75 in English with Sir Naeem. HSSC, I was able to attempt my paper exceptionally, and I hope for the best.', 2, '73/75 in SSC English', 'SSC 73/75 English', 2, 0),
+('Aashir Usman', 'I''ve been a regular student for two years and part of almost all its bootcamps. When I joined, I barely knew grammar. Today, due to Sir Naeem''s teaching, I''ve achieved 91 marks in part one and am aiming for more in part two.', 2, '91 marks in Part I', '2-year student - 91 marks', 3, 0),
+('Tabu Khan', 'It''s the most authentic platform for studying arts subjects in Pakistan. Amazing notes for every section, grammar revision, crash courses for last-minute revision, and the FLP batch improved my presentation skills and time management.', 1, NULL, 'Verified Google Review', 4, 0),
+('Muhammad Mueen', 'Learning from Sir Naeem has been nothing short of phenomenal. His ability to simplify complex concepts with unmatched clarity is remarkable.', 1, NULL, 'Verified Google Review', 5, 1),
+('Rubab Fatima', 'This was my first EKA course, for my 2nd-year preparation, now I regret not availing it earlier. You never feel the communication gap you usually feel in online classes.', 5, 'Bootcamp', 'HSSC-II Student', 6, 0),
+('Syed Adan Ali', 'My English was average, but then I joined Sir''s crash course, and it was totally worth it. It really helped me clear my concepts and confusions.', 5, 'Crash Course', 'Verified Google Review', 7, 0),
+('Atif', 'I love EnglishKeys Academy. Sir Naeem is very determined and works hard to make sure students understand well. Notes are very concise and it was so fun studying with him.', 4, 'English', 'Verified Google Review', 8, 0),
+('Ayan Awais', 'I took the Crash Course for 11th Urdu, and it was really helpful. The concepts were explained clearly and in a structured way.', 4, 'Urdu', 'Class 11 Urdu', 9, 0),
+('Syed Muhammad Muhaymin Ali', 'I took the Marathon course for Class 11 2nd-Annual Urdu, and the way Sir taught everything in four weeks, from grammar to letter/application writing, is exceptional.', 4, 'Urdu', 'Urdu Marathon', 10, 0),
+('Eshaal Azam', 'I was concerned about my Urdu MCQs, but Alhamdulillah I got them all right. In 10th I used to learn the MCQs Sir posted a day before the exam, it really helped.', 4, 'Islamiat & TQ', 'Islamiat & Tarjuma-tul-Quran', 11, 0),
+('Muhammad Hassan Asif Khan', 'The best crash-course experience I ever had. Study 10/10, fun 9/10, help 11/10. Sir is really helpful and thoughtful, and the notes really came in clutch.', 5, 'Crash Course', 'Crash Course', 12, 0),
+('Shamshad Ali', 'I joined the English Marathon by Sir Naeem, and it was a truly valuable experience. The Zoom sessions were well-structured and focused on important exam topics.', 4, 'English', 'English Marathon', 13, 0),
+('Hamza Sadique', 'I had a great experience. Sir explained every concept deeply and taught us more than the scheduled time. I saw a lot of improvement in English after completing the Marathon batch.', 4, 'English', 'English Marathon', 14, 0),
+('Raneen Falak', 'The test series provided three full-length papers with proper time extension, notes and assessment. I went from being unconfident about MCQs to writing a 3-page report and a well-written paragraph.', 5, 'Test Series / FLP', 'Test Series / FLP', 15, 0),
+('M. Amin', 'The one-pager grammar notes, where every topic is properly managed, are really helpful. It seemed impossible to complete whole-paper preparation in only two months, but EnglishKeys Academy made it possible.', 5, 'Bootcamp', 'Bootcamp', 16, 0),
+('Ayesha Umer', 'I was worried about my son''s preparation. Luckily I came across the academy and followed every post. I''m highly impressed by the devotion and dedication of Sir. My son is expecting around 93 in the exams.', 3, NULL, 'Parent', 17, 0);
 
 -- ---------------------------------------------------------------------
 -- Renamed from "news" to "blog_posts" to match the live site's /blog page.

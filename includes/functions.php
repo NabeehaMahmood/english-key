@@ -14,6 +14,17 @@ function slugify(string $text): string
     return trim($text, '-');
 }
 
+/**
+ * A subtle staggered-reveal delay for the Nth item (0-indexed) in a card
+ * grid, read by the .reveal IntersectionObserver in assets/js/site.js.
+ * Capped so long grids don't end up with a sluggish tail.
+ */
+function revealDelay(int $index, float $step = 0.06, float $max = 0.3): string
+{
+    $delay = min($index * $step, $max);
+    return $delay > 0 ? ' data-delay="' . $delay . '"' : '';
+}
+
 function getSetting(string $key, string $default = ''): string
 {
     static $cache = null;
@@ -108,4 +119,38 @@ function getFlashMessage(): ?array
     $flash = ['message' => $_SESSION['flash_message'], 'type' => $_SESSION['flash_type'] ?? 'success'];
     unset($_SESSION['flash_message'], $_SESSION['flash_type']);
     return $flash;
+}
+
+/**
+ * Renders one testimonial card. $cardStyle comes from the testimonial's
+ * category (testimonial_categories.card_style) and picks the markup
+ * variant: 'standard' (stars only), 'marks' (orange marks badge from
+ * $t['course']), 'tag' (navy subject/course badge from $t['course']),
+ * 'parent' (left-border pull-quote card, no badge/stars).
+ */
+function renderTestimonialCard(array $t, string $cardStyle = 'standard', int $index = 0): string
+{
+    $delayAttr = revealDelay($index);
+
+    if ($cardStyle === 'parent') {
+        return '<div class="pquote reveal"' . $delayAttr . '>'
+            . '<p>&ldquo;' . e($t['quote']) . '&rdquo;</p>'
+            . '<b>' . e($t['name']) . '</b><br><span>' . e($t['source_label']) . '</span>'
+            . '</div>';
+    }
+
+    $badge = '';
+    if ($cardStyle === 'marks' && !empty($t['course'])) {
+        $badge = '<span class="otag">' . e($t['course']) . '</span>';
+    } elseif ($cardStyle === 'tag' && !empty($t['course'])) {
+        $badge = '<span class="ntag">' . e($t['course']) . '</span>';
+    }
+
+    $stars = $cardStyle === 'standard' ? '<div class="stars">' . starRow((int)($t['rating'] ?: 5)) . '</div>' : '';
+
+    return '<div class="rcard reveal"' . $delayAttr . '>'
+        . $stars . $badge
+        . '<p>&ldquo;' . e($t['quote']) . '&rdquo;</p>'
+        . '<div><b>' . e($t['name']) . '</b><br><span>' . e($t['source_label']) . '</span></div>'
+        . '</div>';
 }

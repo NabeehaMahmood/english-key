@@ -4,21 +4,44 @@ require_once __DIR__ . '/includes/header.php';
 $db = getDb();
 $subjects = $db->query("SELECT * FROM courses WHERE category = 'subject' AND is_active = 1 ORDER BY sort_order LIMIT 4")->fetchAll();
 $achievers = $db->query('SELECT * FROM alumni WHERE is_active = 1 ORDER BY sort_order LIMIT 3')->fetchAll();
-$teachers = $db->query('SELECT * FROM teachers WHERE is_active = 1 ORDER BY sort_order LIMIT 2')->fetchAll();
-$testimonials = $db->query("SELECT * FROM testimonials WHERE is_active = 1 AND category != 'Parent' ORDER BY sort_order LIMIT 6")->fetchAll();
-$parentTestimonials = $db->query("SELECT * FROM testimonials WHERE is_active = 1 AND category = 'Parent' ORDER BY sort_order LIMIT 2")->fetchAll();
+$testimonials = $db->query('SELECT * FROM testimonials WHERE is_active = 1 ORDER BY sort_order LIMIT 3')->fetchAll();
+$featured = $db->query("SELECT * FROM courses WHERE category = 'featured' AND is_active = 1 ORDER BY sort_order LIMIT 1")->fetch();
 
-$statLearners = getSetting('stat_learners');
-$statPositions = getSetting('stat_positions');
-$statYears = getSetting('stat_years');
-$statSince = getSetting('stat_since');
-$statYoutube = getSetting('stat_youtube_subs');
 $googleUrl = getSetting('google_reviews_url');
 $googleRating = getSetting('google_rating');
 $googleCount = getSetting('google_review_count');
 $aboutQuote = getContentBlock('about', 'quote');
-?>
 
+$whyCards = $db->query('SELECT * FROM home_why_cards WHERE is_active = 1 ORDER BY sort_order, id')->fetchAll();
+$homeStats = $db->query('SELECT * FROM home_stats WHERE is_active = 1 ORDER BY sort_order, id')->fetchAll();
+
+$heroCta1Label = getSetting('hero_cta1_label', 'Explore Courses');
+$heroCta1Link = getSetting('hero_cta1_link', 'courses.php');
+$heroCta2Label = getSetting('hero_cta2_label', 'See Our Results');
+$heroCta2Link = getSetting('hero_cta2_link', '#results');
+
+$trackHeading = getContentBlock('home', 'track_record_heading')['content'] ?: 'Three years. Three first positions.';
+$trackParts = explode('. ', $trackHeading);
+$trackLast = array_pop($trackParts);
+$trackRest = $trackParts ? implode('. ', $trackParts) . '. ' : '';
+$trackDescription = getContentBlock('home', 'track_record_description')['content'] ?: 'Not testimonials, verifiable federal board results.';
+$trackBgImage = getContentBlock('home', 'track_record_bg')['image_path'] ?? null;
+
+$foundersHeading = getContentBlock('home', 'founders_heading')['content'] ?: 'Founders’ Vision';
+$foundersTeacherId = (int) getSetting('founders_vision_teacher_id');
+$foundersTeacher = null;
+if ($foundersTeacherId > 0) {
+    $stmt = $db->prepare('SELECT * FROM teachers WHERE id = ? AND is_active = 1');
+    $stmt->execute([$foundersTeacherId]);
+    $foundersTeacher = $stmt->fetch();
+}
+if (!$foundersTeacher) {
+    $foundersTeacher = $db->query('SELECT * FROM teachers WHERE is_active = 1 ORDER BY sort_order, id LIMIT 1')->fetch();
+}
+
+$whyHeading = getContentBlock('home', 'why_heading')['content'] ?: 'A planned, year-round path from foundation to final paper.';
+?>
+<main class="page-home">
 <section class="hero">
   <div class="wrap hg">
     <div class="reveal">
@@ -28,37 +51,33 @@ $aboutQuote = getContentBlock('about', 'quote');
         $heroWords = explode(' ', $heroTitle);
         $heroLastWord = array_pop($heroWords);
       ?>
-      <h1><?= e(implode(' ', $heroWords)) ?> <span class="hl"><?= e($heroLastWord) ?></span></h1>
+      <h1><?= e(implode(' ', $heroWords)) ?> <span class="hl hl-o"><?= e($heroLastWord) ?></span></h1>
       <p class="sub"><?= e(getSetting('hero_subtitle')) ?></p>
       <div class="hctas">
-        <a class="btn btn-o" href="courses.php">Explore Courses</a>
-        <a class="btn btn-l" href="#results">See Our Results</a>
+        <a class="btn btn-o ar" href="<?= e($heroCta1Link) ?>"><?= e($heroCta1Label) ?>&nbsp;</a>
+        <a class="btn btn-l" href="<?= e($heroCta2Link) ?>"><?= e($heroCta2Label) ?></a>
       </div>
       <p class="micro"><?= e(getSetting('hero_micro')) ?></p>
-      <div class="hfacts">
-        <div class="hf"><b><?= e($statPositions) ?></b><span>HSSC 1st Positions</span></div>
-        <div class="hf"><b><?= e($statLearners) ?></b><span>Learners</span></div>
-        <div class="hf"><b><?= e($statYoutube) ?></b><span>YouTube Subscribers</span></div>
-        <div class="hf"><b>15+</b><span>Years of Transforming Minds</span></div>
-      </div>
     </div>
     <div class="reveal">
       <div class="pw">
-        <div class="pframe"><img src="<?= e(getSetting('hero_image')) ?>" alt="Lead Instructor"></div>
+        <div class="pbars" aria-hidden="true"><span class="pb1"></span><span class="pb2"></span><span class="pb3"></span></div>
+        <div class="pframe"><img src="<?= e(getSetting('hero_image')) ?>" alt="Mr. Naeem Haider"></div>
         <div class="pr">Mr. Naeem Haider<small>Co-Founder &amp; Lead Instructor</small></div>
       </div>
     </div>
   </div>
 </section>
 
+<?php if ($homeStats): ?>
 <div class="band">
-  <div class="wrap bg4 reveal">
-    <div class="bs"><b><?= e($statLearners) ?></b><span>Learners in our community</span></div>
-    <div class="bs"><b><?= e($statPositions) ?></b><span>Consecutive HSSC 1st positions</span></div>
-    <div class="bs"><b><?= e($statYears) ?></b><span>Teaching FBISE online</span></div>
-    <div class="bs"><b><?= e($statSince) ?></b><span>Teaching languages since</span></div>
+  <div class="wrap bg-auto reveal">
+    <?php foreach ($homeStats as $stat): ?>
+      <div class="bs"><b><?= e($stat['value']) ?></b><span><?= e($stat['label']) ?></span></div>
+    <?php endforeach; ?>
   </div>
 </div>
+<?php endif; ?>
 
 <?php if ($subjects): ?>
 <section id="courses">
@@ -68,9 +87,9 @@ $aboutQuote = getContentBlock('about', 'quote');
       <h2 class="t">Four subjects. One standard: <span class="hl">first position.</span></h2>
       <p class="sub">Complete FBISE preparation for Classes 9-12, from the first lecture to the final board paper.</p>
     </div>
-    <div class="g2 reveal">
-      <?php foreach ($subjects as $s): ?>
-        <div class="card scard" style="--c:<?= e($s['accent_color']) ?>">
+    <div class="g2">
+      <?php foreach ($subjects as $i => $s): ?>
+        <div class="card scard reveal"<?= revealDelay($i) ?> style="--c:<?= e($s['accent_color']) ?>">
           <div class="num" style="color:<?= e($s['accent_color']) ?>">0<?= (int)$s['sort_order'] ?>, <?= e($s['level']) ?></div>
           <h3><?= e($s['title']) ?></h3>
           <p><?= e($s['description']) ?></p>
@@ -86,16 +105,23 @@ $aboutQuote = getContentBlock('about', 'quote');
 <?php endif; ?>
 
 <?php if ($achievers): ?>
-<section class="dark" id="results">
+<section class="dark trackrecord" id="results">
+  <div class="tr-bg" aria-hidden="true">
+    <?php if ($trackBgImage): ?>
+      <img src="<?= e($trackBgImage) ?>" alt="">
+    <?php else: ?>
+      <?= icon('trophy', 'tr-icon tr-i1') ?><?= icon('medal', 'tr-icon tr-i2') ?><?= icon('award', 'tr-icon tr-i3') ?><?= icon('trophy', 'tr-icon tr-i4') ?>
+    <?php endif; ?>
+  </div>
   <div class="wrap">
     <div class="reveal">
       <div class="kick">Proven Track Record</div>
-      <h2 class="t">Three years. <span class="hl">Three first positions.</span></h2>
-      <p class="sub">Not testimonials, verifiable federal board results.</p>
+      <h2 class="t"><?= e($trackRest) ?><span class="hl"><?= e($trackLast) ?></span></h2>
+      <p class="sub"><?= e($trackDescription) ?></p>
     </div>
-    <div class="g3 reveal">
-      <?php foreach ($achievers as $a): ?>
-        <div class="tcard">
+    <div class="g3">
+      <?php foreach ($achievers as $i => $a): ?>
+        <div class="tcard reveal"<?= revealDelay($i) ?>>
           <span class="tpos">1ST POSITION</span>
           <div class="tyr"><?= e(substr($a['batch_info'], -4)) ?></div>
           <b><?= e($a['name']) ?></b>
@@ -105,73 +131,49 @@ $aboutQuote = getContentBlock('about', 'quote');
     </div>
     <?php if ($googleUrl): ?>
     <div class="gbar reveal">
-      <div><span class="big"><?= e($googleRating) ?> <?= icon('star', 'icon star-icon') ?></span><small><?= e($googleCount) ?> Google reviews</small></div>
-      <p>Rated <?= e($googleRating) ?> <?= icon('star', 'icon star-icon') ?> by <?= e($googleCount) ?> students, parents and teachers on Google.</p>
-      <a class="btn btn-w" href="<?= e($googleUrl) ?>" target="_blank" rel="noopener">See Reviews</a>
+      <span class="big"><?= e($googleRating) ?><?= icon('star', 'icon star-icon') ?></span><span class="st"><?= str_repeat(' '.icon('star', 'icon star-icon'), 5) ?></span><small><?= e($googleCount) ?> Google reviews</small>
+      <p>Rated <?= e($googleRating) ?><?= icon('star', 'icon star-icon') ?> by <?= e($googleCount) ?> students, parents and teachers on Google.</p>
+      <a class="btn btn-w ar" href="<?= e($googleUrl) ?>" target="_blank" rel="noopener">See Reviews&nbsp;</a>
     </div>
     <?php endif; ?>
   </div>
 </section>
 <?php endif; ?>
 
-<?php if ($teachers): ?>
-<section class="soft">
+<?php if ($aboutQuote['content'] && $foundersTeacher): ?>
+<section class="soft fv">
   <div class="wrap">
-    <div class="reveal" style="text-align:center;max-width:760px;margin:0 auto 14px">
-      <div class="kick" style="justify-content:center">The Founders</div>
-      <h2 class="t" style="margin-left:auto;margin-right:auto">One academy. <span class="hl">One family.</span></h2>
-      <p class="sub" style="text-align:center;margin:0 auto 18px">EnglishKeys Academy is founded and run by a husband and wife, a partnership of vision and teaching that treats every student like family.</p>
+    <div class="reveal fv-center">
+      <div class="kick"><?= e($foundersHeading) ?></div>
+      <p class="fv-quote">&ldquo;<?= e($aboutQuote['content']) ?>&rdquo;</p>
+      <div class="fv-by"><b><?= e($foundersTeacher['name']) ?></b><?php if (!empty($foundersTeacher['role_title'])): ?><span><?= e($foundersTeacher['role_title']) ?></span><?php endif; ?></div>
     </div>
-    <?php if ($aboutQuote['content']): ?>
-      <div class="pquote reveal" style="max-width:720px;margin:0 auto 44px;text-align:center;border-left:none;border-top:5px solid var(--orange)">
-        <p style="font-style:italic;margin:0">&ldquo;<?= e($aboutQuote['content']) ?>&rdquo;</p>
-      </div>
-    <?php endif; ?>
-    <div class="g2 reveal" style="max-width:920px;margin:0 auto">
-      <?php foreach ($teachers as $t): ?>
-        <div class="bcard">
-          <?php if ($t['photo']): ?><div class="pcrop"><img src="<?= e($t['photo']) ?>" alt="<?= e($t['name']) ?>"></div><?php endif; ?>
-          <div class="bbody">
-            <span style="font-family:'Manrope',sans-serif;font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--purple)"><?= e($t['role_title']) ?></span>
-            <h3><?= e($t['name']) ?></h3>
-            <p><?= e($t['bio']) ?></p>
-          </div>
-        </div>
-      <?php endforeach; ?>
-    </div>
-    <p style="text-align:center;margin-top:36px" class="reveal"><a class="btn btn-n" href="about.php">Meet the founders</a></p>
   </div>
 </section>
 <?php endif; ?>
 
-<section>
+<?php if ($whyCards): ?>
+<section class="why">
   <div class="wrap">
     <div class="reveal">
       <div class="kick">Why EnglishKeys</div>
-      <h2 class="t">A planned, year-round path from foundation to final paper.</h2>
+      <h2 class="t"><?= e($whyHeading) ?></h2>
     </div>
-    <div class="g3 reveal" style="margin-top:34px">
-      <div class="card">
-        <?= icon('cap', 'icon feature-icon') ?>
-        <h3 style="font-size:18px;margin:12px 0 8px">Taught by one expert, not a rotating panel</h3>
-        <p style="color:var(--muted);font-size:14px">Every class is led by Mr. Naeem Haider himself, an M.Phil. English Linguistics scholar with 14+ years of teaching.</p>
-      </div>
-      <div class="card">
-        <?= icon('target', 'icon feature-icon') ?>
-        <h3 style="font-size:18px;margin:12px 0 8px">Mapped exactly to the FBISE syllabus</h3>
-        <p style="color:var(--muted);font-size:14px">Nothing wasted. Smart notes, model papers and MCQ banks built around the current board pattern.</p>
-      </div>
-      <div class="card">
-        <?= icon('people', 'icon feature-icon') ?>
-        <h3 style="font-size:18px;margin:12px 0 8px">A community of <?= e($statLearners) ?> learners</h3>
-        <p style="color:var(--muted);font-size:14px">Followed across Facebook, YouTube and Instagram, a proven, trusted place to prepare.</p>
-      </div>
+    <div class="g3" style="margin-top:34px">
+      <?php foreach ($whyCards as $i => $card): ?>
+        <div class="card reveal"<?= revealDelay($i) ?>>
+          <div class="why-icon"><?= icon($card['icon'] ?: 'grad-cap', '') ?></div>
+          <h3 style="font-size:18px;margin-bottom:8px"><?= e($card['title']) ?></h3>
+          <p style="color:var(--muted);font-size:14px"><?= e($card['description']) ?></p>
+        </div>
+      <?php endforeach; ?>
     </div>
   </div>
 </section>
+<?php endif; ?>
 
 <?php if ($testimonials): ?>
-<section class="soft">
+<section class="soft" id="student-stories">
   <div class="wrap">
     <div class="reveal">
       <div class="kick">Student Stories</div>
@@ -179,31 +181,67 @@ $aboutQuote = getContentBlock('about', 'quote');
       <p class="sub">Genuine, permission-granted reviews from students and parents across Pakistan.</p>
     </div>
     <div class="g3">
-      <?php foreach ($testimonials as $t): ?>
-        <div class="rcard reveal">
-          <div class="stars"><?= starRow(5) ?></div>
+      <?php foreach ($testimonials as $i => $t): ?>
+        <div class="rcard reveal"<?= revealDelay($i) ?>>
+          <div class="stars"><?= starRow((int)($t['rating'] ?: 5)) ?></div>
           <p>&ldquo;<?= e($t['quote']) ?>&rdquo;</p>
           <div><b><?= e($t['name']) ?></b><br><span><?= e($t['source_label']) ?></span></div>
         </div>
       <?php endforeach; ?>
     </div>
-    <?php if ($parentTestimonials): ?>
-      <h3 class="mini reveal">From parents.</h3>
-      <div class="g2">
-        <?php foreach ($parentTestimonials as $t): ?>
-          <div class="pquote reveal">
-            <p style="font-style:italic;font-size:14.5px;margin-bottom:16px">&ldquo;<?= e($t['quote']) ?>&rdquo;</p>
-            <b><?= e($t['name']) ?></b><br><span style="color:var(--muted);font-size:12.5px"><?= e($t['source_label']) ?></span>
-          </div>
-        <?php endforeach; ?>
-      </div>
-    <?php endif; ?>
-    <?php if ($googleUrl): ?>
-      <p style="margin-top:34px" class="reveal"><a class="btn btn-n" href="<?= e($googleUrl) ?>" target="_blank" rel="noopener">See all reviews on Google</a></p>
-    <?php endif; ?>
+    <p style="margin-top:34px;display:flex;gap:14px;flex-wrap:wrap" class="reveal">
+      <?php if ($googleUrl): ?><a class="btn btn-n ar" href="<?= e($googleUrl) ?>" target="_blank" rel="noopener">See Reviews on Google&nbsp;</a><?php endif; ?>
+      <a class="btn btn-l ar" href="testimonials.php">See All Testimonials&nbsp;</a>
+    </p>
   </div>
 </section>
 <?php endif; ?>
 
 <?php require_once __DIR__ . '/includes/cta-banner.php'; ?>
+
+<?php
+$fcPopupBg = getContentBlock('home', 'fc_popup_bg')['image_path'] ?? null;
+$fcPopupWidth = (int) getSetting('fc_popup_card_width', '430') ?: 430;
+$fcPopupBtn1Label = getSetting('fc_popup_btn1_label', 'Enrol Now');
+$fcPopupBtn1Link = getSetting('fc_popup_btn1_link', 'enroll.php');
+$fcPopupBtn2Label = getSetting('fc_popup_btn2_label', 'See All Courses');
+$fcPopupBtn2Link = getSetting('fc_popup_btn2_link', 'courses.php');
+?>
+<?php if ($featured): ?>
+<!-- A4: featured-course popup. Rendered only when an active featured course exists,
+     so the JS in assets/js/site.js simply finds nothing on pages without it. -->
+<div class="fc-pop" id="fcPop" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="fcTitle">
+  <div class="fc-back" data-fc-close></div>
+  <div class="card fcard fc-card<?= $fcPopupBg ? ' fc-card-bg' : '' ?>" style="max-width:<?= $fcPopupWidth ?>px<?= $fcPopupBg ? ";background-image:linear-gradient(rgba(255,255,255,.93),rgba(255,255,255,.93)),url('" . e($fcPopupBg) . "')" : '' ?>">
+    <button class="fc-x" type="button" data-fc-close aria-label="Close popup">&times;</button>
+    <span class="fbadge">Enrolling Now</span>
+    <h3 class="ptitle" id="fcTitle"><?= e($featured['title']) ?><?php if (!empty($featured['tag_line'])): ?>, <span class="hl"><?= e($featured['tag_line']) ?></span><?php endif; ?></h3>
+    <?php if (!empty($featured['description'])): ?>
+      <p class="pdesc"><?= e($featured['description']) ?></p>
+    <?php endif; ?>
+    <?php
+      // same detail order and icons as the featured card on courses.php
+      $fcRows = [
+        ['calendar', $featured['duration'] ?? ''],
+        ['person',   $featured['eligibility'] ?: ($featured['level'] ?? '')],
+        ['book',     $featured['mode'] ?? ''],
+        ['card',     $featured['price'] ?? ''],
+        ['ticket',   $featured['seats_info'] ?? ''],
+      ];
+      $fcMeta = '';
+      foreach ($fcRows as [$fcIcon, $fcVal]) {
+        if ($fcVal !== '' && $fcVal !== null) {
+          $fcMeta .= '<span>' . icon($fcIcon) . ' ' . e($fcVal) . '</span>';
+        }
+      }
+    ?>
+    <?php if ($fcMeta): ?><div class="meta"><?= $fcMeta ?></div><?php endif; ?>
+    <div class="fcta">
+      <a class="btn btn-o" href="<?= e($fcPopupBtn1Link) ?>"><?= e($fcPopupBtn1Label) ?></a>
+      <a class="btn btn-l" href="<?= e($fcPopupBtn2Link) ?>"><?= e($fcPopupBtn2Label) ?></a>
+    </div>
+  </div>
+</div>
+<?php endif; ?>
+</main>
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

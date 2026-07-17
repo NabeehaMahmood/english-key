@@ -27,6 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mode = trim($_POST['mode'] ?? '');
         $scheduleInfo = trim($_POST['schedule_info'] ?? '');
         $highlights = trim($_POST['highlights'] ?? '');
+        $modules = trim($_POST['modules'] ?? '');
+        $programmeGroup = trim($_POST['programme_group'] ?? '');
         $seatsInfo = trim($_POST['seats_info'] ?? '');
         $accentColor = trim($_POST['accent_color'] ?? '');
         $sortOrder = (int)($_POST['sort_order'] ?? 0);
@@ -43,20 +45,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             redirectWithMessage('courses.php', $e->getMessage(), 'error');
         }
 
-        $fields = [$title, $slug, $category, $tagLine, $description, $duration, $level, $price, $eligibility, $mode, $scheduleInfo, $highlights, $seatsInfo, $accentColor, $sortOrder, $isActive];
-
         if ($id > 0) {
             if ($image) {
-                $db->prepare('UPDATE courses SET title=?, slug=?, category=?, tag_line=?, description=?, image=?, duration=?, level=?, price=?, eligibility=?, mode=?, schedule_info=?, highlights=?, seats_info=?, accent_color=?, sort_order=?, is_active=? WHERE id=?')
-                   ->execute([$title, $slug, $category, $tagLine, $description, $image, $duration, $level, $price, $eligibility, $mode, $scheduleInfo, $highlights, $seatsInfo, $accentColor, $sortOrder, $isActive, $id]);
+                $db->prepare('UPDATE courses SET title=?, slug=?, category=?, programme_group=?, tag_line=?, description=?, image=?, duration=?, level=?, price=?, eligibility=?, mode=?, schedule_info=?, highlights=?, modules=?, seats_info=?, accent_color=?, sort_order=?, is_active=? WHERE id=?')
+                   ->execute([$title, $slug, $category, $programmeGroup, $tagLine, $description, $image, $duration, $level, $price, $eligibility, $mode, $scheduleInfo, $highlights, $modules, $seatsInfo, $accentColor, $sortOrder, $isActive, $id]);
             } else {
-                $db->prepare('UPDATE courses SET title=?, slug=?, category=?, tag_line=?, description=?, duration=?, level=?, price=?, eligibility=?, mode=?, schedule_info=?, highlights=?, seats_info=?, accent_color=?, sort_order=?, is_active=? WHERE id=?')
-                   ->execute([$title, $slug, $category, $tagLine, $description, $duration, $level, $price, $eligibility, $mode, $scheduleInfo, $highlights, $seatsInfo, $accentColor, $sortOrder, $isActive, $id]);
+                $db->prepare('UPDATE courses SET title=?, slug=?, category=?, programme_group=?, tag_line=?, description=?, duration=?, level=?, price=?, eligibility=?, mode=?, schedule_info=?, highlights=?, modules=?, seats_info=?, accent_color=?, sort_order=?, is_active=? WHERE id=?')
+                   ->execute([$title, $slug, $category, $programmeGroup, $tagLine, $description, $duration, $level, $price, $eligibility, $mode, $scheduleInfo, $highlights, $modules, $seatsInfo, $accentColor, $sortOrder, $isActive, $id]);
             }
             redirectWithMessage('courses.php', 'Course updated.');
         } else {
-            $db->prepare('INSERT INTO courses (title, slug, category, tag_line, description, image, duration, level, price, eligibility, mode, schedule_info, highlights, seats_info, accent_color, sort_order, is_active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
-               ->execute([$title, $slug, $category, $tagLine, $description, $image, $duration, $level, $price, $eligibility, $mode, $scheduleInfo, $highlights, $seatsInfo, $accentColor, $sortOrder, $isActive]);
+            $db->prepare('INSERT INTO courses (title, slug, category, programme_group, tag_line, description, image, duration, level, price, eligibility, mode, schedule_info, highlights, modules, seats_info, accent_color, sort_order, is_active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
+               ->execute([$title, $slug, $category, $programmeGroup, $tagLine, $description, $image, $duration, $level, $price, $eligibility, $mode, $scheduleInfo, $highlights, $modules, $seatsInfo, $accentColor, $sortOrder, $isActive]);
             redirectWithMessage('courses.php', 'Course added.');
         }
     }
@@ -90,6 +90,9 @@ $courses = $db->query('SELECT * FROM courses ORDER BY category, sort_order, id')
   <label>Title
     <input type="text" name="title" value="<?= e($editing['title'] ?? '') ?>" required>
   </label>
+  <label>Programme Group (Seasonal Programme only - groups courses into an accordion on the Courses page, e.g. "Full Syllabus", "Exam Prep"; leave blank to fall back to a single "Programmes" group)
+    <input type="text" name="programme_group" value="<?= e($editing['programme_group'] ?? '') ?>">
+  </label>
   <label>Tag Line (short label under the title, e.g. tags separated by " - ", or a subtitle)
     <input type="text" name="tag_line" value="<?= e($editing['tag_line'] ?? '') ?>">
   </label>
@@ -111,11 +114,14 @@ $courses = $db->query('SELECT * FROM courses ORDER BY category, sort_order, id')
   <label>Mode
     <input type="text" name="mode" value="<?= e($editing['mode'] ?? '') ?>" placeholder="e.g. Online via Zoom">
   </label>
-  <label>Schedule Info (free text, e.g. "Starts ... - Ends ... - Mon-Fri - 7-9 PM")
+  <label>Schedule Info (Featured course detail grid - "Label:Value" pairs separated by "|", e.g. "Starts:06 July 2026|Ends:31 July 2026|Schedule:Monday-Friday|Time:07:00-09:00 PM (PKT)|Sessions:20 live, 2 hours each". Plain free text still works and shows as a single cell.)
     <input type="text" name="schedule_info" value="<?= e($editing['schedule_info'] ?? '') ?>">
   </label>
   <label>Highlights (one bullet per line)
     <textarea name="highlights" rows="4"><?= e($editing['highlights'] ?? '') ?></textarea>
+  </label>
+  <label>Curriculum Modules (Featured course only, optional - blocks of "Label|Title|bullet one&#10;bullet two", separate blocks with a line containing only "---")
+    <textarea name="modules" rows="5"><?= e($editing['modules'] ?? '') ?></textarea>
   </label>
   <label>Seats Info
     <input type="text" name="seats_info" value="<?= e($editing['seats_info'] ?? '') ?>" placeholder="e.g. Limited seats">

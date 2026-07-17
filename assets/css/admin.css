@@ -27,6 +27,130 @@
 
 .admin-content { flex: 1; padding: 30px; max-width: 1000px; }
 
+/* ============================================================
+   Tabbed section navigation (Homepage Content / Stats / Testimonials only).
+   Everything below is scoped under .admin-tabs-page so it cannot affect
+   any other admin screen. Clicking a tab shows only that panel; see
+   assets/js/admin.js for the activation logic.
+   ============================================================ */
+.admin-tabs-page h1 {
+  margin: 0 0 4px;
+  font-size: 1.55rem;
+  color: #111827;
+}
+.admin-page-intro {
+  color: #6b7280;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin: 0 0 22px;
+  max-width: 680px;
+}
+
+/* .admin-tabbar is the top-level segmented control (sticky);
+   .admin-tabbar-nested is the smaller variant used inside a merged
+   section (e.g. Why Us Cards, Testimonial Categories). */
+.admin-tabs-page .admin-tabbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  background: #e7e9ec;
+  border: 1px solid #dcdee2;
+  border-radius: 12px;
+  padding: 5px;
+  margin-bottom: 26px;
+  box-shadow: 0 1px 2px rgba(16, 24, 32, 0.05);
+}
+.admin-tabs-page .admin-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 14px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #5b6472;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+.admin-tabs-page .admin-tab .tab-icon { width: 15px; height: 15px; flex-shrink: 0; opacity: 0.7; }
+.admin-tabs-page .admin-tab:hover { background: #f1f2f4; color: #1f2937; }
+.admin-tabs-page .admin-tab.active {
+  background: #fff;
+  color: #1f6b45;
+  box-shadow: 0 1px 3px rgba(16, 24, 32, 0.12), 0 0 0 1px rgba(47, 111, 79, 0.15);
+}
+.admin-tabs-page .admin-tab.active .tab-icon { opacity: 1; color: #2f6f4f; }
+.admin-tabs-page .admin-tab .tab-count {
+  background: #eef0f2;
+  color: #5b6472;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 999px;
+  line-height: 1.5;
+}
+.admin-tabs-page .admin-tab.active .tab-count { background: #e4f2ea; color: #1f6b45; }
+
+.admin-tabs-page .admin-tabbar-nested {
+  position: static;
+  background: #f2f3f5;
+  border: 1px solid #e5e7eb;
+  box-shadow: none;
+  padding: 4px;
+  gap: 4px;
+  margin: 0 0 20px;
+}
+.admin-tabs-page .admin-tabbar-nested .admin-tab { padding: 7px 13px; font-size: 0.82rem; }
+
+.admin-tabpanel[hidden], .admin-tabpanel-nested[hidden] { display: none; }
+
+.admin-tabs-page .admin-section-card {
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 30px;
+}
+.admin-tabs-page .admin-section-card > h2:first-child { margin-top: 0; }
+
+.admin-tabs-page .admin-tabpanel h2,
+.admin-tabs-page .admin-tabpanel-nested h2,
+.admin-tabs-page .admin-section-card h2 {
+  font-size: 1.15rem;
+  color: #1f2937;
+  margin-top: 0;
+}
+
+/* Instructional callouts inside a tab (e.g. "managed elsewhere" hints),
+   replacing plain <p> notes with a more scannable, on-brand box. */
+.admin-note {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: #f3f8f5;
+  border: 1px solid #dcebe3;
+  border-left: 3px solid #2f6f4f;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 0 0 18px;
+  font-size: 0.86rem;
+  color: #374151;
+  line-height: 1.55;
+  max-width: 640px;
+}
+.admin-note .note-icon { width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px; color: #2f6f4f; }
+.admin-note a { font-weight: 600; }
+.admin-note p { margin: 0; }
+.admin-note p + p { margin-top: 6px; }
+
 .admin-form {
   display: flex;
   flex-direction: column;
