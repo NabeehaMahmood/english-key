@@ -2,66 +2,111 @@
 require_once __DIR__ . '/includes/header.php';
 
 $db = getDb();
-$featured = $db->query("SELECT * FROM courses WHERE category = 'featured' AND is_active = 1 ORDER BY sort_order LIMIT 1")->fetch();
+
+// B1: the LIMIT 1 is gone - every active featured course is rendered.
+$featured = $db->query("SELECT * FROM courses WHERE category = 'featured' AND is_active = 1 ORDER BY sort_order")->fetchAll();
 $subjects = $db->query("SELECT * FROM courses WHERE category = 'subject' AND is_active = 1 ORDER BY sort_order")->fetchAll();
 $programmes = $db->query("SELECT * FROM courses WHERE category = 'programme' AND is_active = 1 ORDER BY sort_order")->fetchAll();
 $testimonials = $db->query('SELECT * FROM testimonials WHERE is_active = 1 ORDER BY sort_order LIMIT 6')->fetchAll();
 
 $whatsapp = getSetting('whatsapp_number');
 $howTo = getContentBlock('courses', 'how_to_enrol_steps');
-$terms = getContentBlock('courses', 'terms_conditions');
-$bankName = getSetting('bank_name');
-$bankTitle = getSetting('bank_title');
-$bankIban = getSetting('bank_iban');
-$easypaisaName = getSetting('easypaisa_name');
-$easypaisaNumber = getSetting('easypaisa_number');
 $googleUrl = getSetting('google_reviews_url');
 $googleRating = getSetting('google_rating');
 $googleCount = getSetting('google_review_count');
+
+/**
+ * One detail order used everywhere a featured course's meta chips appear -
+ * Duration -> Level/Eligibility -> Mode -> Price -> Seats.
+ */
+function featuredMeta(array $c): string
+{
+    $rows = [
+        ['meta-calendar', $c['duration'] ?? ''],
+        ['meta-person',   $c['eligibility'] ?: ($c['level'] ?? '')],
+        ['meta-mode',     $c['mode'] ?? ''],
+        ['meta-price',    $c['price'] ?? ''],
+        ['meta-seats',    $c['seats_info'] ?? ''],
+    ];
+    $out = '';
+    foreach ($rows as [$ic, $val]) {
+        if ($val !== '' && $val !== null) {
+            $out .= '<span>' . icon($ic, 'icon') . ' ' . e($val) . '</span>';
+        }
+    }
+    return $out ? '<div class="meta">' . $out . '</div>' : '';
+}
 ?>
 
 <div class="phero">
-  <div class="wrap reveal">
-    <div class="kick">Courses</div>
+  <div class="wrap reveal" data-anim="scale-in">
     <h1>Built around the FBISE syllabus, <span class="hl">nothing wasted.</span></h1>
     <p class="sub">Complete preparation for Classes 9-12 across four subjects, plus seasonal intensives, bootcamps and crash courses.</p>
   </div>
 </div>
 
-<?php if ($featured): ?>
-<section>
+<nav class="jumpnav wrap reveal" aria-label="Section navigation">
+  <span class="jumpnav-label"><?= icon('list', 'icon') ?> On this page</span>
+  <?php if ($featured): ?><a href="#featured"><span>Featured Courses</span></a><?php endif; ?>
+  <?php if ($subjects): ?><a href="#subjects"><span>Core Subjects</span></a><?php endif; ?>
+  <?php if ($programmes): ?><a href="#programmes"><span>Programmes</span></a><?php endif; ?>
+  <a href="#enrol"><span>How to Enrol</span></a>
+</nav>
+
+<?php if ($featured):
+  $primaryFeatured = $featured[0];
+?>
+<section id="featured">
   <div class="wrap">
     <div class="reveal">
       <div class="kick">Featured, Enrolling Now</div>
-      <h2 class="t"><?= e($featured['title']) ?>, <span class="hl"><?= e($featured['tag_line']) ?></span></h2>
-      <p class="sub"><?= e($featured['description']) ?></p>
+      <h2 class="t" style="max-width:32ch">
+        <?= e($primaryFeatured['title']) ?><?php if ($primaryFeatured['tag_line']): ?>,<br><span class="hl-mark"><?= e($primaryFeatured['tag_line']) ?></span><?php endif; ?>
+      </h2>
+      <?php if ($primaryFeatured['description']): ?>
+        <p style="margin-top:14px;color:var(--muted);font-size:16.5px;max-width:56ch"><?= e($primaryFeatured['description']) ?></p>
+      <?php endif; ?>
     </div>
-    <div class="g2 reveal">
-      <div class="card">
-        <?php if ($featured['schedule_info']): ?>
-          <div class="detgrid">
-            <?php foreach (explode(' - ', $featured['schedule_info']) as $part): ?>
-              <div class="det"><b><?= e($part) ?></b></div>
-            <?php endforeach; ?>
+    <div class="g2 reveal" style="margin-top:30px">
+      <?php foreach ($featured as $i => $f): ?>
+        <div class="card fcard">
+          <span class="fbadge">Enrolling Now</span>
+          <h3 class="ptitle"><?= e($f['title']) ?><?php if ($f['tag_line']): ?>, <span class="hl"><?= e($f['tag_line']) ?></span><?php endif; ?></h3>
+          <?php if ($f['description']): ?><p class="pdesc"><?= e($f['description']) ?></p><?php endif; ?>
+          <?= featuredMeta($f) ?>
+          <?php if ($f['schedule_info'] || $f['highlights']): ?>
+            <button type="button" class="btn btn-l fdetails-toggle" data-target="fdetails-<?= (int)$f['id'] ?>" aria-expanded="false">
+              View Details <span class="chev">&#9660;</span>
+            </button>
+            <div class="fdetails" id="fdetails-<?= (int)$f['id'] ?>">
+              <?php if ($f['schedule_info']): ?>
+                <div class="detgrid">
+                  <?php foreach (explode(' - ', $f['schedule_info']) as $part): ?>
+                    <div class="det"><b><?= e(trim($part)) ?></b></div>
+                  <?php endforeach; ?>
+                </div>
+              <?php endif; ?>
+              <?php if ($f['highlights']): ?>
+                <h4 style="font-size:15px;margin:16px 0 6px">Course highlights</h4>
+                <?php foreach (explode("\n", $f['highlights']) as $h): if (trim($h) === '') continue; ?>
+                  <div class="check"><?= e(trim($h)) ?></div>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </div>
+          <?php endif; ?>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:18px">
+            <a class="btn btn-o" href="https://wa.me/<?= e($whatsapp) ?>" target="_blank" rel="noopener">Enrol on WhatsApp</a>
+            <a class="btn btn-l" href="contact.php">Ask a Question</a>
           </div>
-        <?php endif; ?>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px">
-          <a class="btn btn-o" href="https://wa.me/<?= e($whatsapp) ?>" target="_blank" rel="noopener">Enrol on WhatsApp</a>
-          <a class="btn btn-l" href="contact.php">Ask a Question</a>
         </div>
-        <?php if ($featured['seats_info']): ?><p style="color:var(--orange);font-weight:700;font-size:13.5px"><?= e($featured['seats_info']) ?></p><?php endif; ?>
-      </div>
-      <div class="card">
-        <h3 style="font-size:20px;margin-bottom:16px">Course highlights</h3>
-        <?php foreach (explode("\n", (string)$featured['highlights']) as $h): ?><div class="check"><?= e($h) ?></div><?php endforeach; ?>
-      </div>
+      <?php endforeach; ?>
     </div>
   </div>
 </section>
 <?php endif; ?>
 
 <?php if ($subjects): ?>
-<section class="soft">
+<section class="soft" id="subjects">
   <div class="wrap">
     <div class="reveal">
       <div class="kick">Core Subjects</div>
@@ -70,11 +115,11 @@ $googleCount = getSetting('google_review_count');
     <div class="g2 reveal" style="margin-top:30px">
       <?php foreach ($subjects as $s): ?>
         <div class="card scard" style="--c:<?= e($s['accent_color']) ?>">
-          <div class="num" style="color:<?= e($s['accent_color']) ?>">0<?= (int)$s['sort_order'] ?>, <?= e($s['level']) ?></div>
+          <div class="num">0<?= (int)$s['sort_order'] ?>, <?= e($s['level']) ?></div>
           <h3><?= e($s['title']) ?></h3>
           <p><?= e($s['description']) ?></p>
           <?php if ($s['tag_line']): ?>
-            <div class="tags"><?php foreach (explode(' - ', $s['tag_line']) as $tag): ?><span class="tag"><?= e($tag) ?></span><?php endforeach; ?></div>
+            <div class="tags"><?php foreach (explode(' - ', $s['tag_line']) as $tag): ?><span class="tag"><?= e(trim($tag)) ?></span><?php endforeach; ?></div>
           <?php endif; ?>
         </div>
       <?php endforeach; ?>
@@ -83,33 +128,52 @@ $googleCount = getSetting('google_review_count');
 </section>
 <?php endif; ?>
 
-<?php if ($programmes): ?>
-<section>
+<?php if ($programmes):
+  // Bucket programmes by their admin-assigned group (courses.programme_group_id
+  // -> programme_groups table). Ungrouped rows fall into a generic "Other
+  // Programmes" bucket rather than being hidden - nothing hardcoded, nothing lost.
+  $byGroup = [];
+  foreach ($programmes as $p) {
+      $byGroup[(int)($p['programme_group_id'] ?? 0)][] = $p;
+  }
+  $groupIds = array_filter(array_keys($byGroup));
+  $groups = [];
+  if ($groupIds) {
+      $placeholders = implode(',', array_fill(0, count($groupIds), '?'));
+      $stmt = $db->prepare("SELECT * FROM programme_groups WHERE id IN ($placeholders) AND is_active = 1 ORDER BY sort_order, name");
+      $stmt->execute($groupIds);
+      $groups = $stmt->fetchAll();
+  }
+  // First group gets the orange accent (soonest/most prominent), the rest navy -
+  // matches the approved design's own pattern rather than a full colour rotation.
+?>
+<section id="programmes">
   <div class="wrap">
     <div class="reveal">
       <div class="kick">Seasonal &amp; Intensive</div>
       <h2 class="t">Programmes for every stage of the year.</h2>
     </div>
-    <div class="g3 reveal" style="margin-top:30px">
-      <?php foreach ($programmes as $p): ?>
-        <div class="card pcard">
-          <?php if ($p['tag_line']): ?><span class="ntag"><?= e($p['tag_line']) ?></span><?php endif; ?>
-          <h3 class="ptitle"><?= e($p['title']) ?></h3>
-          <p class="pdesc"><?= e($p['description']) ?></p>
-          <?php if ($p['highlights']): ?>
-            <ul class="pfeat"><?php foreach (explode("\n", $p['highlights']) as $h): ?><li><?= e($h) ?></li><?php endforeach; ?></ul>
-          <?php endif; ?>
-          <div class="meta">
-            <?php if ($p['eligibility']): ?><span><?= icon('person') ?> <?= e($p['eligibility']) ?></span><?php endif; ?>
-            <?php if ($p['duration']): ?><span><?= icon('calendar') ?> <?= e($p['duration']) ?></span><?php endif; ?>
-            <?php if ($p['price']): ?><span><?= icon('card') ?> <?= e($p['price']) ?></span><?php endif; ?>
-            <?php if ($p['seats_info']): ?><span><?= icon('ticket') ?> <?= e($p['seats_info']) ?></span><?php endif; ?>
-          </div>
-        </div>
+    <div class="pgroups reveal" style="margin-top:30px">
+      <?php $gi = 0; foreach ($groups as $g):
+        if (empty($byGroup[$g['id']])) continue;
+        $items = $byGroup[$g['id']];
+        $accent = $gi === 0 ? 'var(--orange)' : 'var(--navy)';
+        $gi++;
+      ?>
+        <?php require __DIR__ . '/includes/programme-group.php'; ?>
       <?php endforeach; ?>
+
+      <?php if (!empty($byGroup[0])):
+        $g = ['id' => 0, 'name' => 'Other Programmes', 'description' => '', 'date_range' => '', 'icon_key' => 'folder'];
+        $items = $byGroup[0];
+        $accent = $gi === 0 ? 'var(--orange)' : 'var(--navy)';
+        $gi++;
+      ?>
+        <?php require __DIR__ . '/includes/programme-group.php'; ?>
+      <?php endif; ?>
     </div>
     <div class="notebar reveal" style="margin-top:26px">
-      <?= icon('calendar', 'icon notebar-icon') ?>
+      <?= icon('meta-calendar', 'icon notebar-icon') ?>
       <p>Seats are limited each term to protect teaching quality. Message us on WhatsApp with your class and subjects for the current schedule and fees.</p>
       <a class="btn btn-o" href="https://wa.me/<?= e($whatsapp) ?>" target="_blank" rel="noopener">Ask on WhatsApp</a>
     </div>
@@ -117,75 +181,63 @@ $googleCount = getSetting('google_review_count');
 </section>
 <?php endif; ?>
 
-<section class="soft">
+<section class="soft" id="enrol">
   <div class="wrap">
     <div class="reveal">
       <div class="kick">How to Enrol</div>
       <h2 class="t">Four simple steps to your seat.</h2>
     </div>
     <?php if ($howTo['content']): ?>
-    <div class="g4 reveal" style="margin-top:30px">
+    <div class="stepper reveal" style="margin-top:36px">
       <?php $n = 0; foreach (explode("\n", $howTo['content']) as $line):
+        if (trim($line) === '') continue;
         [$title, $desc] = array_pad(explode('|', $line, 2), 2, ''); $n++;
         $title = preg_replace('/^\d+\.\s*/', '', $title); ?>
-        <div class="mcard">
-          <div class="mno">0<?= $n ?></div>
-          <h3><?= e($title) ?></h3>
-          <p><?= e($desc) ?></p>
+        <div class="step">
+          <div class="step-circle">0<?= $n ?></div>
+          <h3><?= e(trim($title)) ?></h3>
+          <p><?= e(trim($desc)) ?></p>
         </div>
       <?php endforeach; ?>
     </div>
     <?php endif; ?>
-    <div class="g2 reveal" style="margin-top:22px">
-      <div class="card">
-        <h3 style="font-size:19px;margin-bottom:16px;display:flex;align-items:center;gap:8px"><?= icon('card') ?> Payment details</h3>
-        <?php if ($bankIban): ?>
-        <div style="background:var(--bg);border-radius:12px;padding:16px 18px;margin-bottom:12px">
-          <b style="display:block;margin-bottom:4px"><?= e($bankName) ?></b>
-          <span style="font-size:14px;color:var(--muted)">Title: <?= e($bankTitle) ?><br>IBAN: <?= e($bankIban) ?></span>
-        </div>
-        <?php endif; ?>
-        <?php if ($easypaisaNumber): ?>
-        <div style="background:var(--bg);border-radius:12px;padding:16px 18px;margin-bottom:12px">
-          <b style="display:block;margin-bottom:4px">EasyPaisa</b>
-          <span style="font-size:14px;color:var(--muted)">Name: <?= e($easypaisaName) ?><br>Number: <?= e($easypaisaNumber) ?></span>
-        </div>
-        <?php endif; ?>
-        <p style="font-size:13.5px;color:var(--muted)">Send your payment screenshot on WhatsApp to activate your seat the same day.</p>
-      </div>
-      <?php if ($terms['content']): ?>
-      <div class="card">
-        <h3 style="font-size:19px;margin-bottom:16px">Terms &amp; conditions</h3>
-        <?php foreach (explode("\n", $terms['content']) as $term): ?><div class="check"><?= e($term) ?></div><?php endforeach; ?>
-      </div>
-      <?php endif; ?>
-    </div>
   </div>
 </section>
 
-<?php if ($testimonials): ?>
+<?php if ($testimonials):
+  $ratingPct = $googleRating ? max(0, min(100, round(((float)$googleRating / 5) * 100))) : 0;
+?>
 <section>
   <div class="wrap">
     <div class="reveal">
       <div class="kick">Student Reviews</div>
       <h2 class="t">What students say, by subject &amp; course.</h2>
-      <?php if ($googleUrl): ?><p class="sub"><b style="color:var(--orange)"><?= icon('star', 'icon star-icon') ?> <?= e($googleRating) ?></b> from <?= e($googleCount) ?> genuine Google reviews.</p><?php endif; ?>
+      <?php if ($googleRating && $googleCount): ?>
+      <div class="rating-badge reveal" style="--pct:<?= (int)$ratingPct ?>%">
+        <div class="rnum"><span class="count-num" data-target="<?= e($googleRating) ?>" data-decimals="1">0.0</span></div>
+        <div class="stars-wrap">
+          <div class="stars-base"><?= str_repeat(icon('star-sm', 'icon'), 5) ?></div>
+          <div class="stars-fill"><?= str_repeat(icon('star-sm', 'icon'), 5) ?></div>
+        </div>
+        <div class="rating-copy">based on <span class="count-num" data-target="<?= (int)$googleCount ?>">0</span> genuine Google reviews</div>
+      </div>
+      <?php endif; ?>
     </div>
-    <div class="g3">
+    <div class="reviews-grid reveal">
       <?php foreach ($testimonials as $t): ?>
-        <div class="rcard reveal">
-          <?php if ($t['category']): ?><span class="ntag"><?= e($t['category']) ?></span><?php endif; ?>
-          <p>&ldquo;<?= e($t['quote']) ?>&rdquo;</p>
-          <div><b><?= e($t['name']) ?></b><br><span><?= e($t['source_label']) ?></span></div>
+        <div class="rcard-premium">
+          <div class="rstars"><?= str_repeat(icon('star-sm', 'icon'), 5) ?></div>
+          <p class="rtext"><?= e($t['quote']) ?></p>
+          <div class="rfoot"><div><b><?= e($t['name']) ?></b><span><?= e($t['source_label']) ?></span></div></div>
         </div>
       <?php endforeach; ?>
     </div>
-    <?php if ($googleUrl): ?>
-      <p style="margin-top:32px" class="reveal"><a class="btn btn-n" href="<?= e($googleUrl) ?>" target="_blank" rel="noopener">See Reviews on Google</a></p>
-    <?php endif; ?>
+    <p style="margin-top:36px;text-align:center;display:flex;gap:14px;justify-content:center;flex-wrap:wrap" class="reveal">
+      <?php if ($googleUrl): ?><a class="btn btn-n" href="<?= e($googleUrl) ?>" target="_blank" rel="noopener">See Reviews on Google <span aria-hidden="true">&rarr;</span></a><?php endif; ?>
+      <a class="btn btn-l" href="testimonials.php">Read All Reviews <span aria-hidden="true">&rarr;</span></a>
+    </p>
   </div>
 </section>
 <?php endif; ?>
 
-<?php require_once __DIR__ . '/includes/cta-banner.php'; ?>
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
