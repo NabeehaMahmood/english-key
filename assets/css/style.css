@@ -76,6 +76,26 @@ a:hover { text-decoration: underline; }
 
 /* ---------- Hero / page hero ---------- */
 .hero, .phero { padding: 70px 0 50px; background: linear-gradient(180deg, var(--orange-soft), #fff); }
+
+/* Blog hero: dark navy variant matching resources/blog.html */
+.phero-dark {
+  background:
+    radial-gradient(600px 380px at 88% 0%, rgba(255,255,255,.07), transparent 60%),
+    linear-gradient(140deg, var(--navy-2), #17204F);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.phero-dark::after {
+  content: ""; position: absolute; right: -90px; top: -70px; width: 380px; height: 330px;
+  background: rgba(122,63,208,.22); border-radius: 70px; transform: rotate(22deg);
+}
+.phero-dark h1 { color: #fff; }
+.phero-dark .sub { color: #DCE3F8; }
+.phero-dark .kick { color: #fff; }
+.phero-dark .hl { background: var(--orange); color: #fff; padding: .04em .24em; border-radius: 6px; }
+.phero-dark .back-blog { color: #C9D3EE; }
+.phero-dark .back-blog:hover { color: #fff; }
 .hg { display: grid; grid-template-columns: 1.2fr 1fr; gap: 50px; align-items: center; }
 .kick {
   display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 800;
@@ -213,10 +233,66 @@ section.dark .sub { color: #b9c2de; }
 .ncard2 .ntag { display: inline-block; background: var(--orange-soft); color: var(--orange); font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px; margin-bottom: 10px; }
 .vlink { font-weight: 700; }
 
-.bcard2 { border: 1.5px solid var(--line); border-radius: 14px; overflow: hidden; background: #fff; }
-.bhead { background: var(--orange-soft); padding: 14px 18px; }
-.otag { display: inline-block; background: var(--navy); color: #fff; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 999px; }
-.bbody { padding: 18px; }
+/* ---------- Blog listing ---------- */
+.blist { display: flex; flex-direction: column; max-width: 800px; margin: 0 auto; }
+.barticle {
+  display: block; padding: 30px 6px; border-bottom: 1px solid var(--line);
+  text-decoration: none; color: inherit; transition: padding-left .2s ease;
+}
+.barticle:first-child { padding-top: 6px; }
+.barticle:hover { padding-left: 10px; text-decoration: none; }
+.barticle-meta {
+  display: flex; align-items: center; gap: 9px; margin-bottom: 10px;
+  font-family: 'Manrope', sans-serif; font-size: 12.5px; font-weight: 800;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--orange);
+}
+.barticle-meta .bdot { color: var(--line); }
+.barticle-meta .bmin { color: var(--muted); text-transform: none; font-weight: 600; letter-spacing: 0; font-size: 13px; }
+.barticle h3 { font-size: 21px; margin-bottom: 8px; color: var(--navy); }
+.barticle p { color: var(--muted); font-size: 15px; line-height: 1.6; margin-bottom: 14px; max-width: 620px; }
+.barticle-cta { display: inline-flex; align-items: center; gap: 6px; font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 14px; color: var(--navy); transition: gap .2s ease; }
+.barticle:hover .barticle-cta { gap: 10px; color: var(--orange); }
+
+/* ---------- Single blog post ---------- */
+
+/* Back breadcrumb */
+.back-blog {
+  display: flex; width: fit-content; align-items: center; gap: 4px;
+  font-size: 13.5px; font-weight: 700; color: var(--orange); margin-bottom: 16px; text-decoration: none;
+}
+.back-blog:hover { text-decoration: none; opacity: .8; }
+
+/* Hero featured image */
+.post-hero-img { border-radius: 16px; overflow: hidden; margin-top: 8px; margin-bottom: 0; }
+.post-hero-img img { width: 100%; max-height: 480px; object-fit: cover; display: block; }
+
+/* Byline row */
+.abyline { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13.5px; margin-bottom: 8px; max-width: 740px; margin-left: auto; margin-right: auto; }
+
+/* Article body */
+.article-body { max-width: 740px; margin: 0 auto; }
+.article-body h2 { font-size: 25px; margin: 46px 0 16px; padding-top: 26px; border-top: 1px solid var(--line); }
+.article-body h2:first-child { border-top: 0; padding-top: 0; margin-top: 0; }
+.article-body h3 { font-size: 18.5px; margin: 26px 0 10px; color: var(--navy); }
+.article-body h4 { font-size: 16px; margin: 20px 0 8px; color: var(--navy); }
+.article-body p { color: var(--text); font-size: 16px; line-height: 1.75; margin-bottom: 16px; }
+.article-body ul, .article-body ol { margin: 0 0 18px 0; padding-left: 22px; }
+.article-body[dir="rtl"] ul, .article-body ul[dir="rtl"], .article-body ol[dir="rtl"] { padding-left: 0; padding-right: 22px; }
+.article-body li { color: var(--text); font-size: 16px; line-height: 1.7; margin-bottom: 8px; }
+.article-body strong { color: var(--navy); }
+.article-body blockquote { color: var(--muted); font-style: italic; font-size: 15.5px; border-left: 3px solid var(--orange); padding: 2px 0 2px 16px; margin: 0 0 18px; }
+.article-body p.ex { color: var(--muted); font-style: italic; font-size: 15.5px; border-left: 3px solid var(--orange); padding: 2px 0 2px 16px; margin: -6px 0 16px; }
+.article-body p.ex[dir="rtl"] { border-left: 0; border-right: 3px solid var(--orange); padding: 2px 16px 2px 0; }
+.article-body [dir="rtl"] { text-align: right; font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', Tahoma, sans-serif; line-height: 2.1; }
+.article-body img { max-width: 100%; border-radius: 8px; margin: 6px 0 18px; }
+.article-body table { width: 100%; border-collapse: collapse; margin: 0 0 18px; }
+.article-body th, .article-body td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; font-size: 15px; }
+.atable-wrap { overflow-x: auto; margin: 8px 0 22px; border: 1px solid var(--line); border-radius: 12px; }
+.atable { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width: 480px; margin: 0; }
+.atable th { background: var(--navy); color: #fff; text-align: left; padding: 12px 14px; font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: .02em; border: 0; }
+.atable th strong { color: inherit; }
+.atable td { padding: 11px 14px; border: 0; border-top: 1px solid var(--line); color: var(--text); }
+.atable tbody tr:nth-child(even) { background: var(--bg); }
 
 /* ---------- CTA banner ---------- */
 .cta { background: var(--navy); color: #fff; }

@@ -14,6 +14,27 @@ function slugify(string $text): string
     return trim($text, '-');
 }
 
+/**
+ * Appends -2, -3, etc. to $baseSlug until it no longer collides with an
+ * existing blog_posts row (other than $excludeId, so re-saving a post under
+ * its own unchanged title doesn't shift its slug).
+ */
+function uniqueBlogSlug(string $baseSlug, int $excludeId = 0): string
+{
+    $db = getDb();
+    $slug = $baseSlug;
+    $suffix = 2;
+    while (true) {
+        $stmt = $db->prepare('SELECT id FROM blog_posts WHERE slug = ? AND id != ?');
+        $stmt->execute([$slug, $excludeId]);
+        if (!$stmt->fetch()) {
+            return $slug;
+        }
+        $slug = $baseSlug . '-' . $suffix;
+        $suffix++;
+    }
+}
+
 function getSetting(string $key, string $default = ''): string
 {
     static $cache = null;
@@ -78,6 +99,53 @@ function handleImageUpload(string $fieldName, string $subdir): ?string
     }
 
     return 'assets/uploads/' . $subdir . '/' . $filename;
+}
+
+/**
+ * Whitelist-sanitizes rich blog content HTML (typed or pasted into the
+ * TinyMCE editor) with HTMLPurifier. Only structural/semantic tags are kept;
+ * inline styles and classes are stripped so every post renders consistently
+ * through the site's own .article-body CSS rather than carrying over
+ * whatever fonts/colors the source of a paste happened to apply.
+ *
+ * `dir` (on block tags) and `class="ex"` (on `p`) are the two exceptions:
+ * the site's Urdu posts rely on dir="rtl" for right-to-left rendering, and
+ * "worked example" callouts rely on class="ex" — both used throughout the
+ * seeded posts in sql/schema.sql, so stripping them would silently break
+ * that formatting the next time such a post is edited and re-saved.
+ */
+function sanitizeBlogHtml(?string $html): string
+{
+    if ($html === null || trim($html) === '') {
+        return '';
+    }
+
+    $cacheDir = sys_get_temp_dir() . '/htmlpurifier-cache';
+    if (!is_dir($cacheDir)) {
+        mkdir($cacheDir, 0775, true);
+    }
+
+    $config = HTMLPurifier_Config::createDefault();
+    $config->set('Cache.SerializerPath', $cacheDir);
+    $config->set('HTML.Allowed', 'p[dir|class],br,strong,b,em,i,u,h2[dir],h3[dir],h4[dir],blockquote,ul[dir],ol[dir],li,a[href|target],img[src|alt|width|height],table,thead,tbody,tr,th,td,hr');
+    $config->set('Attr.AllowedClasses', ['ex']);
+    $config->set('HTML.TargetBlank', true);
+    $config->set('AutoFormat.RemoveEmpty', true);
+
+    $purifier = new HTMLPurifier($config);
+    return $purifier->purify($html);
+}
+
+/**
+ * Estimated reading time in minutes (~200 words/min). Splits on whitespace
+ * rather than str_word_count(), which only recognises Latin-script letters
+ * and would undercount Urdu/RTL posts to a handful of "words".
+ */
+function blogReadingMinutes(?string $htmlContent): int
+{
+    $text  = trim(strip_tags((string)$htmlContent));
+    $words = $text === '' ? [] : preg_split('/\s+/u', $text, -1, PREG_SPLIT_NO_EMPTY);
+    return max(1, (int)ceil(count($words) / 200));
 }
 
 /**
