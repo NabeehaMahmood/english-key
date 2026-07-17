@@ -13,6 +13,7 @@ $navItems = [
     'home-stats.php' => 'Homepage Stats',
     'page-content.php' => 'Page Content',
     'courses.php' => 'Courses',
+    'programme-groups.php' => 'Programme Groups',
     'teachers.php' => 'Our Team',
     'testimonials.php' => 'Testimonials',
     'blog.php' => 'Blog',

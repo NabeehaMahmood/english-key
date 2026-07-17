@@ -95,4 +95,5 @@ $achievers = $db->query('SELECT * FROM alumni WHERE is_active = 1 ORDER BY sort_
 <?php endif; ?>
 </main>
 <?php require_once __DIR__ . '/includes/cta-banner.php'; ?>
+
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

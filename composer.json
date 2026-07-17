@@ -1,0 +1,14 @@
+{
+    "name": "englishkeys/academy-site",
+    "description": "EnglishKeys Academy website",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.2",
+        "ezyang/htmlpurifier": "^4.17"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
+    }
+}

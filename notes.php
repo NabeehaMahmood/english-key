@@ -29,5 +29,4 @@ $notes = getDb()->query('SELECT * FROM notes WHERE is_active = 1 ORDER BY sort_o
   </div>
 </section>
 
-<?php require_once __DIR__ . '/includes/cta-banner.php'; ?>
 <?php require_once __DIR__ . '/includes/footer.php'; ?>
