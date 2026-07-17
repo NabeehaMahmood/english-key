@@ -116,49 +116,68 @@ $posts = $db->query('SELECT * FROM blog_posts ORDER BY COALESCE(published_at, cr
 </div>
 
 <div data-tab-panel="add">
-<form method="post" class="admin-form admin-form-wide">
+<?php
+// SEO fields are secondary to writing the post itself, so they're tucked into
+// a collapsed-by-default panel — but auto-expand it when editing a post that
+// already has any of them filled in, so nothing looks "lost".
+$hasSeoData = !empty($editing['meta_description']) || !empty($editing['primary_keyword'])
+    || !empty($editing['secondary_keywords']) || !empty($editing['target_audience']);
+?>
+<form method="post" class="admin-form admin-form-wide blog-editor">
   <?= csrfField() ?>
   <input type="hidden" name="action" value="save">
   <input type="hidden" name="id" value="<?= (int)($editing['id'] ?? 0) ?>">
 
-  <h2><?= $editing ? 'Edit Post' : 'Add Post' ?></h2>
-  <p class="hint">Every post is written to the same standard, in this order, so the site always renders it the same way: Title, Category, Meta Description, URL Slug, Primary Keyword, Secondary Keywords, Target Audience, then Content.</p>
+  <div class="blog-editor-main">
+    <h2><?= $editing ? 'Edit Post' : 'Add Post' ?></h2>
 
-  <label>Title
-    <input type="text" name="title" value="<?= e($editing['title'] ?? '') ?>" required>
-  </label>
-  <label>Category (e.g. Exam Technique, Grammar, Urdu, Board Updates)
-    <input type="text" name="category" value="<?= e($editing['category'] ?? '') ?>">
-  </label>
-  <label>Meta Description (the snippet shown in Google search results &mdash; leave blank to auto-generate from the content)
-    <textarea name="meta_description" rows="2" maxlength="300"><?= e($editing['meta_description'] ?? '') ?></textarea>
-  </label>
-  <p class="hint">Aim for about 150&ndash;160 characters.</p>
-  <label>URL Slug (leave blank to generate from the title)
-    <input type="text" name="slug" value="<?= e($editing['slug'] ?? '') ?>" placeholder="e.g. full-marks-paragraph-writing-fbise">
-  </label>
-  <p class="hint">This becomes the page's address: /blog/your-slug-here.</p>
-  <label>Primary Keyword
-    <input type="text" name="primary_keyword" value="<?= e($editing['primary_keyword'] ?? '') ?>" placeholder="the one phrase this post should rank for">
-  </label>
-  <label>Secondary Keywords (comma-separated)
-    <input type="text" name="secondary_keywords" value="<?= e($editing['secondary_keywords'] ?? '') ?>" placeholder="e.g. FBISE paragraph writing, SLO English marks">
-  </label>
-  <label>Target Audience
-    <input type="text" name="target_audience" value="<?= e($editing['target_audience'] ?? '') ?>" placeholder="e.g. FBISE SSC-I students preparing for boards">
-  </label>
-  <label>Excerpt (shown on the blog listing card &mdash; leave blank to auto-generate from the content)
-    <textarea name="excerpt" rows="2"><?= e($editing['excerpt'] ?? '') ?></textarea>
-  </label>
-  <label>Content (type directly, or paste text from elsewhere)
-    <textarea name="content" id="blog-content" rows="16"><?= e($editing['content'] ?? '') ?></textarea>
-  </label>
-
-  <div class="admin-form-actions">
-    <button type="submit" name="status" value="draft" class="btn-draft">Save Draft</button>
-    <button type="submit" name="status" value="published">Publish</button>
-    <?php if ($editing): ?><a href="blog.php" class="button-secondary">Cancel</a><?php endif; ?>
+    <label>Title
+      <input type="text" name="title" value="<?= e($editing['title'] ?? '') ?>" required>
+    </label>
+    <label>Content (type directly, or paste text from elsewhere)
+      <textarea name="content" id="blog-content" rows="16"><?= e($editing['content'] ?? '') ?></textarea>
+    </label>
   </div>
+
+  <aside class="blog-editor-sidebar">
+    <div class="blog-editor-panel">
+      <div class="admin-form-actions">
+        <button type="submit" name="status" value="draft" class="btn-draft">Save Draft</button>
+        <button type="submit" name="status" value="published">Publish</button>
+        <?php if ($editing): ?><a href="blog.php" class="button-secondary">Cancel</a><?php endif; ?>
+      </div>
+    </div>
+
+    <div class="blog-editor-panel">
+      <label>Category (e.g. Exam Technique, Grammar, Urdu, Board Updates)
+        <input type="text" name="category" value="<?= e($editing['category'] ?? '') ?>">
+      </label>
+      <label>URL Slug (leave blank to generate from the title)
+        <input type="text" name="slug" value="<?= e($editing['slug'] ?? '') ?>" placeholder="e.g. full-marks-paragraph-writing-fbise">
+      </label>
+      <p class="hint">Becomes the page address: /blog/your-slug-here.</p>
+      <label>Excerpt (shown on the blog listing card &mdash; leave blank to auto-generate)
+        <textarea name="excerpt" rows="3"><?= e($editing['excerpt'] ?? '') ?></textarea>
+      </label>
+    </div>
+
+    <details class="blog-editor-panel blog-seo-details"<?= $hasSeoData ? ' open' : '' ?>>
+      <summary>SEO details <span class="hint">(optional)</span></summary>
+      <label>Meta Description (Google search snippet &mdash; leave blank to auto-generate)
+        <textarea name="meta_description" rows="2" maxlength="300"><?= e($editing['meta_description'] ?? '') ?></textarea>
+      </label>
+      <p class="hint">Aim for about 150&ndash;160 characters.</p>
+      <label>Primary Keyword
+        <input type="text" name="primary_keyword" value="<?= e($editing['primary_keyword'] ?? '') ?>" placeholder="the one phrase this post should rank for">
+      </label>
+      <label>Secondary Keywords (comma-separated)
+        <input type="text" name="secondary_keywords" value="<?= e($editing['secondary_keywords'] ?? '') ?>" placeholder="e.g. FBISE paragraph writing, SLO English marks">
+      </label>
+      <label>Target Audience
+        <input type="text" name="target_audience" value="<?= e($editing['target_audience'] ?? '') ?>" placeholder="e.g. FBISE SSC-I students preparing for boards">
+      </label>
+    </details>
+  </aside>
 </form>
 </div>
 
@@ -219,11 +238,16 @@ $posts = $db->query('SELECT * FROM blog_posts ORDER BY COALESCE(published_at, cr
 <script>
 tinymce.init({
   selector: '#blog-content',
-  height: 460,
+  // Grows with the content instead of scrolling internally in a fixed-size
+  // box — the page itself is the only scroll region while writing, and
+  // Save Draft/Publish stay reachable via the sticky sidebar regardless of
+  // how long the post gets.
+  min_height: 320,
+  autoresize_bottom_margin: 24,
   menubar: false,
   branding: false,
   promotion: false,
-  plugins: 'lists link image table code',
+  plugins: 'lists link image table code autoresize',
   toolbar: 'blocks | bold italic underline | bullist numlist | blockquote link image | alignleft aligncenter alignright | removeformat | code',
   block_formats: 'Paragraph=p; Heading 2=h2; Heading 3=h3; Heading 4=h4; Quote=blockquote',
   valid_elements: 'p,br,strong/b,em/i,u,h2,h3,h4,blockquote,ul,ol,li,a[href|target],img[src|alt|width|height],table,thead,tbody,tr,th,td,hr',
