@@ -10,9 +10,14 @@ setup and the day-to-day Git workflow.
 | Tool | Why you need it | Get it |
 |---|---|---|
 | **Git** | To pull/push code from GitHub | [git-scm.com/downloads](https://git-scm.com/downloads) |
-| **XAMPP** (Apache + MySQL + PHP 8) | Runs the site locally exactly like the real hosting will | [apachefriends.org](https://www.apachefriends.org/) |
+| **XAMPP** (Apache + MySQL + PHP 8.2+) | Runs the site locally exactly like the real hosting will | [apachefriends.org](https://www.apachefriends.org/) |
+| **Composer** | Installs PHP packages the site depends on (e.g. the library that sanitizes blog post content) | [getcomposer.org/download](https://getcomposer.org/download/) |
 | **A code editor** | VS Code is recommended, but any editor works | [code.visualstudio.com](https://code.visualstudio.com/) |
 | **A GitHub account** | To clone the repo and open Pull Requests | [github.com](https://github.com/) |
+
+> The blog module needs PHP 8.2 or newer. XAMPP installers from 2024 onward
+> bundle a new-enough PHP by default — check with `php -v` (or the version
+> shown in XAMPP's control panel) if you're on an older XAMPP install.
 
 You do **not** need to install PHP or MySQL separately — XAMPP bundles
 both, plus phpMyAdmin (a web UI for the database) and Apache (the web
@@ -35,20 +40,32 @@ real too.
    directory, e.g. `C:\xampp\htdocs\academy` (Windows) or
    `/Applications/XAMPP/htdocs/academy` (Mac).
 3. **Start Apache and MySQL** from the XAMPP Control Panel.
-4. **Create the database**: open `http://localhost/phpmyadmin`, and import
+4. **Install PHP dependencies**: open a terminal in the project folder and
+   run `composer install`. This downloads the packages listed in
+   `composer.json` into a `vendor/` folder — it's gitignored (not part of
+   the repo), so every teammate runs this once locally. Skipping this step
+   means the blog admin's "Save"/"Publish" buttons fail with a
+   `Class "HTMLPurifier_Config" not found` error.
+5. **Create the database**: open `http://localhost/phpmyadmin`, and import
    `sql/schema.sql` (Import tab → choose file → Go). This creates the
    `academy` database with all tables and starter content in one step.
-5. **Visit the site**: `http://localhost/academy/`. Admin dashboard is at
+   - Already have an `academy` database from before this blog update? Importing
+     `schema.sql` again will drop and recreate it from scratch (including
+     any test data you'd added by hand). If you'd rather keep what's there,
+     import `sql/migrations/2026-07-16-blog-seo-fields.sql` instead — it
+     upgrades an existing `blog_posts` table in place.
+6. **Visit the site**: `http://localhost/academy/`. Admin dashboard is at
    `http://localhost/academy/admin/` — log in with:
    - username: `admin`
    - password: `ChangeMe123!`
-6. **Config check**: `config.php` already defaults to XAMPP's standard
+7. **Config check**: `config.php` already defaults to XAMPP's standard
    settings (`localhost`, user `root`, no password), so it should work
    immediately after import with no editing. Only touch this file if your
    local MySQL setup is non-standard.
 
 You only need to do this setup once. After that, it's just pull → work →
-test → push.
+test → push. (If a future pull changes `composer.json`, re-run
+`composer install` to pick up the new dependency.)
 
 ## 3. Day-to-day Git workflow
 
@@ -121,6 +138,12 @@ git pull
   automatically shared. If you need to change the schema itself (add a
   column, a table), edit `sql/schema.sql` directly and mention it in your
   PR so others know to re-import it.
+- **Blog pretty URLs** (`/academy/blog`, `/academy/blog/<slug>`) rely on
+  `.htaccess` and Apache's `mod_rewrite`. XAMPP enables both by default, so
+  this normally works with no setup — but if a blog link 404s for you
+  while `http://localhost/academy/blog.php` works fine, check that
+  `mod_rewrite` is enabled and `AllowOverride All` is set for `htdocs` in
+  `xampp/apache/conf/httpd.conf`.
 - **Merge conflicts**: if `git pull` reports a conflict, don't panic —
   open the conflicting file, look for the `<<<<<<<` / `=======` /
   `>>>>>>>` markers, decide which version (or combination) is correct,

@@ -30,6 +30,11 @@ define('UPLOAD_ALLOWED_EXT', ['jpg', 'jpeg', 'png', 'webp']);
 
 date_default_timezone_set(SITE_TIMEZONE);
 
+// --- Composer dependencies (HTMLPurifier, for sanitizing rich blog content) ---
+if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+    require_once __DIR__ . '/vendor/autoload.php';
+}
+
 // Surface errors during local/staging testing. Set APP_DEBUG=false as an
 // environment variable (or edit this line) before going live on Hostinger,
 // so raw errors are never shown to site visitors.

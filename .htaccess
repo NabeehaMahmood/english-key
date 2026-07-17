@@ -1,0 +1,5 @@
+RewriteEngine On
+
+# Pretty URLs for the blog module: /blog and /blog/<slug>
+RewriteRule ^blog/?$ blog.php [L,QSA]
+RewriteRule ^blog/([A-Za-z0-9-]+)/?$ blog-post.php?slug=$1 [L,QSA]
