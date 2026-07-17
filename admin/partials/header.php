@@ -10,6 +10,7 @@ $navItems = [
     'index.php' => 'Dashboard',
     'settings.php' => 'Site Settings',
     'home-content.php' => 'Homepage Content',
+    'home-stats.php' => 'Homepage Stats',
     'page-content.php' => 'Page Content',
     'courses.php' => 'Courses',
     'programme-groups.php' => 'Programme Groups',

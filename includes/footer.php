@@ -94,6 +94,10 @@ $footerProgrammes = getDb()->query("
         <?php if ($yt): ?><a class="fcontact" href="<?= e($yt) ?>" target="_blank" rel="noopener">YouTube, <?= e($ytSubs) ?> subscribers</a><?php endif; ?>
       </div>
     </div>
+    <div class="fbase">
+      <span>&copy; <?= date('Y') ?> <?= e($siteName) ?>. <?= e($footerText) ?></span>
+      <span><?= e($footerNote) ?></span>
+    </div>
 
     <div class="footer-bottom">
       <span>&copy; <?= date('Y') ?> <?= e($siteName) ?>. <?= e($footerText) ?></span>
