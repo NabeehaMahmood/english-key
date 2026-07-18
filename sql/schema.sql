@@ -2860,23 +2860,41 @@ INSERT INTO blog_posts (title, slug, category, excerpt, content, status, publish
 <ul><li>Federal Board of Intermediate and Secondary Education, Curriculum and Model Question Papers: https://www.fbise.edu.pk/curriculum_model_paper.php</li><li>FBISE, Question Paper Setter/Item Developer Training Manual: official PDF available through the FBISE website.</li><li>FBISE, current English Compulsory SSC-I and HSSC-I Assessment Frameworks and Model Question Papers.</li><li>FBISE, current Urdu SSC/HSSC Assessment Frameworks and Model Question Papers.</li><li>National Curriculum of Pakistan documents linked through the official FBISE portal.</li></ul>', 'published', '2026-06-24 09:00:00');
 
 -- ---------------------------------------------------------------------
-CREATE TABLE notes (
+-- Notes library: the public Notes page filters by class (9-12, fixed) and
+-- subject (admin-editable list, note_subjects). Actual sample PDFs live in
+-- note_samples; a class+subject combo with zero published samples still
+-- renders on the public page as a Request Access card only.
+CREATE TABLE note_subjects (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(200) NOT NULL,
-    subject_tag VARCHAR(100),
-    description TEXT,
-    link VARCHAR(255),
+    name VARCHAR(80) NOT NULL,
+    slug VARCHAR(80) NOT NULL UNIQUE,
+    accent_color VARCHAR(20) NOT NULL DEFAULT '#1F2B54',
     sort_order INT NOT NULL DEFAULT 0,
     is_active TINYINT(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB;
 
-INSERT INTO notes (title, subject_tag, description, link, sort_order) VALUES
-('Smart Notes for Revision', 'Class 9 - Islamiat', 'Complete revision notes in English and Urdu medium, built on the FBISE pattern.', 'https://wa.me/923111537563', 1),
-('Surah-Wise Complete Notes', 'Class 9 - Tarjuma-tul-Quran', 'Full translation notes with Shaan-e-Nuzul and surah-wise MCQs for all surahs.', 'https://wa.me/923111537563', 2),
-('Model Papers & MCQ Bank', 'Class 12 - Urdu', 'Full-length model papers, past-paper MCQs and hawala-e-sher notes for HSSC-II.', 'https://wa.me/923111537563', 3),
-('Grammar & Composition Pack', 'Class 10 - English', 'Tenses, voice, narration and paragraph writing with solved examples.', 'https://wa.me/923111537563', 4),
-('Prose & Poetry Explanations', 'Class 11 - English', 'Chapter summaries, reference-to-context and important questions for HSSC-I.', 'https://wa.me/923111537563', 5),
-('Concept Notes + Past Papers', 'Class 12 - Islamiat', 'Concept-first notes with topic-wise past-paper questions and answers.', 'https://wa.me/923111537563', 6);
+INSERT INTO note_subjects (name, slug, accent_color, sort_order) VALUES
+('English', 'english', '#1B7FB4', 1),
+('Urdu', 'urdu', '#E56A19', 2),
+('Islamiat', 'islamiat', '#7A3FD0', 3),
+('Tarjuma-tul-Quran', 'tarjuma-tul-quran', '#1F2B54', 4);
+
+CREATE TABLE note_samples (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    class_level TINYINT UNSIGNED NOT NULL,
+    subject_id INT NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    chapter_label VARCHAR(40),
+    content_type ENUM('prose', 'poetry', 'other') NOT NULL DEFAULT 'other',
+    description TEXT,
+    file_path VARCHAR(255) NOT NULL,
+    sort_order INT NOT NULL DEFAULT 0,
+    status ENUM('draft', 'published') NOT NULL DEFAULT 'draft',
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_note_samples_subject FOREIGN KEY (subject_id) REFERENCES note_subjects(id) ON DELETE RESTRICT,
+    INDEX idx_note_samples_filter (class_level, subject_id, status)
+) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
 -- is_active doubles as the moderation flag: publicly-submitted stories

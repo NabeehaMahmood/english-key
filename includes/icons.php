@@ -40,6 +40,7 @@ function icon(string $name, string $class = 'icon', bool $gradient = false): str
         'check-circle' => ['<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>', '0 0 24 24'],
         'star-badge' => ['<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>', '0 0 24 24'],
         'lightning' => ['<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>', '0 0 24 24'],
+        'eye' => ['<path d="M1.5 10S4.5 4 10 4s8.5 6 8.5 6-3 6-8.5 6-8.5-6-8.5-6z"/><circle cx="10" cy="10" r="2.6"/>'],
     ];
 
     $def = $defs[$name] ?? [];
