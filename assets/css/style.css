@@ -584,6 +584,13 @@ section.soft .card { background: #fff; }
 .article-body img { max-width: 100%; border-radius: 8px; margin: 6px 0 18px; }
 .article-body table { width: 100%; border-collapse: collapse; margin: 0 0 18px; }
 .article-body th, .article-body td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; font-size: 15px; }
+/* Defensive fallback for a plain (non-.atable) table on a narrow screen --
+   a table with several columns can't actually shrink to fit width:100% on
+   a phone without becoming unreadable, so let it scroll horizontally
+   inside the article column instead of forcing the whole page to overflow. */
+@media (max-width: 680px) {
+  .article-body table:not(.atable) { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
 .atable-wrap { overflow-x: auto; margin: 8px 0 22px; border: 1px solid var(--line); border-radius: 12px; }
 .atable { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width: 480px; margin: 0; }
 .atable th { background: var(--navy); color: #fff; text-align: left; padding: 12px 14px; font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: .02em; border: 0; }
@@ -1413,16 +1420,37 @@ html:not(.js) .pghead { cursor: default; }
 .b3-pv:hover { background: var(--nn-orange); }
 .b3 svg { width: 15px; height: 15px; flex: 0 0 auto; }
 
-.reqcard { background: linear-gradient(150deg, #F6F3FF, #EEF1FA); border: 2px dashed var(--nn-purple-l); border-radius: 14px; padding: 24px 22px; display: flex; flex-direction: column; transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease; }
+.reqcard { grid-column: 1 / -1; background: linear-gradient(150deg, #F6F3FF, #EEF1FA); border: 2px dashed var(--nn-purple-l); border-radius: 14px; padding: 28px 26px; display: flex; flex-direction: column; transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease; }
 .reqcard:hover { transform: translateY(-5px); box-shadow: 0 16px 34px rgba(91,43,166,.16); }
-.reqic { width: 42px; height: 42px; border-radius: 11px; background: var(--nn-purple); color: #fff; display: grid; place-items: center; margin-bottom: 14px; }
+.reqic { width: 42px; height: 42px; border-radius: 11px; background: var(--nn-purple); color: #fff; display: grid; place-items: center; margin-bottom: 14px; flex: none; }
 .reqic .icon { width: 21px; height: 21px; }
-.reqcard h3 { font-size: 18px; margin-bottom: 8px; }
-.reqcard p { color: var(--nn-muted); font-size: 14.5px; line-height: 1.6; flex: 1; margin-bottom: 16px; }
-.b3-rq { background: var(--nn-purple); color: #fff; width: 100%; box-shadow: 0 10px 22px rgba(91,43,166,.3); }
+.reqcard h3 { font-size: 19px; margin-bottom: 10px; }
+.reqcard p { color: var(--nn-muted); font-size: 14.5px; line-height: 1.65; margin: 0 0 12px; max-width: 760px; }
+.reqcard p:last-of-type { margin-bottom: 22px; }
+.b3-rq { background: var(--nn-purple); color: #fff; width: auto; align-self: flex-start; padding: 12px 26px; box-shadow: 0 10px 22px rgba(91,43,166,.3); }
 .b3-rq:hover { background: var(--nn-orange); }
 
 .nempty { text-align: center; color: var(--nn-muted); padding: 30px 0; font-size: 15.5px; }
+
+/* Cards past the visible limit (see notes.php $visibleLimit) stay in the
+   DOM but hidden, so revealing them slots back into the grid in place
+   rather than needing JS to move the Unlock Complete Notes card around. */
+.ncard3-extra { display: none; }
+html.js .ncard3-extra.show { display: flex; }
+html:not(.js) .ncard3-extra { display: flex; }
+html:not(.js) .nmore-toggle { display: none; }
+
+.nmore-toggle {
+  grid-column: 1 / -1; justify-self: start;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  color: var(--nn-purple-l); background: #fff; border: 1.5px solid #D8C7F2;
+  border-radius: 999px; padding: 9px 18px; margin: 4px 0 4px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: background .2s, color .2s, border-color .2s, transform .18s;
+}
+.nmore-toggle:hover { background: var(--nn-purple-l); border-color: var(--nn-purple-l); color: #fff; transform: translateY(-1px); }
+.nmore-ic { width: 14px; height: 14px; flex-shrink: 0; transition: transform .3s cubic-bezier(.2,.7,.3,1); }
+.nmore-toggle[aria-expanded="true"] .nmore-ic { transform: rotate(180deg); }
 
 @media (max-width: 980px) { .ngrid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 640px) {

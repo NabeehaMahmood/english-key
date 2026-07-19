@@ -45,7 +45,7 @@ $navItems = [
     </nav>
     <a href="logout.php" class="logout-link">Log Out</a>
   </aside>
-  <div class="admin-content">
+  <div class="admin-content<?= in_array($currentPage, ['blog.php', 'notes.php'], true) ? ' admin-content-wide' : '' ?>">
     <?php if ($flash): ?>
       <div class="flash flash-<?= e($flash['type']) ?>"><?= e($flash['message']) ?></div>
     <?php endif; ?>

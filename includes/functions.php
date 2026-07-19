@@ -204,8 +204,14 @@ function sanitizeBlogHtml(?string $html): string
 
     $config = HTMLPurifier_Config::createDefault();
     $config->set('Cache.SerializerPath', $cacheDir);
-    $config->set('HTML.Allowed', 'p[dir|class],br,strong,b,em,i,u,h2[dir],h3[dir],h4[dir],blockquote,ul[dir],ol[dir],li,a[href|target],img[src|alt|width|height],table,thead,tbody,tr,th,td,hr');
-    $config->set('Attr.AllowedClasses', ['ex']);
+    // div[class]/table[class] are needed for the .atable-wrap/.atable pair
+    // (assets/css/style.css) that makes a pasted/authored table scroll
+    // horizontally on narrow screens instead of breaking the page layout --
+    // without them here, that wrapper was silently stripped on every save,
+    // so a responsive table looked fine in the editor but reverted to a
+    // plain unscrollable one the moment it was published.
+    $config->set('HTML.Allowed', 'p[dir|class],br,strong,b,em,i,u,h2[dir],h3[dir],h4[dir],blockquote,ul[dir],ol[dir],li,a[href|target],img[src|alt|width|height],div[class],table[class],thead,tbody,tr,th,td,hr');
+    $config->set('Attr.AllowedClasses', ['ex', 'atable-wrap', 'atable']);
     $config->set('HTML.TargetBlank', true);
     $config->set('AutoFormat.RemoveEmpty', true);
 
