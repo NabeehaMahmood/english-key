@@ -257,3 +257,90 @@ function animateCount(el) {
     });
   });
 })();
+
+/* ------------------------------------------------------------------
+   "On this page" jump nav: scroll-spy. Highlights whichever section
+   is currently under the sticky header + sticky jumpnav as the user
+   scrolls, using IntersectionObserver rather than a scroll listener.
+   Clicking a link still does a normal anchor jump (CSS scroll-behavior:
+   smooth + scroll-padding-top already handle the sticky offset there).
+   Finds nothing and does nothing on any page without a .jumpnav.
+   ------------------------------------------------------------------ */
+(function () {
+  var nav = document.querySelector('.jumpnav');
+  if (!nav || !('IntersectionObserver' in window)) return;
+
+  var links = Array.prototype.slice.call(nav.querySelectorAll('a[href^="#"]'));
+  var sections = links
+    .map(function (link) { return document.getElementById(link.getAttribute('href').slice(1)); })
+    .filter(Boolean);
+  if (!sections.length) return;
+
+  var current = null;
+  var visible = Object.create(null);
+
+  function setActive(id) {
+    if (id === current) return;
+    current = id;
+    links.forEach(function (link) {
+      var isActive = link.getAttribute('href') === '#' + id;
+      link.classList.toggle('active', isActive);
+      if (isActive) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+    // Tablet/mobile: the bar scrolls horizontally instead of wrapping, so
+    // keep the active pill in view. Scroll the nav's own scrollLeft directly
+    // (not scrollIntoView) - the nav has no vertical overflow of its own, so
+    // scrollIntoView's "nearest" would resolve against the window and fight
+    // the page's own smooth-scroll to the section.
+    if (nav.scrollWidth > nav.clientWidth) {
+      var activeLink = nav.querySelector('a.active');
+      if (activeLink) {
+        var target = activeLink.offsetLeft - (nav.clientWidth - activeLink.offsetWidth) / 2;
+        nav.scrollTo({ left: Math.max(0, target), behavior: 'smooth' });
+      }
+    }
+  }
+
+  function pickActive() {
+    // Two adjacent sections can briefly both sit inside the thin "active
+    // band" as one scrolls out and the next scrolls in - prefer the later
+    // one in document order so the nav switches the moment the new
+    // section arrives, instead of lagging on the one that's leaving.
+    for (var i = sections.length - 1; i >= 0; i--) {
+      if (visible[sections[i].id]) { setActive(sections[i].id); return; }
+    }
+  }
+
+  var observer = null;
+  function build() {
+    if (observer) observer.disconnect();
+    visible = Object.create(null);
+    var header = document.querySelector('header.site');
+    var offset = (header ? header.offsetHeight : 0) + nav.offsetHeight;
+    observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        visible[entry.target.id] = entry.isIntersecting;
+      });
+      pickActive();
+    }, { rootMargin: '-' + (offset + 1) + 'px 0px -65% 0px', threshold: 0 });
+    sections.forEach(function (s) { observer.observe(s); });
+  }
+
+  build();
+  setActive(sections[0].id);
+
+  // Reaching the bottom of the page: the last section may be short
+  // enough that its band never lands under the sticky bars, so force
+  // the last link active once the user can't scroll any further.
+  window.addEventListener('scroll', function () {
+    var atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2;
+    if (atBottom) setActive(sections[sections.length - 1].id);
+  }, { passive: true });
+
+  var resizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(build, 200);
+  });
+})();

@@ -51,6 +51,7 @@ function featuredMeta(array $c): string
   <?php if ($subjects): ?><a href="#subjects"><span>Core Subjects</span></a><?php endif; ?>
   <?php if ($programmes): ?><a href="#programmes"><span>Programmes</span></a><?php endif; ?>
   <a href="#enrol"><span>How to Enrol</span></a>
+  <?php if ($testimonials): ?><a href="#reviews"><span>Reviews</span></a><?php endif; ?>
 </nav>
 
 <?php if ($featured):
@@ -112,16 +113,25 @@ function featuredMeta(array $c): string
       <div class="kick">Core Subjects</div>
       <h2 class="t">Four subjects, mapped to your class.</h2>
     </div>
-    <div class="g2 reveal" style="margin-top:30px">
+    <div class="courses-grid reveal" style="margin-top:30px">
       <?php foreach ($subjects as $s): ?>
-        <div class="card scard" style="--c:<?= e($s['accent_color']) ?>">
-          <div class="num">0<?= (int)$s['sort_order'] ?>, <?= e($s['level']) ?></div>
-          <h3><?= e($s['title']) ?></h3>
-          <p><?= e($s['description']) ?></p>
-          <?php if ($s['tag_line']): ?>
-            <div class="tags"><?php foreach (explode(' - ', $s['tag_line']) as $tag): ?><span class="tag"><?= e(trim($tag)) ?></span><?php endforeach; ?></div>
-          <?php endif; ?>
-        </div>
+        <a href="#enrol" class="ccard" style="--c:<?= e($s['accent_color']) ?>">
+          <div class="ccard-media">
+            <?php if (!empty($s['image'])): ?>
+              <img src="<?= e($s['image']) ?>" alt="<?= e($s['title']) ?>" loading="lazy">
+            <?php else: ?>
+              <span class="ccard-media-fallback"><?= icon('book-open', 'icon') ?></span>
+            <?php endif; ?>
+          </div>
+          <div class="ccard-body">
+            <div class="ccard-num">0<?= (int)$s['sort_order'] ?>, <?= e($s['level']) ?></div>
+            <h3 class="ccard-title"><?= e($s['title']) ?></h3>
+            <p class="ccard-desc"><?= e($s['description']) ?></p>
+            <?php if ($s['tag_line']): ?>
+              <div class="tags"><?php foreach (explode(' - ', $s['tag_line']) as $tag): ?><span class="tag"><?= e(trim($tag)) ?></span><?php endforeach; ?></div>
+            <?php endif; ?>
+          </div>
+        </a>
       <?php endforeach; ?>
     </div>
   </div>
@@ -154,10 +164,15 @@ function featuredMeta(array $c): string
       <h2 class="t">Programmes for every stage of the year.</h2>
     </div>
     <div class="pgroups reveal" style="margin-top:30px">
-      <?php $gi = 0; foreach ($groups as $g):
+      <?php
+        // All programme-group cards share the same navy resting accent and
+        // transition to the client orange on hover/interaction - consistent
+        // colour behaviour across every card rather than singling one out.
+        $accent = 'var(--navy)';
+        $gi = 0;
+      foreach ($groups as $g):
         if (empty($byGroup[$g['id']])) continue;
         $items = $byGroup[$g['id']];
-        $accent = $gi === 0 ? 'var(--orange)' : 'var(--navy)';
         $gi++;
       ?>
         <?php require __DIR__ . '/includes/programme-group.php'; ?>
@@ -166,7 +181,6 @@ function featuredMeta(array $c): string
       <?php if (!empty($byGroup[0])):
         $g = ['id' => 0, 'name' => 'Other Programmes', 'description' => '', 'date_range' => '', 'icon_key' => 'folder'];
         $items = $byGroup[0];
-        $accent = $gi === 0 ? 'var(--orange)' : 'var(--navy)';
         $gi++;
       ?>
         <?php require __DIR__ . '/includes/programme-group.php'; ?>
@@ -207,7 +221,7 @@ function featuredMeta(array $c): string
 <?php if ($testimonials):
   $ratingPct = $googleRating ? max(0, min(100, round(((float)$googleRating / 5) * 100))) : 0;
 ?>
-<section>
+<section id="reviews">
   <div class="wrap">
     <div class="reveal">
       <div class="kick">Student Reviews</div>

@@ -293,16 +293,66 @@ section.soft .card { background: #fff; }
 .scard:hover .tag { background: color-mix(in srgb, var(--c) 14%, #fff); }
 @media (prefers-reduced-motion: reduce) { .scard:hover { animation: none; transform: none; } }
 
+/* ---------- Course cards (courses.php #subjects, Coursera-style catalogue grid) ---------- */
+.courses-grid { display: grid; grid-template-columns: 1fr; gap: 26px; }
+@media (min-width: 640px)  { .courses-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 992px)  { .courses-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1280px) { .courses-grid { grid-template-columns: repeat(4, 1fr); gap: 24px; } }
+
+.ccard {
+  --c: var(--orange);
+  display: flex; flex-direction: column; height: 100%;
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius);
+  overflow: hidden; box-shadow: var(--shadow); color: inherit; text-decoration: none;
+  transition: transform .35s cubic-bezier(.2,.7,.3,1), box-shadow .35s ease, border-color .35s ease;
+}
+.ccard:hover, .ccard:focus-visible {
+  transform: translateY(-8px);
+  border-color: rgba(234,108,31,.3);
+  box-shadow: 0 26px 54px -22px rgba(27,42,74,.28), 0 0 0 1px rgba(234,108,31,.06);
+  text-decoration: none;
+}
+.ccard:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
+
+.ccard-media {
+  position: relative; height: 168px; flex: none; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--c) 16%, #fff), color-mix(in srgb, var(--c) 5%, #fff));
+}
+.ccard-media img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s cubic-bezier(.2,.7,.3,1); }
+.ccard:hover .ccard-media img { transform: scale(1.06); }
+.ccard-media-fallback {
+  width: 56px; height: 56px; border-radius: 14px; display: grid; place-items: center;
+  background: color-mix(in srgb, var(--c) 16%, #fff); color: var(--c);
+  transition: transform .35s cubic-bezier(.2,.7,.3,1);
+}
+.ccard-media-fallback .icon { width: 28px; height: 28px; }
+.ccard:hover .ccard-media-fallback { transform: scale(1.08) rotate(-4deg); }
+
+.ccard-body { display: flex; flex-direction: column; flex: 1; padding: 24px 26px 28px; }
+.ccard-num {
+  font-family: var(--font-d); font-weight: 800; font-size: 12px;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--c); margin-bottom: 12px;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.ccard-num::before { content: ""; width: 8px; height: 8px; border-radius: 2px; background: currentColor; transform: rotate(45deg); flex: none; }
+.ccard-title { font-size: 20px; margin-bottom: 8px; transition: color .25s ease; }
+.ccard:hover .ccard-title, .ccard:focus-visible .ccard-title { color: var(--orange); }
+.ccard-desc { color: var(--muted); font-size: 14.5px; margin: 0; }
+.ccard .tags { margin-top: auto; padding-top: 18px; }
+@media (prefers-reduced-motion: reduce) { .ccard, .ccard-media img, .ccard-media-fallback, .ccard-title { transition: none; } .ccard:hover { transform: none; } }
+
 /* ---------- Programme groups (client_courses_final.html: pgroups accordion) ---------- */
 .pgroups { display: flex; flex-direction: column; gap: 20px; }
 
 .pgroup {
-  --c: var(--orange);
+  --c: var(--navy);
   background: var(--paper); border: 1px solid var(--line);
   border-radius: 20px; box-shadow: var(--shadow); overflow: hidden;
-  transition: box-shadow .25s ease, border-color .25s ease;
+  transition: transform .3s cubic-bezier(.2,.7,.3,1), box-shadow .3s ease, border-color .3s ease;
 }
-.pgroup:hover { box-shadow: var(--shadow-h); }
+.pgroup:hover { transform: translateY(-3px); box-shadow: var(--shadow-h); border-color: rgba(234,108,31,.2); }
+@media (prefers-reduced-motion: reduce) { .pgroup:hover { transform: none; } }
 
 .pghead {
   display: flex; align-items: center; gap: 22px;
@@ -315,7 +365,7 @@ section.soft .card { background: #fff; }
   flex: none; width: 64px; height: 64px; border-radius: 16px;
   display: flex; align-items: center; justify-content: center;
   background: color-mix(in srgb, var(--c) 10%, #fff); color: var(--c);
-  transition: transform .28s cubic-bezier(.2,.7,.3,1), background .28s ease;
+  transition: transform .28s cubic-bezier(.2,.7,.3,1), background .28s ease, color .28s ease;
 }
 .pgicon svg { width: 30px; height: 30px; }
 .pghead:hover .pgicon { transform: scale(1.08) rotate(-4deg); background: var(--orange-soft); color: var(--orange); }
@@ -666,7 +716,10 @@ section.soft .card { background: #fff; }
   flex: none; width: 100%; max-width: 360px;
   background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
   border-radius: 16px; padding: 22px 24px;
+  box-shadow: 0 24px 54px -26px rgba(0,0,0,.5);
+  transition: border-color .3s ease, transform .3s ease;
 }
+.admissions-card:hover { border-color: rgba(234,108,31,.35); transform: translateY(-2px); }
 .admissions-card h4 { font-size: 16px; font-weight: 800; margin-bottom: 16px; color: #fff; }
 .finfo-row { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
 .finfo-row:last-child { margin-bottom: 0; }
@@ -690,8 +743,8 @@ section.soft .card { background: #fff; }
 .footer-links h5 { font-size: 13.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: #B9C0CF; margin-bottom: 14px; }
 .footer-links p.fdesc { font-size: 13.5px; color: #9DA5B8; line-height: 1.6; margin-bottom: 18px; }
 .footer-col { display: flex; flex-direction: column; gap: 10px; }
-.footer-col a, .footer-col a.fcontact { font-size: 13.5px; color: #B9C0CF; text-decoration: none; transition: color .2s ease; }
-.footer-col a:hover { color: #fff; }
+.footer-col a, .footer-col a.fcontact { font-size: 13.5px; color: #B9C0CF; text-decoration: none; transition: color .2s ease, transform .2s ease; display: inline-block; }
+.footer-col a:hover { color: #fff; transform: translateX(3px); }
 .footer-social { display: flex; gap: 10px; margin-top: 4px; }
 .footer-social a {
   width: 36px; height: 36px; border-radius: 50%; background: rgba(255,255,255,.08);
@@ -985,8 +1038,9 @@ section.soft .card { background: #fff; }
   transition: transform .22s cubic-bezier(.2,.7,.3,1), opacity .22s ease; z-index: 0;
 }
 .jumpnav a span { position: relative; z-index: 1; }
-.jumpnav a:hover { border-color: var(--orange); color: var(--orange); transform: translateY(-1px); }
-.jumpnav a:hover::before { transform: scale(1); opacity: 1; }
+.jumpnav a:hover, .jumpnav a.active { border-color: var(--orange); color: var(--orange); transform: translateY(-1px); }
+.jumpnav a:hover::before, .jumpnav a.active::before { transform: scale(1); opacity: 1; }
+.jumpnav a.active { font-weight: 700; }
 .jumpnav a:active { transform: translateY(0) scale(.97); }
 /* Tablet & mobile: scroll horizontally with snap instead of wrapping to
    multiple lines - a sticky bar that wraps to 2-3 rows eats vertical space
