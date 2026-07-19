@@ -109,10 +109,12 @@ if (isset($_GET['edit'])) {
 $posts = $db->query('SELECT * FROM blog_posts ORDER BY COALESCE(published_at, created_at) DESC')->fetchAll();
 ?>
 <h1>Blog</h1>
+<p class="admin-page-intro">Write and publish articles for the public Blog page, and manage everything already posted.</p>
 
-<div class="admin-tabs">
-  <button type="button" class="admin-tab-btn active" data-tab="add">Add Post</button>
-  <button type="button" class="admin-tab-btn" data-tab="list">All Posts (<?= count($posts) ?>)</button>
+<div class="cms-admin">
+<div class="cms-tabbar">
+  <button type="button" class="cms-tab active" data-tab="add">Add Post</button>
+  <button type="button" class="cms-tab" data-tab="list">All Posts (<?= count($posts) ?>)</button>
 </div>
 
 <div data-tab-panel="add">
@@ -182,6 +184,7 @@ $hasSeoData = !empty($editing['meta_description']) || !empty($editing['primary_k
 </div>
 
 <div data-tab-panel="list" hidden>
+<div class="cms-table-scroll">
 <table class="admin-table">
   <thead>
     <tr><th>Title</th><th>Slug</th><th>Category</th><th>Status</th><th>Published</th><th>Actions</th></tr>
@@ -215,10 +218,12 @@ $hasSeoData = !empty($editing['meta_description']) || !empty($editing['primary_k
   </tbody>
 </table>
 </div>
+</div>
+</div><!-- /.cms-admin -->
 
 <script>
 (function () {
-  var buttons = document.querySelectorAll('.admin-tab-btn');
+  var buttons = document.querySelectorAll('.cms-tab');
   var panels = document.querySelectorAll('[data-tab-panel]');
   var showTab = function (tab) {
     buttons.forEach(function (btn) {
@@ -248,12 +253,43 @@ tinymce.init({
   branding: false,
   promotion: false,
   plugins: 'lists link image table code autoresize',
-  toolbar: 'blocks | bold italic underline | bullist numlist | blockquote link image | alignleft aligncenter alignright | removeformat | code',
+  toolbar: 'blocks | bold italic underline | bullist numlist | blockquote link image table | alignleft aligncenter alignright | removeformat | code',
   block_formats: 'Paragraph=p; Heading 2=h2; Heading 3=h3; Heading 4=h4; Quote=blockquote',
-  valid_elements: 'p,br,strong/b,em/i,u,h2,h3,h4,blockquote,ul,ol,li,a[href|target],img[src|alt|width|height],table,thead,tbody,tr,th,td,hr',
+  // div[class]/table[class] are needed for the .atable-wrap/.atable pair
+  // (assets/css/style.css) that keeps a table scrollable instead of
+  // breaking the page on narrow screens -- see the matching allowance in
+  // sanitizeBlogHtml(), the server-side gatekeeper this must agree with so
+  // a table doesn't look right here but lose its wrapper on save.
+  valid_elements: 'p,br,strong/b,em/i,u,h2,h3,h4,blockquote,ul,ol,li,a[href|target],img[src|alt|width|height],div[class],table[class],thead,tbody,tr,th,td,hr',
+  table_default_attributes: { class: 'atable' },
+  table_class_list: [{ title: 'Responsive table', value: 'atable' }],
+  table_toolbar: '',
   content_css: '../assets/css/style.css',
   body_class: 'article-body',
   setup: function (editor) {
+    // Any table (inserted via the table plugin, pasted from Word/Docs, or
+    // typed in Code view) needs to end up wrapped in .atable-wrap for the
+    // horizontal-scroll-on-mobile behavior to apply -- table_default_attributes
+    // alone only sets the .atable class, not the wrapper div, and no single
+    // insertion-time event reliably covers every path a table can enter the
+    // editor. Normalizing here, right before content is read out for save
+    // (every path -- Save Draft/Publish, autosave -- calls getContent()),
+    // catches all of them in one place instead of chasing each one.
+    editor.on('GetContent', function (e) {
+      var wrapper = document.createElement('div');
+      wrapper.innerHTML = e.content;
+      wrapper.querySelectorAll('table').forEach(function (table) {
+        table.classList.add('atable');
+        var parent = table.parentNode;
+        if (!parent || !parent.classList || !parent.classList.contains('atable-wrap')) {
+          var wrap = document.createElement('div');
+          wrap.className = 'atable-wrap';
+          table.parentNode.insertBefore(wrap, table);
+          wrap.appendChild(table);
+        }
+      });
+      e.content = wrapper.innerHTML;
+    });
     // Google Docs/Word/LibreOffice don't tag quoted paragraphs as
     // <blockquote> — they just apply an indent (margin-left) and/or a left
     // border via inline styles. Those styles get stripped by valid_elements,

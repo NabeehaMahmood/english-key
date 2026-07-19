@@ -584,6 +584,13 @@ section.soft .card { background: #fff; }
 .article-body img { max-width: 100%; border-radius: 8px; margin: 6px 0 18px; }
 .article-body table { width: 100%; border-collapse: collapse; margin: 0 0 18px; }
 .article-body th, .article-body td { border: 1px solid var(--line); padding: 8px 10px; text-align: left; font-size: 15px; }
+/* Defensive fallback for a plain (non-.atable) table on a narrow screen --
+   a table with several columns can't actually shrink to fit width:100% on
+   a phone without becoming unreadable, so let it scroll horizontally
+   inside the article column instead of forcing the whole page to overflow. */
+@media (max-width: 680px) {
+  .article-body table:not(.atable) { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
 .atable-wrap { overflow-x: auto; margin: 8px 0 22px; border: 1px solid var(--line); border-radius: 12px; }
 .atable { width: 100%; border-collapse: collapse; font-size: 14.5px; min-width: 480px; margin: 0; }
 .atable th { background: var(--navy); color: #fff; text-align: left; padding: 12px 14px; font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: .02em; border: 0; }
@@ -1355,3 +1362,127 @@ html:not(.js) .pgpanel { max-height: none; opacity: 1; }
 html:not(.js) .pghead { cursor: default; }
 
 @media (prefers-reduced-motion: reduce) { .fdetails, .fbadge::before { transition: none; animation: none; } }
+
+/* ---------- Notes library (class + subject filter, sample cards, PDF modal) ----------
+   Colors below are lifted 1:1 from resources/notes.html (its own --navy/--blue/--purple
+   etc. differ slightly from this file's global palette used elsewhere on the site), so
+   they're scoped to their own --nn-* custom properties rather than overriding the
+   shared tokens other pages rely on. */
+:root {
+  --nn-navy: #1E2A66;
+  --nn-navy-d: #17204F;
+  --nn-orange: #E56A19;
+  --nn-bg: #F1F4FA;
+  --nn-text: #121938;
+  --nn-muted: #333B5E;
+  --nn-line: #D5DCEC;
+  --nn-purple: #5B2BA6;
+  --nn-purple-l: #7A3FD0;
+  --nn-blue: #3D68B0;
+}
+
+.nfbar { background: rgba(255,255,255,.94); border-bottom: 1px solid var(--nn-line); }
+.nfbar-2 { background: var(--nn-bg); border-bottom: 1px solid var(--nn-line); }
+.nfin { max-width: 1140px; margin: 0 auto; padding: 14px 20px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.nfl { font-family: 'Manrope', sans-serif; font-size: 11.5px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; color: var(--nn-muted); margin-right: 4px; }
+.nft { font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700; color: var(--nn-navy); background: #EEF1FA; border: 1.5px solid transparent; border-radius: 9px; padding: 9px 17px; cursor: pointer; transition: background .2s, color .2s, border-color .2s, transform .2s; }
+.nft:hover { border-color: var(--nn-blue); transform: translateY(-1px); }
+.nft.on { background: var(--nn-navy); color: #fff; border-color: var(--nn-navy); box-shadow: 0 8px 18px rgba(18,25,56,.24); }
+/* Subject nav borrows the resource's "pick a subject" chip language (.rchip):
+   purple outline at rest, solid purple when selected. */
+.nft-sub { font-family: 'Manrope', sans-serif; font-size: 12.5px; font-weight: 700; color: var(--nn-purple-l); background: #fff; border: 1.5px solid #D8C7F2; border-radius: 999px; padding: 8px 15px; cursor: pointer; transition: background .2s, color .2s, border-color .2s, transform .2s; }
+.nft-sub:hover { background: var(--nn-purple-l); border-color: var(--nn-purple-l); color: #fff; transform: translateY(-1px); }
+.nft-sub.on { background: var(--nn-purple-l); color: #fff; border-color: var(--nn-purple-l); }
+
+.clblock { padding: 64px 0 40px; border-bottom: 1px solid var(--nn-line); }
+.clblock:last-child { border-bottom: 0; }
+.clblock-head { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; }
+.clblock-head h2 { font-size: clamp(24px, 3vw, 32px); margin: 0; color: var(--nn-text); }
+.clbadge { font-family: 'Manrope', sans-serif; font-size: 11.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #fff; background: var(--nn-purple); border-radius: 7px; padding: 6px 12px; }
+.clblock-sub { color: var(--nn-muted); font-size: 15.5px; margin-bottom: 22px; max-width: 640px; }
+.nrule { height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--nn-purple), var(--nn-orange) 60%, transparent); margin-bottom: 22px; }
+
+.ngrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+.ncard3 { background: #fff; border: 1.5px solid var(--nn-blue); border-radius: 14px; padding: 24px 22px; display: flex; flex-direction: column; position: relative; overflow: hidden; transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease; }
+.ncard3::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--acc, var(--nn-navy)); }
+.ncard3:hover { transform: translateY(-5px); box-shadow: 0 16px 34px rgba(30,42,102,.13); }
+.n3free { position: absolute; top: 0; right: 0; font-family: 'Manrope', sans-serif; font-size: 10.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #fff; background: var(--nn-orange); padding: 5px 12px; border-radius: 0 0 0 10px; }
+.n3top { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; }
+.n3ch { font-family: 'Manrope', sans-serif; font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--acc, var(--nn-navy)); }
+.n3type { font-family: 'Manrope', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; border-radius: 999px; padding: 5px 11px; background: #EEF1FA; color: var(--nn-navy); }
+.n3type.poetry { background: #F3EBFF; color: var(--nn-purple); }
+.ncard3 h3 { font-size: 18px; margin: 0 0 8px; padding-right: 52px; }
+.ncard3 p { color: var(--nn-muted); font-size: 14.5px; line-height: 1.6; flex: 1; margin-bottom: 16px; }
+.n3meta { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; font-weight: 700; color: var(--nn-muted); border-top: 1px solid var(--nn-line); padding-top: 13px; margin-bottom: 16px; }
+.b3 { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 13.5px; border-radius: 9px; padding: 11px 15px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; cursor: pointer; border: none; transition: transform .2s, background .2s, color .2s, box-shadow .2s; }
+.b3:hover { transform: translateY(-2px); }
+.b3-pv { background: var(--nn-navy); color: #fff; width: 100%; box-shadow: 0 8px 18px rgba(18,25,56,.22); }
+.b3-pv:hover { background: var(--nn-orange); }
+.b3 svg { width: 15px; height: 15px; flex: 0 0 auto; }
+
+.reqcard { grid-column: 1 / -1; background: linear-gradient(150deg, #F6F3FF, #EEF1FA); border: 2px dashed var(--nn-purple-l); border-radius: 14px; padding: 28px 26px; display: flex; flex-direction: column; transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease; }
+.reqcard:hover { transform: translateY(-5px); box-shadow: 0 16px 34px rgba(91,43,166,.16); }
+.reqic { width: 42px; height: 42px; border-radius: 11px; background: var(--nn-purple); color: #fff; display: grid; place-items: center; margin-bottom: 14px; flex: none; }
+.reqic .icon { width: 21px; height: 21px; }
+.reqcard h3 { font-size: 19px; margin-bottom: 10px; }
+.reqcard p { color: var(--nn-muted); font-size: 14.5px; line-height: 1.65; margin: 0 0 12px; max-width: 760px; }
+.reqcard p:last-of-type { margin-bottom: 22px; }
+.b3-rq { background: var(--nn-purple); color: #fff; width: auto; align-self: flex-start; padding: 12px 26px; box-shadow: 0 10px 22px rgba(91,43,166,.3); }
+.b3-rq:hover { background: var(--nn-orange); }
+
+.nempty { text-align: center; color: var(--nn-muted); padding: 30px 0; font-size: 15.5px; }
+
+/* Cards past the visible limit (see notes.php $visibleLimit) stay in the
+   DOM but hidden, so revealing them slots back into the grid in place
+   rather than needing JS to move the Unlock Complete Notes card around. */
+.ncard3-extra { display: none; }
+html.js .ncard3-extra.show { display: flex; }
+html:not(.js) .ncard3-extra { display: flex; }
+html:not(.js) .nmore-toggle { display: none; }
+
+.nmore-toggle {
+  grid-column: 1 / -1; justify-self: start;
+  font-family: 'Manrope', sans-serif; font-size: 13px; font-weight: 700;
+  color: var(--nn-purple-l); background: #fff; border: 1.5px solid #D8C7F2;
+  border-radius: 999px; padding: 9px 18px; margin: 4px 0 4px; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: background .2s, color .2s, border-color .2s, transform .18s;
+}
+.nmore-toggle:hover { background: var(--nn-purple-l); border-color: var(--nn-purple-l); color: #fff; transform: translateY(-1px); }
+.nmore-ic { width: 14px; height: 14px; flex-shrink: 0; transition: transform .3s cubic-bezier(.2,.7,.3,1); }
+.nmore-toggle[aria-expanded="true"] .nmore-ic { transform: rotate(180deg); }
+
+@media (max-width: 980px) { .ngrid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 640px) {
+  .ngrid { grid-template-columns: 1fr; }
+  .clblock { padding-top: 48px; }
+  .nfin { padding: 12px 16px; gap: 8px; }
+  .nft { padding: 8px 13px; font-size: 13px; }
+  .nft-sub { padding: 7px 13px; font-size: 12px; }
+  .nfl { width: 100%; margin-bottom: 2px; }
+}
+
+/* PDF preview modal, chrome modeled on Google Classroom's viewer:
+   close top-left, filename center, "more options" (open in new tab) top-right. */
+.pdfmodal { position: fixed; inset: 0; z-index: 200; display: none; }
+.pdfmodal.open { display: block; }
+.pdfmodal-backdrop { position: absolute; inset: 0; background: rgba(15,20,40,.72); }
+.pdfmodal-panel {
+  position: relative; z-index: 1; margin: 26px auto; width: min(920px, 94vw); height: calc(100vh - 52px);
+  background: #2b2f38; border-radius: 12px; overflow: hidden; display: flex; flex-direction: column;
+  box-shadow: 0 30px 70px -20px rgba(0,0,0,.6);
+}
+.pdfmodal-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 8px 10px 6px; background: #24262e; color: #fff; }
+.pdfmodal-close { background: none; border: none; color: #fff; width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; flex: 0 0 auto; }
+.pdfmodal-close:hover { background: rgba(255,255,255,.12); }
+.pdfmodal-close svg { width: 18px; height: 18px; }
+.pdfmodal-title { flex: 1; min-width: 0; font-family: 'Manrope', sans-serif; font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pdfmodal-controls { position: relative; flex: 0 0 auto; }
+.pdfmodal-menu-btn { background: none; border: none; color: #fff; width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; }
+.pdfmodal-menu-btn:hover { background: rgba(255,255,255,.12); }
+.pdfmodal-menu-btn svg { width: 19px; height: 19px; }
+.pdfmodal-menu-list { position: absolute; top: 44px; right: 0; background: #fff; border-radius: 10px; box-shadow: 0 14px 34px -10px rgba(0,0,0,.4); padding: 6px; min-width: 168px; }
+.pdfmodal-menu-list a { display: block; padding: 9px 12px; border-radius: 7px; font-size: 13.5px; font-weight: 600; color: var(--text); white-space: nowrap; }
+.pdfmodal-menu-list a:hover { background: var(--bg); text-decoration: none; }
+.pdfmodal-frame { flex: 1; width: 100%; border: none; background: #525659; }
+@media (max-width: 640px) { .pdfmodal-panel { margin: 0; width: 100%; height: 100vh; border-radius: 0; } }

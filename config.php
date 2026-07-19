@@ -27,6 +27,8 @@ define('MAIL_FROM', 'no-reply@example.com');  // must be a real mailbox on your 
 // --- Uploads ---
 define('UPLOAD_MAX_BYTES', 5 * 1024 * 1024); // 5MB
 define('UPLOAD_ALLOWED_EXT', ['jpg', 'jpeg', 'png', 'webp']);
+define('UPLOAD_MAX_PDF_BYTES', 20 * 1024 * 1024); // 20MB
+define('UPLOAD_ALLOWED_PDF_EXT', ['pdf']);
 
 date_default_timezone_set(SITE_TIMEZONE);
 

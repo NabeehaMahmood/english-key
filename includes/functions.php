@@ -23,6 +23,9 @@ function revealDelay(int $index, float $step = 0.06, float $max = 0.3): string
 {
     $delay = min($index * $step, $max);
     return $delay > 0 ? ' data-delay="' . $delay . '"' : '';
+}
+
+/**
  * Appends -2, -3, etc. to $baseSlug until it no longer collides with an
  * existing blog_posts row (other than $excludeId, so re-saving a post under
  * its own unchanged title doesn't shift its slug).
@@ -34,6 +37,27 @@ function uniqueBlogSlug(string $baseSlug, int $excludeId = 0): string
     $suffix = 2;
     while (true) {
         $stmt = $db->prepare('SELECT id FROM blog_posts WHERE slug = ? AND id != ?');
+        $stmt->execute([$slug, $excludeId]);
+        if (!$stmt->fetch()) {
+            return $slug;
+        }
+        $slug = $baseSlug . '-' . $suffix;
+        $suffix++;
+    }
+}
+
+/**
+ * Appends -2, -3, etc. to $baseSlug until it no longer collides with an
+ * existing note_subjects row (other than $excludeId), mirroring
+ * uniqueBlogSlug() for the notes-library subject nav.
+ */
+function uniqueSubjectSlug(string $baseSlug, int $excludeId = 0): string
+{
+    $db = getDb();
+    $slug = $baseSlug;
+    $suffix = 2;
+    while (true) {
+        $stmt = $db->prepare('SELECT id FROM note_subjects WHERE slug = ? AND id != ?');
         $stmt->execute([$slug, $excludeId]);
         if (!$stmt->fetch()) {
             return $slug;
@@ -110,6 +134,51 @@ function handleImageUpload(string $fieldName, string $subdir): ?string
 }
 
 /**
+ * Validates and moves an uploaded PDF into assets/uploads/{subdir}. Same
+ * shape as handleImageUpload() but for note sample files (PDF-only, larger
+ * size cap). Returns the relative path to store in the DB, or null if no
+ * file was uploaded. Throws RuntimeException on validation failure.
+ */
+function handlePdfUpload(string $fieldName, string $subdir): ?string
+{
+    if (empty($_FILES[$fieldName]['name']) || $_FILES[$fieldName]['error'] === UPLOAD_ERR_NO_FILE) {
+        return null;
+    }
+
+    $file = $_FILES[$fieldName];
+
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        throw new RuntimeException('Upload failed (error code ' . $file['error'] . ').');
+    }
+    if ($file['size'] > UPLOAD_MAX_PDF_BYTES) {
+        throw new RuntimeException('PDF is too large. Max size is ' . (UPLOAD_MAX_PDF_BYTES / 1024 / 1024) . 'MB.');
+    }
+
+    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    if (!in_array($ext, UPLOAD_ALLOWED_PDF_EXT, true)) {
+        throw new RuntimeException('Unsupported file type. Only PDF files are allowed.');
+    }
+
+    $mime = mime_content_type($file['tmp_name']);
+    if ($mime !== 'application/pdf') {
+        throw new RuntimeException('Uploaded file is not a valid PDF.');
+    }
+
+    $filename = bin2hex(random_bytes(16)) . '.' . $ext;
+    $destDir = __DIR__ . '/../assets/uploads/' . $subdir;
+    if (!is_dir($destDir)) {
+        mkdir($destDir, 0755, true);
+    }
+    $destPath = $destDir . '/' . $filename;
+
+    if (!move_uploaded_file($file['tmp_name'], $destPath)) {
+        throw new RuntimeException('Failed to save uploaded file.');
+    }
+
+    return 'assets/uploads/' . $subdir . '/' . $filename;
+}
+
+/**
  * Whitelist-sanitizes rich blog content HTML (typed or pasted into the
  * TinyMCE editor) with HTMLPurifier. Only structural/semantic tags are kept;
  * inline styles and classes are stripped so every post renders consistently
@@ -135,8 +204,14 @@ function sanitizeBlogHtml(?string $html): string
 
     $config = HTMLPurifier_Config::createDefault();
     $config->set('Cache.SerializerPath', $cacheDir);
-    $config->set('HTML.Allowed', 'p[dir|class],br,strong,b,em,i,u,h2[dir],h3[dir],h4[dir],blockquote,ul[dir],ol[dir],li,a[href|target],img[src|alt|width|height],table,thead,tbody,tr,th,td,hr');
-    $config->set('Attr.AllowedClasses', ['ex']);
+    // div[class]/table[class] are needed for the .atable-wrap/.atable pair
+    // (assets/css/style.css) that makes a pasted/authored table scroll
+    // horizontally on narrow screens instead of breaking the page layout --
+    // without them here, that wrapper was silently stripped on every save,
+    // so a responsive table looked fine in the editor but reverted to a
+    // plain unscrollable one the moment it was published.
+    $config->set('HTML.Allowed', 'p[dir|class],br,strong,b,em,i,u,h2[dir],h3[dir],h4[dir],blockquote,ul[dir],ol[dir],li,a[href|target],img[src|alt|width|height],div[class],table[class],thead,tbody,tr,th,td,hr');
+    $config->set('Attr.AllowedClasses', ['ex', 'atable-wrap', 'atable']);
     $config->set('HTML.TargetBlank', true);
     $config->set('AutoFormat.RemoveEmpty', true);
 
