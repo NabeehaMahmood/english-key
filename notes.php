@@ -4,7 +4,7 @@ require_once __DIR__ . '/includes/header.php';
 $notes = getDb()->query('SELECT * FROM notes WHERE is_active = 1 ORDER BY sort_order')->fetchAll();
 ?>
 
-<div class="phero">
+<div class="phero phero-navy">
   <div class="wrap reveal">
     <div class="kick">Free Resources</div>
     <h1>Notes that <span class="hl">open doors.</span></h1>

@@ -24,7 +24,7 @@ $posts = $db->query(
 ?>
 
 <?php /* ── Hero ─────────────────────────────────────────────────────────────── */ ?>
-<div class="phero phero-dark">
+<div class="phero phero-navy">
   <div class="wrap reveal">
     <div class="kick">Blog</div>
     <h1>Exam tips, study routines &amp; <span class="hl">board updates.</span></h1>

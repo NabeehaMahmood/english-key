@@ -38,7 +38,7 @@ function featuredMeta(array $c): string
 }
 ?>
 
-<div class="phero">
+<div class="phero phero-navy">
   <div class="wrap reveal" data-anim="scale-in">
     <h1>Built around the FBISE syllabus, <span class="hl">nothing wasted.</span></h1>
     <p class="sub">Complete preparation for Classes 9-12 across four subjects, plus seasonal intensives, bootcamps and crash courses.</p>

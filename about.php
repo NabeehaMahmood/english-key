@@ -12,7 +12,7 @@ $statSince = getSetting('stat_since');
 $methodSteps = getContentBlock('about', 'method_steps');
 ?>
 
-<div class="phero">
+<div class="phero phero-navy">
   <div class="wrap reveal">
     <div class="kick">About Us</div>
     <h1>Where words <span class="hl">build futures.</span></h1>

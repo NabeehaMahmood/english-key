@@ -7,7 +7,7 @@ $googleRating = getSetting('google_rating');
 $googleCount = getSetting('google_review_count');
 ?>
 
-<div class="phero">
+<div class="phero phero-navy">
   <div class="wrap reveal">
     <div class="kick">Student Reviews</div>
     <h1>What students <span class="hl">actually say.</span></h1>

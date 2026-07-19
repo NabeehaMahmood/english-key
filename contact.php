@@ -46,7 +46,7 @@ $officeHours = getSetting('office_hours');
 $humanQuestion = humanCheckQuestion();
 ?>
 
-<div class="phero">
+<div class="phero phero-navy">
   <div class="wrap reveal">
     <div class="kick">Contact Us</div>
     <h1>Questions? <span class="hl">We're here to help.</span></h1>

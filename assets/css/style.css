@@ -151,6 +151,19 @@ header.site .btn { padding: 9px 18px; font-size: 14px; }
   box-shadow: 0 8px 20px -8px rgba(234,108,31,.65);
 }
 .hero, .phero { padding: 70px 0 50px; background: linear-gradient(180deg, var(--orange-soft), #fff); }
+/* .phero-navy: the approved dark-navy hero (client_courses_final.html /
+   courses.php) restored on the pages that use it. Needed because the
+   shared rule above flattens plain .phero to the light .hero gradient -
+   scoped to this modifier class so pages not opted in are unaffected. */
+.phero.phero-navy {
+  background:
+    radial-gradient(700px 420px at 88% 0%, rgba(255,255,255,.08), transparent 60%),
+    linear-gradient(140deg, var(--navy-2), #141B44 70%, #0F1533);
+  padding: 112px 0 92px;
+}
+@media (max-width: 680px) {
+  .phero.phero-navy { padding: 70px 0 52px; }
+}
 
 /* Blog hero: dark navy variant matching resources/blog.html */
 .phero-dark {

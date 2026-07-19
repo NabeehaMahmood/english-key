@@ -45,7 +45,7 @@ $stories = $db->query("SELECT * FROM alumni WHERE is_active = 1 AND story IS NOT
 $humanQuestion = humanCheckQuestion();
 ?>
 
-<div class="phero">
+<div class="phero phero-navy">
   <div class="wrap reveal">
     <div class="kick">Alumnus Corner</div>
     <h1>Once EnglishKeys, <span class="hl">always EnglishKeys.</span></h1>
