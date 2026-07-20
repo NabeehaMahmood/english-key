@@ -204,6 +204,8 @@
 }
 .status-badge.status-published { background: #e3f3ea; color: #1e7145; }
 .status-badge.status-draft { background: #f1f1f1; color: #666; }
+.status-badge.status-pending { background: var(--orange-soft, #FDEEDF); color: #b25a12; }
+.status-badge.status-rejected { background: #fdecea; color: #a1352a; }
 
 /* Blog "Add/Edit Post" editor: main content left, sticky settings sidebar
    right, so Save Draft/Publish stay in view without scrolling past a long

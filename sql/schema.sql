@@ -2775,24 +2775,55 @@ INSERT INTO notes (title, subject_tag, description, link, sort_order) VALUES
 ('Concept Notes + Past Papers', 'Class 12 - Islamiat', 'Concept-first notes with topic-wise past-paper questions and answers.', 'https://wa.me/923111537563', 6);
 
 -- ---------------------------------------------------------------------
--- is_active doubles as the moderation flag: publicly-submitted stories
--- insert with is_active = 0 and wait for admin approval.
+-- `type` distinguishes achiever-band entries from alumni-story-wall entries
+-- (previously inferred purely from whether `story` was empty).
+-- `is_active` means "shows publicly" and is read as-is by index.php and
+-- about.php for the homepage/about "Proven Track Record" band - keep its
+-- meaning stable. `status` is the moderation state for story submissions
+-- (pending/approved/rejected); achiever rows are always 'approved' since
+-- they're admin-authored and never go through the public queue.
 CREATE TABLE alumni (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(150) NOT NULL,
+    type ENUM('achiever', 'story') NOT NULL DEFAULT 'achiever',
     achievement VARCHAR(200),
     batch_info VARCHAR(100),
+    passing_year VARCHAR(20),
     photo VARCHAR(255),
     story TEXT,
     contact VARCHAR(150),
     sort_order INT NOT NULL DEFAULT 0,
-    is_active TINYINT(1) NOT NULL DEFAULT 1
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    status ENUM('pending', 'approved', 'rejected') NOT NULL DEFAULT 'approved'
 ) ENGINE=InnoDB;
 
-INSERT INTO alumni (name, achievement, batch_info, sort_order) VALUES
-('Hafiza Tanzeela Sahar', 'HSSC 1st Position - Federal Board', 'Class of 2023', 1),
-('Seerat Fatima', 'HSSC 1st Position - Federal Board', 'Class of 2024', 2),
-('Aleena Tahir', 'HSSC 1st Position - RMU MBBS Merit #2', 'Class of 2025', 3);
+INSERT INTO alumni (name, type, achievement, batch_info, passing_year, sort_order, is_active, status) VALUES
+('Hafiza Tanzeela Sahar', 'achiever', 'HSSC 1st Position - Federal Board', 'Class of 2023', '2023', 1, 1, 'approved'),
+('Seerat Fatima', 'achiever', 'HSSC 1st Position - Federal Board', 'Class of 2024', '2024', 2, 1, 'approved'),
+('Aleena Tahir', 'achiever', 'HSSC 1st Position - RMU MBBS Merit #2', 'Class of 2025', '2025', 3, 1, 'approved');
+
+INSERT INTO alumni (name, type, achievement, batch_info, sort_order, is_active, status, story) VALUES
+('Bilal Ahmed', 'story', 'Studying at NUST', 'Class 12, 2024', 4, 1, 'approved',
+'I came for English but the Tarjuma-tul-Quran notes ended up being my favourite part of the course. Surah-wise translation with Shaan-e-Nuzul made the subject feel meaningful instead of something to cram.
+
+I am now in my first year at NUST. The writing practice from this academy still helps me in university assignments.'),
+('Fatima Noor', 'story', 'A grade, HSSC-I', 'Class 11, 2024', 3, 1, 'approved',
+'I was terrified of unseen comprehension passages. In the Crash Course we did one passage every single day and sir showed us how to find the answer inside the passage instead of guessing.
+
+By the exam it had become the easiest part of my paper. The doubt sessions late at night before the paper were a lifesaver.'),
+('Muhammad Hamza', 'story', 'Federal Board position holder', 'Class 10, 2025', 2, 1, 'approved',
+'Urdu was always my weakest subject. The tashreeh notes and the hawala-e-sher sheets from EnglishKeys were the first material that actually made sense to me because everything was written exactly the way examiners expect.
+
+Alhamdulillah I secured a position in the Federal Board. The marked worksheets every week are what kept me consistent.'),
+('Ayesha Siddiqui', 'story', 'A+ in FBISE HSSC-II', 'Class 12, 2025', 1, 1, 'approved',
+'I joined the English Marathon three months before my HSSC-II paper with only 68 in my send-up.
+
+What changed everything was the structured paper practice and continuous worksheets.
+
+I scored 91 in English and secured an overall A+.
+
+To anyone starting late:
+It is never too late if you consistently follow the plan.');
 
 -- ---------------------------------------------------------------------
 CREATE TABLE contact_messages (

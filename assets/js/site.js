@@ -219,18 +219,52 @@ function animateCount(el) {
 
 /* ------------------------------------------------------------------
    Alumni Stories: "Read More" / "Show Less" expand toggle for the
-   3-line-clamped story preview. Finds nothing and does nothing on any
-   page without a .story-toggle button.
+   3-line-clamped story preview. A story only gets the button if its text
+   actually overflows the 3-line clamp (scrollHeight > clientHeight) -
+   short stories that already fit never show "Read More". Finds nothing
+   and does nothing on any page without a .story-card.
    ------------------------------------------------------------------ */
 (function () {
-  document.querySelectorAll('.story-toggle').forEach(function (btn) {
+  document.querySelectorAll('.story-card').forEach(function (card) {
+    var text = card.querySelector('.story-text');
+    var btn = card.querySelector('.story-toggle');
+    if (!text || !btn) return;
+    if (text.scrollHeight - text.clientHeight <= 1) {
+      btn.remove();
+      return;
+    }
     btn.addEventListener('click', function () {
-      var card = btn.closest('.story-card');
-      if (!card) return;
       var expanded = card.classList.toggle('expanded');
       btn.textContent = expanded ? 'Show Less' : 'Read More';
     });
   });
+})();
+
+/* ------------------------------------------------------------------
+   Alumni "Share Your Story": on a successful submission the server
+   redirects back with a session flash message rendered by header.php as
+   a plain .flash.flash-success banner (shared site-wide with
+   contact/enroll). Only on the alumni page - identified by #sharePanel,
+   which nothing else on the site has - that same banner is upgraded into
+   a premium auto-dismissing toast, without touching the shared component
+   used elsewhere. Finds nothing and does nothing on any other page.
+   ------------------------------------------------------------------ */
+(function () {
+  var sharePanel = document.getElementById('sharePanel');
+  var flash = document.querySelector('.flash.flash-success');
+  if (!sharePanel || !flash) return;
+
+  var message = flash.textContent;
+  flash.innerHTML = '';
+  var text = document.createElement('span');
+  text.textContent = message;
+  flash.appendChild(text);
+  flash.classList.add('alumni-toast');
+
+  setTimeout(function () {
+    flash.classList.add('alumni-toast-hide');
+    setTimeout(function () { flash.remove(); }, 400);
+  }, 4500);
 })();
 
 /* ------------------------------------------------------------------
