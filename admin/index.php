@@ -8,7 +8,6 @@ $counts = [
     'Blog Posts' => $db->query('SELECT COUNT(*) FROM blog_posts')->fetchColumn(),
     'Notes' => $db->query('SELECT COUNT(*) FROM note_samples')->fetchColumn(),
     'Pending Alumni Stories' => $db->query('SELECT COUNT(*) FROM alumni WHERE is_active = 0')->fetchColumn(),
-    'Unread Messages' => $db->query('SELECT COUNT(*) FROM contact_messages WHERE is_read = 0')->fetchColumn(),
     'New Enrollments' => $db->query("SELECT COUNT(*) FROM enrollments WHERE status = 'new'")->fetchColumn(),
 ];
 ?>

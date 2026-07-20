@@ -20,7 +20,6 @@ $navItems = [
     'notes.php' => 'Notes',
     'alumni.php' => 'Alumni',
     'enrollments.php' => 'Enrollments',
-    'messages.php' => 'Messages',
 ];
 ?>
 <!DOCTYPE html>

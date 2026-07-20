@@ -80,6 +80,16 @@ function getSetting(string $key, string $default = ''): string
     return $cache[$key] ?? $default;
 }
 
+/**
+ * Builds a wa.me link with a pre-filled message, so "message us on
+ * WhatsApp" buttons open with useful context instead of a blank chat.
+ */
+function waLink(string $number, ?string $message = null): string
+{
+    $message = $message ?? 'Assalam-o-alaikum! I have a question about EnglishKeys Academy.';
+    return 'https://wa.me/' . $number . '?text=' . rawurlencode($message);
+}
+
 function getContentBlock(string $pageSlug, string $blockKey): array
 {
     $stmt = getDb()->prepare('SELECT content, image_path FROM content_blocks WHERE page_slug = ? AND block_key = ?');
@@ -259,6 +269,104 @@ function getFlashMessage(): ?array
     $flash = ['message' => $_SESSION['flash_message'], 'type' => $_SESSION['flash_type'] ?? 'success'];
     unset($_SESSION['flash_message'], $_SESSION['flash_type']);
     return $flash;
+}
+
+/**
+ * Live values the offline chat widget's small hardcoded safety-net answers
+ * (assets/js/chatbot.js) reference via {{token}}, shipped to the browser
+ * as window.EKA_INFO (see includes/footer.php). This only needs to cover
+ * what that fixed, minimal KB actually asks for — the real answering
+ * (buildChatFacts(), below) reads the DB directly and needs no token map.
+ */
+function buildChatTokens(): array
+{
+    $tokens = [
+        'waLink' => waLink(getSetting('whatsapp_number')),
+        'whatsapp' => getSetting('phone'),
+        'phone2' => getSetting('phone_2'),
+        'email' => getSetting('email'),
+        'bankLine' => getSetting('bank_name') . ' — Title: ' . getSetting('bank_title') . ', IBAN ' . getSetting('bank_iban'),
+        'easypaisaLine' => getSetting('easypaisa_number') ? (getSetting('easypaisa_name') . ', ' . getSetting('easypaisa_number')) : '',
+    ];
+
+    $summerCourse = getDb()->query("SELECT price, schedule_info FROM courses WHERE slug = 'summer-intensive-2026' LIMIT 1")->fetch();
+    $tokens['summerPrice'] = $summerCourse['price'] ?? '';
+    $sched = [];
+    foreach (explode('|', (string)($summerCourse['schedule_info'] ?? '')) as $part) {
+        [$k, $v] = array_pad(explode(':', $part, 2), 2, '');
+        $sched[trim($k)] = trim($v);
+    }
+    $scheduleStr = implode(', ', array_filter([$sched['Schedule'] ?? '', $sched['Time'] ?? '']));
+    $range = (!empty($sched['Starts']) && !empty($sched['Ends'])) ? ($sched['Starts'] . ' to ' . $sched['Ends']) : '';
+    $tokens['summerDates'] = trim($scheduleStr . ($range ? ' (' . $range . ')' : ''));
+
+    return $tokens;
+}
+
+/**
+ * Assembles the AI chat assistant's knowledge block from live DB data
+ * (site_settings, teachers, courses, alumni) instead of a hardcoded string,
+ * so editing content in the admin panel (fees, contact info, teachers,
+ * results) keeps the chatbot's answers in sync without a code change.
+ */
+function buildChatFacts(): string
+{
+    $db = getDb();
+
+    $about = "ABOUT\n"
+        . '- Online academy coaching FBISE (Federal Board) students. Tagline: "' . getSetting('tagline') . '."' . "\n"
+        . '- Teaching since ' . getSetting('stat_since') . '; co-founded in its current form on ' . getSetting('founded_date') . ".\n"
+        . '- 100% online, live classes on Zoom, ' . getSetting('address') . ".\n"
+        . '- Community of ' . getSetting('stat_learners') . "+ learners.\n"
+        . '- ' . getSetting('stat_youtube_subs') . " subscribers on YouTube.\n"
+        . '- Rated ' . getSetting('google_rating') . ' stars from ' . getSetting('google_review_count') . " Google reviews.";
+
+    $teachers = $db->query("SELECT name, role_title, credentials FROM teachers WHERE is_active = 1 ORDER BY sort_order")->fetchAll();
+    $founderLines = [];
+    foreach ($teachers as $t) {
+        $creds = str_replace("\n", ', ', (string)$t['credentials']);
+        $founderLines[] = '- ' . $t['name'] . ' — ' . $t['role_title'] . '. ' . $creds . '.';
+    }
+    $founders = "FOUNDERS (husband and wife)\n" . implode("\n", $founderLines);
+
+    $subjects = $db->query("SELECT title FROM courses WHERE category = 'subject' AND is_active = 1 ORDER BY sort_order")->fetchAll();
+    $programmes = $db->query("SELECT title, price, duration, eligibility, mode, schedule_info FROM courses WHERE category IN ('programme', 'featured') AND is_active = 1 ORDER BY sort_order")->fetchAll();
+    $progLines = [];
+    foreach ($programmes as $p) {
+        $bits = array_filter([$p['duration'], $p['eligibility'], $p['mode'], $p['price'] ? 'Fee: ' . $p['price'] : null]);
+        $schedule = $p['schedule_info'] ? ' (' . str_replace('|', ', ', $p['schedule_info']) . ')' : '';
+        $progLines[] = '- ' . $p['title'] . ': ' . implode(', ', $bits) . $schedule;
+    }
+    $subjectsCourses = "SUBJECTS & COURSES (Classes 9–12, FBISE)\n"
+        . '- Four core subjects: ' . implode(', ', array_column($subjects, 'title')) . ".\n"
+        . "- Programmes:\n" . implode("\n", $progLines);
+
+    $alumni = $db->query("SELECT name, achievement, batch_info FROM alumni WHERE is_active = 1 ORDER BY sort_order")->fetchAll();
+    $resultLines = [];
+    foreach ($alumni as $a) {
+        $resultLines[] = '- ' . $a['batch_info'] . ': ' . $a['name'] . ' — ' . $a['achievement'] . '.';
+    }
+    $results = "RESULTS (verifiable Federal Board results)\n" . implode("\n", $resultLines);
+
+    $notes = "NOTES\n- Free notes for every visitor on the Notes page (no login). Premium notes and model papers unlock with an active subscription; some notes are secured, view-only PDFs.";
+
+    $feesLines = ['- Bank: ' . getSetting('bank_name') . ', Title "' . getSetting('bank_title') . '", IBAN ' . getSetting('bank_iban') . '.'];
+    if (getSetting('easypaisa_number')) {
+        $feesLines[] = '- EasyPaisa: ' . getSetting('easypaisa_name') . ', ' . getSetting('easypaisa_number') . '.';
+    }
+    if (getSetting('jazzcash_number')) {
+        $feesLines[] = '- JazzCash: ' . getSetting('jazzcash_name') . ', ' . getSetting('jazzcash_number') . '.';
+    }
+    $fees = "FEES & PAYMENT\n" . implode("\n", $feesLines) . "\n- Ask on WhatsApp for fees of any programme not listed above.";
+
+    $whatsapp = getSetting('whatsapp_number');
+    $contact = "CONTACT\n"
+        . '- WhatsApp (fastest, reply within 3 hours): +' . $whatsapp . ' → https://wa.me/' . $whatsapp . "\n"
+        . '- Phone: ' . getSetting('phone') . ', ' . getSetting('phone_2') . '. Email: ' . getSetting('email') . ".\n"
+        . "- Pages: /courses /notes /blog /testimonials /alumni /about /contact /enroll\n"
+        . '- Enrol via the form at /enroll or on WhatsApp.';
+
+    return implode("\n\n", [$about, $founders, $subjectsCourses, $results, $notes, $fees, $contact]);
 }
 
 /**
