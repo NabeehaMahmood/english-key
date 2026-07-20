@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 require_once __DIR__ . '/includes/header.php';
 
-$trackRecords = getTrackRecords(3);
+$trackRecords = getTrackRecords();
 $stories = $db->query("SELECT * FROM alumni WHERE is_active = 1 AND story IS NOT NULL AND story != '' ORDER BY sort_order DESC")->fetchAll();
 $humanQuestion = humanCheckQuestion();
 ?>
@@ -51,8 +51,8 @@ $humanQuestion = humanCheckQuestion();
 <section class="dark" style="padding:64px 0">
   <div class="wrap">
     <div class="g3 reveal">
-      <?php foreach ($trackRecords as $r): ?>
-        <?= renderTrackRecordCard($r) ?>
+      <?php foreach ($trackRecords as $i => $r): ?>
+        <?= renderTrackRecordCard($r, 'tcard reveal', revealDelay($i)) ?>
       <?php endforeach; ?>
     </div>
   </div>

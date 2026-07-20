@@ -114,10 +114,12 @@ foreach ($profiles as $p): $t = $p['t'];
       <?php foreach ($faculty as $i => $t): ?>
         <div class="faculty-card"<?= revealDelay($i) ?>>
           <?php if ($t['photo']): ?><div class="pcrop"><img src="<?= e($t['photo']) ?>" alt="<?= e($t['name']) ?>"></div><?php endif; ?>
-          <h3><?= e($t['name']) ?></h3>
-          <?php if ($t['role_title']): ?><span class="faculty-role"><?= e($t['role_title']) ?></span><?php endif; ?>
-          <?php if ($t['qualification']): ?><p class="faculty-qual"><?= e($t['qualification']) ?></p><?php endif; ?>
-          <?php if ($t['bio']): ?><p class="faculty-desc"><?= e($t['bio']) ?></p><?php endif; ?>
+          <div class="faculty-card-body">
+            <h3><?= e($t['name']) ?></h3>
+            <?php if ($t['role_title']): ?><span class="faculty-role"><?= e($t['role_title']) ?></span><?php endif; ?>
+            <?php if ($t['qualification']): ?><p class="faculty-qual"><?= e($t['qualification']) ?></p><?php endif; ?>
+            <?php if ($t['bio']): ?><p class="faculty-desc"><?= e($t['bio']) ?></p><?php endif; ?>
+          </div>
         </div>
       <?php endforeach; ?>
     </div>

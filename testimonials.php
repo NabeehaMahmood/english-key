@@ -18,7 +18,7 @@ $categories = array_values(array_filter($categories, static function ($cat) use 
     return !empty($byCategory[$cat['id']]);
 }));
 
-$trackRecords = getTrackRecords(3);
+$trackRecords = getTrackRecords();
 
 $testimonialsSubtitle = $googleUrl
     ? sprintf('Every quote on this page is a genuine, permission-granted review from students, parents and alumni, part of our %s★ rating from %s Google reviews.', $googleRating, $googleCount)
@@ -71,7 +71,7 @@ $testimonialsSubtitle = $googleUrl
     </div>
     <div class="g3 reveal">
       <?php foreach ($trackRecords as $i => $r): ?>
-        <?= renderTrackRecordCard($r, 'tcard', revealDelay($i)) ?>
+        <?= renderTrackRecordCard($r, 'tcard reveal', revealDelay($i)) ?>
       <?php endforeach; ?>
     </div>
     <div class="gbar reveal" style="margin-top:26px">

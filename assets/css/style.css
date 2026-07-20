@@ -113,6 +113,10 @@ a:hover { text-decoration: underline; }
 .phero h1 { color: #fff; }
 .phero .kick { color: #F0A468; }
 .phero .kick::before { content: ""; width: 26px; height: 2px; border-radius: 2px; background: #F0A468; }
+.phero .hl {
+  display: inline-block; background: var(--orange); color: #fff; padding: .04em .24em;
+  border-radius: 6px; transform: rotate(-1.2deg);
+}
 .phero .sub, .phero-desc { color: #DCE3F8; }
 .phero-desc { font-size: 15px; max-width: 620px; margin-top: 10px; }
 @media (prefers-reduced-motion: reduce) { .phero::before, .phero::after { animation: none; } }
@@ -197,11 +201,15 @@ section.dark .sub { color: #b9c2de; }
 
 .pquote { border-left: 4px solid var(--orange); padding: 18px 22px; background: var(--bg); border-radius: 0 12px 12px 0; }
 
-.tcard { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.15); border-radius: 14px; padding: 22px; text-align: center; }
-.tcard .tpos { display: inline-block; background: var(--orange); color: #fff; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 999px; margin-bottom: 10px; letter-spacing: .06em; }
-.tcard .tyr { font-family: 'Manrope', sans-serif; font-size: 1.6rem; font-weight: 800; color: #fff; }
-.tcard b { display: block; color: #fff; margin-top: 4px; }
-.tcard span { font-size: 12.5px; color: #b9c2de; }
+.tcard { background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14); border-radius: 14px; padding: 34px 28px; position: relative; }
+.tcard .tpos {
+  position: absolute; top: -14px; right: 18px; background: var(--orange); color: #fff; font-weight: 700;
+  font-size: 12px; letter-spacing: .1em; padding: 8px 16px; border-radius: 8px; transform: rotate(2deg);
+  box-shadow: 0 8px 20px rgba(229,106,25,.45);
+}
+.tcard .tyr { font-family: 'Manrope', sans-serif; font-size: 44px; font-weight: 800; color: #F5A468; line-height: 1; margin-bottom: 12px; }
+.tcard b { font-size: 18px; display: block; margin-bottom: 4px; color: #fff; }
+.tcard span { color: #C3CCE9; font-size: 14px; }
 
 .gbar { background: #fff; border-radius: 16px; padding: 26px; margin-top: 30px; display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
 .gbar .big { font-family: 'Manrope', sans-serif; font-size: 2rem; font-weight: 800; color: var(--orange); }
@@ -216,14 +224,21 @@ section.dark .sub { color: #b9c2de; }
 .split { display: grid; grid-template-columns: 1fr 1.3fr; gap: 50px; align-items: center; }
 .split.rev { grid-template-columns: 1.3fr 1fr; }
 .split.rev .bio { order: -1; }
-.bio .creds { margin-top: 8px; }
-.cred { padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13.5px; color: var(--text); }
+.creds { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 26px; margin: 24px 0 28px; }
+.cred { position: relative; padding-left: 28px; font-size: 15px; color: #333C5C; font-weight: 500; }
+.cred::before {
+  content: "\2713"; position: absolute; left: 0; top: 0; width: 19px; height: 19px; border-radius: 50%;
+  border: 2px solid var(--purple); color: var(--purple); font-size: 11px; font-weight: 700;
+  display: grid; place-items: center;
+}
+@media (max-width: 640px) { .creds { grid-template-columns: 1fr; } }
 @media (max-width: 860px) { .split, .split.rev { grid-template-columns: 1fr; } .split.rev .bio { order: 0; } }
 
-.mcard { text-align: center; }
-.mno { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 1.6rem; color: var(--orange-soft); -webkit-text-stroke: 1.5px var(--orange); color: transparent; margin-bottom: 8px; }
-.mcard h3 { font-size: 16px; }
-.mcard p { font-size: 13.5px; color: var(--muted); }
+.mcard { background: #fff; border: 1.5px solid var(--blue); border-radius: 14px; padding: 26px 24px; transition: transform .2s ease, box-shadow .2s ease; }
+.mcard:hover { transform: translateY(-4px); box-shadow: 0 14px 32px rgba(30,42,102,.1); }
+.mno { font-family: 'Manrope', sans-serif; color: var(--purple); font-weight: 800; font-size: 15px; letter-spacing: .1em; margin-bottom: 8px; }
+.mcard h3 { font-size: 18px; margin-bottom: 8px; }
+.mcard p { color: var(--muted); font-size: 15px; line-height: 1.6; }
 
 .check { display: flex; align-items: flex-start; gap: 8px; font-size: 14px; padding: 6px 0; }
 .check::before {
@@ -418,9 +433,9 @@ footer h4::after { content: ""; display: block; width: 26px; height: 2px; backgr
   border-radius: 6px; transform: rotate(-1.2deg);
 }
 .page-home .hl-o, .page-testimonials .hl-o, .page-courses .hl-o { background: var(--orange); }
-.page-home section.dark .hl, .page-home .phero .hl,
-.page-testimonials section.dark .hl, .page-testimonials .phero .hl,
-.page-courses section.dark .hl, .page-courses .phero .hl { background: var(--orange); color: #fff; }
+/* .phero .hl is now unscoped (see the shared "Page hero" rule above), so this
+   only needs to cover the non-hero dark sections that still use .page-X scoping. */
+.page-home section.dark .hl, .page-testimonials section.dark .hl, .page-courses section.dark .hl { background: var(--orange); color: #fff; }
 .ar::after { content: "\2192"; }
 
 /* Note: .phero is now unscoped dark-navy for every inner page (see the
@@ -820,15 +835,20 @@ footer h4::after { content: ""; display: block; width: 26px; height: 2px; backgr
 }
 .founder-frame img { width: 100%; height: auto; display: block; aspect-ratio: 4/5; object-fit: cover; }
 
-/* ---------- Faculty grid: 3-4 cols desktop, 2 tablet, 1 mobile ---------- */
-.faculty-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px,1fr)); gap: 24px; margin-top: 34px; }
+/* ---------- Faculty grid: 3-4 cols desktop, 2 tablet, 1 mobile. Large square
+   photo fills the top of the card (object-fit: cover, biased toward the top
+   so faces don't get cropped off), text content below in its own padded
+   area; the card has no fixed height, so it grows with longer bios. ---------- */
+.faculty-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap: 24px; margin-top: 34px; }
 .faculty-card {
   background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
-  padding: 28px 24px; text-align: center;
+  overflow: hidden; text-align: center;
   transition: transform .25s cubic-bezier(.2,.7,.3,1), box-shadow .25s ease, border-color .25s ease;
 }
 .faculty-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-h); border-color: #DCD7C9; }
-.faculty-card .pcrop { width: 96px; height: 96px; border-radius: 50%; margin: 0 auto 16px; }
+.faculty-card .pcrop { width: 100%; margin: 0; border-radius: 0; }
+.faculty-card .pcrop img { object-position: center 20%; }
+.faculty-card-body { padding: 22px 24px 26px; }
 .faculty-card h3 { font-size: 17px; margin-bottom: 2px; }
 .faculty-role {
   display: block; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;

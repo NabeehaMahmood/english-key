@@ -3,7 +3,7 @@ require_once __DIR__ . '/includes/header.php';
 
 $db = getDb();
 $subjects = $db->query("SELECT * FROM courses WHERE category = 'subject' AND is_active = 1 ORDER BY sort_order LIMIT 4")->fetchAll();
-$trackRecords = getTrackRecords(3);
+$trackRecords = getTrackRecords();
 $testimonials = $db->query('SELECT * FROM testimonials WHERE is_active = 1 ORDER BY sort_order LIMIT 3')->fetchAll();
 $featured = $db->query("SELECT * FROM courses WHERE category = 'featured' AND is_active = 1 ORDER BY sort_order LIMIT 1")->fetch();
 
@@ -119,7 +119,7 @@ $whyHeading = getContentBlock('home', 'why_heading')['content'] ?: 'A planned, y
       <h2 class="t"><?= e($trackRest) ?><span class="hl"><?= e($trackLast) ?></span></h2>
       <p class="sub"><?= e($trackDescription) ?></p>
     </div>
-    <div class="g3">
+    <div class="g3 reveal">
       <?php foreach ($trackRecords as $i => $r): ?>
         <?= renderTrackRecordCard($r, 'tcard reveal', revealDelay($i)) ?>
       <?php endforeach; ?>
