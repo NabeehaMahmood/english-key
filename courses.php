@@ -15,6 +15,11 @@ $googleUrl = getSetting('google_reviews_url');
 $googleRating = getSetting('google_rating');
 $googleCount = getSetting('google_review_count');
 
+// Handout links are backend-driven via site_settings; '#' is a safe
+// placeholder until those keys are populated, so the buttons never 404.
+$courseOutlineViewUrl = getSetting('course_outline_view_url', '#');
+$courseOutlineDownloadUrl = getSetting('course_outline_download_url', '#');
+
 /**
  * One detail order used everywhere a featured course's meta chips appear -
  * Duration -> Level/Eligibility -> Mode -> Price -> Seats.
@@ -137,6 +142,36 @@ function featuredMeta(array $c): string
   </div>
 </section>
 <?php endif; ?>
+
+<section class="handout-panel">
+  <div class="wrap">
+    <div class="handout-card reveal" data-anim="fade-up">
+      <div class="handout-icon" aria-hidden="true">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 3h6l3 3v10.5A.5.5 0 0 1 14.5 17h-8a.5.5 0 0 1-.5-.5v-13A.5.5 0 0 1 6 3z"/><path d="M12 3v3h3"/><path d="M7.5 10h5M7.5 12.5h5"/>
+        </svg>
+      </div>
+      <div class="handout-body">
+        <div class="kick">Course Handout</div>
+        <p class="handout-desc">Download or view the latest detailed course outline, syllabus and study structure prepared by EnglishKeys Academy.</p>
+      </div>
+      <div class="handout-actions">
+        <a class="btn btn-l handout-btn" href="<?= e($courseOutlineViewUrl) ?>" target="_blank" rel="noopener">
+          <svg class="icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M1.5 10S4.5 4.5 10 4.5 18.5 10 18.5 10 15.5 15.5 10 15.5 1.5 10 1.5 10z"/><circle cx="10" cy="10" r="2.5"/>
+          </svg>
+          View Course Outline
+        </a>
+        <a class="btn btn-o handout-btn" href="<?= e($courseOutlineDownloadUrl) ?>" download rel="noopener">
+          <svg class="icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M10 3v9.5M6 9l4 4 4-4"/><path d="M3.5 15.5v1a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-1"/>
+          </svg>
+          Download Course Outline
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
 
 <?php if ($programmes):
   // Bucket programmes by their admin-assigned group (courses.programme_group_id
