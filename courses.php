@@ -115,7 +115,7 @@ function featuredMeta(array $c): string
     </div>
     <div class="courses-grid reveal" style="margin-top:30px">
       <?php foreach ($subjects as $s): ?>
-        <a href="#enrol" class="ccard" style="--c:<?= e($s['accent_color']) ?>">
+        <a href="enroll.php#enrol-form" class="ccard" style="--c:<?= e($s['accent_color']) ?>">
           <div class="ccard-media">
             <?php if (!empty($s['image'])): ?>
               <img src="<?= e($s['image']) ?>" alt="<?= e($s['title']) ?>" loading="lazy">

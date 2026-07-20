@@ -61,7 +61,7 @@ $subjectOptions = ['English', 'Urdu', 'Islamiat', 'Tarjuma-tul-Quran'];
 $programmeOptions = ['Full syllabus (regular)', 'Summer Intensive', 'FBISE Bootcamp', 'Exam Marathon', 'Crash Course', 'Deen Camp (Islamiat & Quran)', 'MDCAT / NUMS English'];
 ?>
 
-<div class="phero">
+<div class="phero phero-navy">
   <div class="wrap reveal">
     <div class="kick">Enrolment</div>
     <h1>Enrol at EnglishKeys, <span class="hl">start this week.</span></h1>
@@ -69,7 +69,7 @@ $programmeOptions = ['Full syllabus (regular)', 'Summer Intensive', 'FBISE Bootc
   </div>
 </div>
 
-<section>
+<section id="enrol-form">
   <div class="wrap ef-wrap">
     <form class="ef-form reveal" method="post" action="enroll.php" novalidate>
       <?= csrfField() ?>

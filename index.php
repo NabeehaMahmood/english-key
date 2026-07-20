@@ -79,16 +79,25 @@ $aboutQuote = getContentBlock('about', 'quote');
       <h2 class="t">Four subjects. One standard: <span class="hl">first position.</span></h2>
       <p class="sub">Complete FBISE preparation for Classes 9-12, from the first lecture to the final board paper.</p>
     </div>
-    <div class="g2 reveal">
+    <div class="courses-grid reveal" style="margin-top:30px">
       <?php foreach ($subjects as $s): ?>
-        <div class="card scard" style="--c:<?= e($s['accent_color']) ?>">
-          <div class="num">0<?= (int)$s['sort_order'] ?>, <?= e($s['level']) ?></div>
-          <h3><?= e($s['title']) ?></h3>
-          <p><?= e($s['description']) ?></p>
-          <?php if ($s['tag_line']): ?>
-            <div class="tags"><?php foreach (explode(' - ', $s['tag_line']) as $tag): ?><span class="tag"><?= e($tag) ?></span><?php endforeach; ?></div>
-          <?php endif; ?>
-        </div>
+        <a href="enroll.php#enrol-form" class="ccard" style="--c:<?= e($s['accent_color']) ?>">
+          <div class="ccard-media">
+            <?php if (!empty($s['image'])): ?>
+              <img src="<?= e($s['image']) ?>" alt="<?= e($s['title']) ?>" loading="lazy">
+            <?php else: ?>
+              <span class="ccard-media-fallback"><?= icon('book-open', 'icon') ?></span>
+            <?php endif; ?>
+          </div>
+          <div class="ccard-body">
+            <div class="ccard-num">0<?= (int)$s['sort_order'] ?>, <?= e($s['level']) ?></div>
+            <h3 class="ccard-title"><?= e($s['title']) ?></h3>
+            <p class="ccard-desc"><?= e($s['description']) ?></p>
+            <?php if ($s['tag_line']): ?>
+              <div class="tags"><?php foreach (explode(' - ', $s['tag_line']) as $tag): ?><span class="tag"><?= e(trim($tag)) ?></span><?php endforeach; ?></div>
+            <?php endif; ?>
+          </div>
+        </a>
       <?php endforeach; ?>
     </div>
     <p style="margin-top:26px" class="reveal"><a class="vlink" href="courses.php">View all courses →</a></p>
