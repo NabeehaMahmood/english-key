@@ -10,7 +10,7 @@ $blocks = [
     ['about', 'method_steps', "About - Method Steps (one per line, format: Title|Description)"],
     ['courses', 'how_to_enrol_steps', "Courses - How to Enrol Steps (one per line, format: 01. Title|Description)"],
     ['courses', 'terms_conditions', 'Courses - Terms & Conditions (one per line)'],
-    ['contact', 'intro', 'Contact - Introduction'],
+    ['courses', 'featured_intro', 'Courses - Featured Section Heading (format: Title|Description)'],
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

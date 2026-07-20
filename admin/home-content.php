@@ -191,6 +191,10 @@ $whyCards = $db->query('SELECT * FROM home_why_cards ORDER BY sort_order, id')->
 
   <div class="admin-tabpanel" id="track-record" data-tab-group="main" data-tab-id="track-record" hidden>
     <h2>Proven Track Record</h2>
+    <div class="admin-note">
+      <?= icon('trophy', 'note-icon') ?>
+      <p>This tab only edits the section's heading, description and background image. The achiever cards themselves (also shown on Testimonials and Alumni) are managed under <a href="home-track-record.php">Homepage Track Record &rarr;</a></p>
+    </div>
     <label>Heading
       <input type="text" name="track_record_heading" value="<?= e($blockValues['track_record_heading']) ?>">
     </label>

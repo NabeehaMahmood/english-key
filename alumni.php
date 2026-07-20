@@ -40,30 +40,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 require_once __DIR__ . '/includes/header.php';
 
-$achievers = $db->query("SELECT * FROM alumni WHERE is_active = 1 AND (story IS NULL OR story = '') ORDER BY sort_order")->fetchAll();
+$trackRecords = getTrackRecords(3);
 $stories = $db->query("SELECT * FROM alumni WHERE is_active = 1 AND story IS NOT NULL AND story != '' ORDER BY sort_order DESC")->fetchAll();
 $humanQuestion = humanCheckQuestion();
 ?>
 
-<div class="phero">
-  <div class="wrap reveal">
-    <div class="kick">Alumnus Corner</div>
-    <h1>Once EnglishKeys, <span class="hl">always EnglishKeys.</span></h1>
-    <p class="sub">Our alumni carry the academy's standard into medical colleges, universities and careers. This corner belongs to them, their journeys, milestones and advice for the students following behind.</p>
-  </div>
-</div>
+<?php renderPageHero('alumni'); ?>
 
-<?php if ($achievers): ?>
+<?php if ($trackRecords): ?>
 <section class="dark" style="padding:64px 0">
   <div class="wrap">
     <div class="g3 reveal">
-      <?php foreach ($achievers as $a): ?>
-        <div class="tcard">
-          <span class="tpos">CLASS OF <?= e(substr($a['batch_info'], -4)) ?></span>
-          <div class="tyr"><?= e(substr($a['batch_info'], -4)) ?></div>
-          <b><?= e($a['name']) ?></b>
-          <span><?= e($a['achievement']) ?></span>
-        </div>
+      <?php foreach ($trackRecords as $r): ?>
+        <?= renderTrackRecordCard($r) ?>
       <?php endforeach; ?>
     </div>
   </div>

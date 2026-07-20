@@ -3,7 +3,7 @@ require_once __DIR__ . '/includes/header.php';
 
 $db = getDb();
 $subjects = $db->query("SELECT * FROM courses WHERE category = 'subject' AND is_active = 1 ORDER BY sort_order LIMIT 4")->fetchAll();
-$achievers = $db->query('SELECT * FROM alumni WHERE is_active = 1 ORDER BY sort_order LIMIT 3')->fetchAll();
+$trackRecords = getTrackRecords(3);
 $testimonials = $db->query('SELECT * FROM testimonials WHERE is_active = 1 ORDER BY sort_order LIMIT 3')->fetchAll();
 $featured = $db->query("SELECT * FROM courses WHERE category = 'featured' AND is_active = 1 ORDER BY sort_order LIMIT 1")->fetch();
 
@@ -104,7 +104,7 @@ $whyHeading = getContentBlock('home', 'why_heading')['content'] ?: 'A planned, y
 </section>
 <?php endif; ?>
 
-<?php if ($achievers): ?>
+<?php if ($trackRecords): ?>
 <section class="dark trackrecord" id="results">
   <div class="tr-bg" aria-hidden="true">
     <?php if ($trackBgImage): ?>
@@ -120,13 +120,8 @@ $whyHeading = getContentBlock('home', 'why_heading')['content'] ?: 'A planned, y
       <p class="sub"><?= e($trackDescription) ?></p>
     </div>
     <div class="g3">
-      <?php foreach ($achievers as $i => $a): ?>
-        <div class="tcard reveal"<?= revealDelay($i) ?>>
-          <span class="tpos">1ST POSITION</span>
-          <div class="tyr"><?= e(substr($a['batch_info'], -4)) ?></div>
-          <b><?= e($a['name']) ?></b>
-          <span><?= e($a['achievement']) ?></span>
-        </div>
+      <?php foreach ($trackRecords as $i => $r): ?>
+        <?= renderTrackRecordCard($r, 'tcard reveal', revealDelay($i)) ?>
       <?php endforeach; ?>
     </div>
     <?php if ($googleUrl): ?>

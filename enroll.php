@@ -61,13 +61,7 @@ $subjectOptions = ['English', 'Urdu', 'Islamiat', 'Tarjuma-tul-Quran'];
 $programmeOptions = ['Full syllabus (regular)', 'Summer Intensive', 'FBISE Bootcamp', 'Exam Marathon', 'Crash Course', 'Deen Camp (Islamiat & Quran)', 'MDCAT / NUMS English'];
 ?>
 
-<div class="phero">
-  <div class="wrap reveal">
-    <div class="kick">Enrolment</div>
-    <h1>Enrol at EnglishKeys, <span class="hl">start this week.</span></h1>
-    <p class="sub">Tell us who's enrolling and which subjects you want. We reply within 3 hours to confirm your seat and share payment details. All classes are online, on Pakistan Standard Time.</p>
-  </div>
-</div>
+<?php renderPageHero('enroll'); ?>
 
 <section>
   <div class="wrap ef-wrap">

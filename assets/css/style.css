@@ -1,15 +1,27 @@
 :root {
   --navy: #1F2B54;
   --navy-2: #26346F;
-  --orange: #E56A19;
+  --orange: #EA6C1F;
   --orange-soft: #FDEEDF;
   --purple: #7A3FD0;
   --blue: #1B7FB4;
   --whatsapp: #25D366;
-  --muted: #6b7280;
+  --muted: #5D6678;
   --bg: #FBFAF7;
-  --line: #E4DECF;
+  --line: #E8E4DA;
   --text: #1c2438;
+
+  /* Design tokens from the approved html folders/client_courses_final.html
+     reference - used by the Courses page and every inner-page Hero. */
+  --ink: #1B2A4A;
+  --paper: #FFFFFF;
+  --soft: #F8F6F1;
+  --orange-2: #FDEBDD;
+  --green: #1E8A5E;
+  --radius: 18px;
+  --shadow: 0 1px 2px rgba(27,42,74,.04), 0 8px 24px -12px rgba(27,42,74,.10);
+  --shadow-h: 0 2px 4px rgba(27,42,74,.05), 0 20px 44px -16px rgba(27,42,74,.18);
+  --font-d: 'Manrope', sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -59,23 +71,52 @@ a:hover { text-decoration: underline; }
   .burger { display: flex; }
 }
 
-/* ---------- Buttons ---------- */
+/* ---------- Buttons (pill shape + hover lift, from client_courses_final.html) ---------- */
 .btn {
-  display: inline-flex; align-items: center; gap: 6px; padding: 11px 22px; border-radius: 9px;
-  font-weight: 700; font-size: 14.5px; cursor: pointer; border: 1.5px solid transparent; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; border-radius: 999px;
+  font-weight: 600; font-size: 14.5px; cursor: pointer; border: 1.5px solid transparent; white-space: nowrap;
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease, color .15s ease, border-color .15s ease;
 }
-.btn-o { background: var(--orange); color: #fff; }
-.btn-o:hover { opacity: .9; text-decoration: none; }
-.btn-n { background: var(--navy); color: #fff; }
-.btn-n:hover { opacity: .9; text-decoration: none; }
-.btn-l { background: transparent; color: var(--navy); border-color: var(--line); }
-.btn-l:hover { border-color: var(--navy); text-decoration: none; }
+.btn:active { transform: scale(.97); }
+.btn-o { background: var(--orange); color: #fff; box-shadow: 0 8px 20px -8px rgba(234,108,31,.55); }
+.btn-o:hover { background: #D45D14; transform: translateY(-1px); text-decoration: none; }
+.btn-n { background: var(--ink); color: #fff; }
+.btn-n:hover { background: #12203C; transform: translateY(-1px); text-decoration: none; }
+.btn-l { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn-l:hover { border-color: var(--ink); text-decoration: none; }
 .btn-w { background: var(--orange-soft); color: var(--orange); }
 .btn-w:hover { text-decoration: none; opacity: .85; }
 .btn-ghost { background: transparent; color: var(--navy); border-color: var(--line); }
 
-/* ---------- Page hero (courses/notes/alumni/blog/contact banner - unchanged) ---------- */
-.phero { padding: 70px 0 50px; background: linear-gradient(180deg, var(--orange-soft), #fff); }
+/* ---------- Page hero (shared by every inner page via renderPageHero(), see includes/hero.php.
+   Home's own <section class="hero"> does not use this class. Dark navy gradient +
+   floating accent shape, matching html folders/client_courses_final.html's .phero. ---------- */
+.phero {
+  background:
+    radial-gradient(700px 420px at 88% 0%, rgba(255,255,255,.08), transparent 60%),
+    linear-gradient(140deg, #26346F, #141B44 70%, #0F1533);
+  padding: 112px 0 92px; position: relative; overflow: hidden; background-size: cover; background-position: center;
+}
+.phero::before {
+  content: ""; position: absolute; right: -100px; top: -80px; width: 400px; height: 340px; border-radius: 76px;
+  background: linear-gradient(155deg, rgba(234,108,31,.30), rgba(122,63,208,.26));
+  transform: rotate(22deg); animation: pheroFloat 5s ease-in-out infinite; pointer-events: none;
+}
+.phero::after {
+  content: ""; position: absolute; left: -120px; bottom: -140px; width: 320px; height: 320px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,.06), transparent 70%);
+  animation: pheroFloat 7.5s ease-in-out infinite reverse; pointer-events: none;
+}
+@keyframes pheroFloat { 0%, 100% { transform: translateY(0) rotate(22deg); } 50% { transform: translateY(-20px) rotate(22deg); } }
+.phero .wrap { position: relative; z-index: 1; }
+.phero-crumb { color: #B9C2DE; font-size: 13px; margin-bottom: 10px; }
+.phero h1 { color: #fff; }
+.phero .kick { color: #F0A468; }
+.phero .kick::before { content: ""; width: 26px; height: 2px; border-radius: 2px; background: #F0A468; }
+.phero .sub, .phero-desc { color: #DCE3F8; }
+.phero-desc { font-size: 15px; max-width: 620px; margin-top: 10px; }
+@media (prefers-reduced-motion: reduce) { .phero::before, .phero::after { animation: none; } }
+
 .kick {
   display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 800;
   letter-spacing: .12em; text-transform: uppercase; color: var(--orange); margin-bottom: 14px;
@@ -121,10 +162,10 @@ section.dark .sub { color: #b9c2de; }
 
 /* ---------- Cards ---------- */
 .card {
-  border: 1.5px solid var(--line); border-radius: 14px; padding: 24px; background: #fff;
-  transition: transform .2s ease, box-shadow .2s ease;
+  border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; background: var(--paper);
+  box-shadow: var(--shadow); transition: transform .2s ease, box-shadow .2s ease;
 }
-.card:hover { transform: translateY(-4px); box-shadow: 0 14px 32px rgba(30,42,102,.1); }
+.card:hover { transform: translateY(-4px); box-shadow: var(--shadow-h); }
 .card img { width: 100%; height: 170px; object-fit: cover; border-radius: 10px; margin-bottom: 14px; }
 .card .meta { color: var(--muted); font-size: 13.5px; }
 
@@ -382,17 +423,10 @@ footer h4::after { content: ""; display: block; width: 26px; height: 2px; backgr
 .page-courses section.dark .hl, .page-courses .phero .hl { background: var(--orange); color: #fff; }
 .ar::after { content: "\2192"; }
 
-/* ---------- Page hero band (reference .phero: dark navy gradient, not the site's shared light one) ---------- */
-.page-testimonials .phero, .page-courses .phero {
-  margin-top: 0;
-  background: radial-gradient(600px 380px at 88% 0%, rgba(255,255,255,.07), transparent 60%), linear-gradient(140deg, #26346F, #17204F);
-  color: #fff;
-  padding: 76px 0 84px;
-  position: relative;
-  overflow: hidden;
-}
-.page-testimonials .phero .sub, .page-courses .phero .sub { color: #DCE3F8; margin-bottom: 0; max-width: 560px; }
-.page-testimonials .phero h1, .page-courses .phero h1 { color: #fff; }
+/* Note: .phero is now unscoped dark-navy for every inner page (see the
+   shared "Page hero" rule above) - the old .page-testimonials/.page-courses
+   -only override that used to live here has been folded into that one rule
+   so it isn't duplicated per page. */
 
 /* ---------- Section headings: slightly larger for readability/hierarchy (was a flat 2rem) ---------- */
 .page-home .t { font-size: clamp(28px, 3.6vw, 38px); }
@@ -541,92 +575,268 @@ footer h4::after { content: ""; display: block; width: 26px; height: 2px; backgr
 }
 
 /* ============================================================
-   Featured-course popup (index.php) - .fcard/.fbadge/.fcta are shared
-   with the popup only; the Courses page below uses its own classes.
+   COURSES PAGE - converted directly from the approved
+   html folders/client_courses_final.html. .fcard/.fbadge are shared
+   with the Home featured-course popup (index.php's .fc-card) so both
+   read as the same component; the rest of these classes are unique to
+   the Courses page.
    ============================================================ */
-.fcard { position: relative; display: flex; flex-direction: column; border-top: 4px solid var(--orange); }
+
+/* ---------- Quick-nav ("On this page") strip ---------- */
+.jumpnav {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 16px 24px; font-size: 14px;
+  position: sticky; top: 67px; z-index: 40;
+  background: rgba(255,255,255,.92); backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.jumpnav-label { color: var(--muted); font-weight: 600; display: inline-flex; align-items: center; gap: 7px; }
+.jumpnav-label svg { width: 15px; height: 15px; color: var(--orange); flex: none; }
+.jumpnav a {
+  position: relative; overflow: hidden; text-decoration: none; font-weight: 600; color: var(--ink);
+  border: 1.5px solid var(--line); border-radius: 999px; padding: 7px 16px;
+  transition: color .18s ease, border-color .18s ease, transform .18s cubic-bezier(.2,.7,.3,1);
+}
+.jumpnav a:hover { border-color: var(--orange); color: var(--orange); transform: translateY(-1px); text-decoration: none; }
+@media (max-width: 680px) {
+  .jumpnav { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .jumpnav::-webkit-scrollbar { display: none; }
+  .jumpnav-label { flex: none; }
+  .jumpnav a { flex: none; white-space: nowrap; }
+}
+
+/* ---------- Featured cards: compact, hover-reveals details ---------- */
+.fcard {
+  position: relative; display: flex; flex-direction: column; align-items: flex-start;
+  padding: 18px; overflow: hidden; cursor: default;
+  transition: transform .22s cubic-bezier(.2,.7,.3,1), box-shadow .22s ease, border-color .22s ease;
+}
+.fcard:hover { transform: translateY(-5px); box-shadow: var(--shadow-h); border-color: #DCD7C9; }
+.fcard::after {
+  content: ""; position: absolute; left: 0; top: 0; height: 3px; width: 40px;
+  background: var(--orange); border-radius: 0 0 3px 0; transition: width .35s cubic-bezier(.2,.7,.3,1);
+}
+.fcard:hover::after { width: 100%; }
 .fbadge {
-  align-self: flex-start; background: var(--orange-soft); color: var(--orange);
-  font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
-  padding: 4px 10px; border-radius: 999px; margin-bottom: 12px;
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--orange); background: var(--orange-2); border-radius: 999px; padding: 4px 11px; margin-bottom: 11px;
 }
-.fcard .ptitle { font-size: 21px; margin: 0 0 8px; }
-.fcard .pdesc { color: var(--muted); font-size: 14.5px; margin: 0 0 14px; }
-.fcard .meta { margin-bottom: 16px; }
-.fcta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
-
-/* ============================================================
-   COURSES PAGE - converted directly from html folders/courses.html.
-   Scoped to .page-courses wherever the class is shared with another
-   page (.card, .rcard, .t, .kick, .hl already have sitewide/scoped
-   rules above); classes unique to this page (.cata*, .pcard, .pmore,
-   .fcard-a/-b) are safe to define directly.
-   ============================================================ */
-
-/* ---------- Featured course: schedule grid + highlights + curriculum modules ---------- */
-.fcgrid { align-items: stretch; }
-.fcard-a, .fcard-b { padding: 30px 28px; display: flex; flex-direction: column; }
-.fcgrid-sched { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; flex: 1; }
-.fcgrid-sched small { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
-.fcgrid-sched b { display: block; font-size: 15px; }
-.fc-note { color: var(--orange); font-weight: 700; font-size: 12.5px; margin-top: 10px; }
-.fcard-b h3 { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 19px; margin-bottom: 18px; }
-.fcheck-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; }
-.fcheck { display: flex; align-items: center; gap: 8px; }
-.fcheck svg { width: 14px; height: 14px; color: var(--whatsapp); flex-shrink: 0; }
-.fcheck span { font-size: 13.5px; }
-.fmodules { display: grid; grid-template-columns: 1fr auto 1fr; gap: 0 16px; margin-top: 18px; }
-.fmod-div { width: 2px; background: var(--purple); align-self: stretch; }
-.fmodules .mod h3 { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 16px; margin-bottom: 8px; }
-.fmodules .mod .mh { font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; display: block; margin-bottom: 8px; }
-.fmodules .mod ul { list-style: none; padding: 0; margin: 0; }
-.fmodules .mod li { position: relative; padding-left: 16px; font-size: 13px; margin-bottom: 4px; }
-.fmodules .mod li::before { content: "\2022"; position: absolute; left: 0; }
-@media (max-width: 860px) { .fmodules { grid-template-columns: 1fr; } .fmod-div { display: none; } }
-
-/* ---------- Core Subjects: unchanged from the existing .scard component ---------- */
-
-/* ---------- Programmes: accordion by group ---------- */
-.gic-sm { display: inline-grid; place-items: center; vertical-align: -3px; margin-right: 4px; width: 14px; height: 14px; flex-shrink: 0; }
-.cata-list { margin-top: 0; }
-.cata {
-  border: 1px solid var(--line); border-left: 4px solid var(--c, var(--navy)); border-radius: 14px;
-  margin-bottom: 16px; overflow: hidden; background: #fff; transition: box-shadow .35s ease, border-color .35s ease;
+.fbadge::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--orange); animation: fbadgePulse 1.8s ease-in-out infinite; }
+@keyframes fbadgePulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(234,108,31,.45); } 55% { box-shadow: 0 0 0 6px rgba(234,108,31,0); } }
+.fcard .ptitle { font-size: 18px; margin-bottom: 7px; }
+.fcard .pdesc { font-size: 13.5px; color: var(--muted); }
+.fcard .meta { margin: 12px 0 0; gap: 6px; }
+.fcard .meta span { font-size: 11.5px; padding: 5px 10px; }
+.fcard .fdetails-toggle {
+  margin-top: 13px; font-size: 12.5px; padding: 7px 15px;
+  transition: border-color .2s ease, background .2s ease, color .2s ease, transform .18s cubic-bezier(.2,.7,.3,1);
 }
-.cata.open { box-shadow: 0 6px 24px rgba(var(--c-rgb, 30,42,102), .1); }
-.cata-hdr {
-  display: flex; align-items: center; gap: 12px; width: 100%; padding: 18px 22px;
-  font-family: 'Manrope', sans-serif; font-size: 16px; font-weight: 800; color: var(--c, var(--navy));
-  background: rgba(var(--c-rgb, 30,42,102), .04); border: none; cursor: pointer; text-align: left;
-  transition: background .25s ease;
-}
-.cata-hdr:hover { background: rgba(var(--c-rgb, 30,42,102), .1); }
-.cata.open .cata-hdr { background: rgba(var(--c-rgb, 30,42,102), .06); }
-.cata-lbl { display: flex; align-items: center; gap: 10px; flex: 1; }
-.cata-ico { width: 18px; height: 18px; flex-shrink: 0; }
-.cata-count { font-family: 'Inter', sans-serif; font-weight: 600; font-size: 13px; color: var(--muted); }
-.cata-ic { width: 16px; height: 16px; transition: transform .25s ease; flex-shrink: 0; }
-.cata.open .cata-ic { transform: rotate(180deg); }
-.cata-bdy { max-height: 0; overflow: hidden; transition: max-height .4s ease; }
-.cata-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px 22px; }
-@media (max-width: 640px) { .cata-grid { grid-template-columns: 1fr; } }
+.fcard .fdetails-toggle:hover { border-color: var(--orange); color: var(--orange); background: var(--orange-2); transform: translateY(-1px); }
+.fcard .fdetails-toggle[aria-expanded="true"] { border-color: var(--orange); color: var(--orange); background: var(--orange-2); }
+.fcard .fdetails-toggle .chev { transition: transform .3s cubic-bezier(.2,.7,.3,1); font-size: 10px; display: inline-block; }
+.fcard .fdetails-toggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
+.fdetails { width: 100%; max-height: 0; overflow: hidden; opacity: 0; transition: max-height .3s cubic-bezier(.2,.7,.3,1), opacity .22s ease, margin .22s ease; }
+.fdetails.open { opacity: 1; margin-top: 14px; }
+.detgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap: 8px; }
+.detgrid .det { background: var(--bg); border-radius: 10px; padding: 10px 12px; font-size: 12.5px; text-align: center; }
 
-.pcard { display: flex; flex-direction: column; }
-.pcard .ptag { display: inline-flex; align-items: center; font-size: 12.5px; font-weight: 700; color: var(--muted); margin-bottom: 10px; }
-.pteaser { color: var(--muted); font-size: 14.5px; line-height: 1.55; margin-bottom: 16px; min-height: 2.5em; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.pmore {
-  display: inline-flex; align-items: center; gap: 6px; font-family: 'Manrope', sans-serif; font-weight: 700;
-  font-size: 13.5px; color: var(--navy); background: none; border: none; cursor: pointer; padding: 12px 0 0;
-  margin-top: auto; text-align: left;
+/* Featured-card checklist row (reused nowhere else - the older public-form
+   .check icon rule this replaced was unused sitewide). */
+.check { position: relative; padding: 4px 0 4px 26px; font-size: 13.5px; color: var(--ink); }
+.check::before {
+  content: "\2713"; position: absolute; left: 0; top: 4px; width: 17px; height: 17px; border-radius: 50%;
+  background: #E3F3EB; color: var(--green); font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
 }
-.pmore:hover { color: var(--orange); }
-.pmore-ic { width: 14px; height: 14px; flex-shrink: 0; transition: transform .25s ease; }
-.pcard.open .pmore-ic { transform: rotate(180deg); }
-.pdetail { max-height: 0; overflow: hidden; transition: max-height .35s ease; }
-.pdetail.open { margin-top: 12px; }
-.pdetail .pdesc { color: var(--muted); font-size: 14px; margin: 0 0 10px; }
-.pdetail .pfeat { padding-left: 18px; margin: 0; font-size: 13.5px; }
+
+/* ---------- Core Subjects: premium hover version of .scard (shared with the Home Courses preview) ---------- */
+.scard {
+  --c: var(--orange); position: relative; padding: 34px; overflow: hidden; border-top: none;
+  transition: transform .35s cubic-bezier(.2,.7,.3,1), box-shadow .4s ease, border-color .35s ease;
+}
+.scard::after { content: ""; position: absolute; left: 0; bottom: 0; height: 3px; width: 0; background: var(--c); transition: width .45s cubic-bezier(.2,.7,.3,1); }
+.scard:hover {
+  transform: translateY(-6px); border-color: rgba(234,108,31,.35);
+  box-shadow: 0 22px 48px -20px rgba(234,108,31,.45), 0 0 0 1px rgba(234,108,31,.08), var(--shadow-h);
+}
+.scard:hover::after { width: 100%; }
+.scard .num {
+  font-family: var(--font-d); font-weight: 800; font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase;
+  margin-bottom: 14px; display: inline-flex; align-items: center; gap: 8px;
+}
+.scard .num::before { content: ""; width: 8px; height: 8px; border-radius: 2px; background: currentColor; transform: rotate(45deg); }
+.scard h3 { font-size: 24px; margin-bottom: 8px; transition: color .25s ease; }
+.scard:hover h3 { color: var(--c); }
+.scard p { color: var(--muted); font-size: 15px; }
+.scard .tags { margin-top: 18px; }
+.scard .tag { background: color-mix(in srgb, var(--c) 9%, #fff); color: color-mix(in srgb, var(--c) 80%, #000); transition: background .2s ease; }
+.scard:hover .tag { background: color-mix(in srgb, var(--c) 14%, #fff); }
+@media (prefers-reduced-motion: reduce) { .scard:hover { animation: none; } }
+
+/* ---------- Programmes: 3 category groups, each an accordion holding its own programme cards ---------- */
+.pgroups { display: flex; flex-direction: column; gap: 20px; }
+.pgroup {
+  --c: var(--orange); background: var(--paper); border: 1px solid var(--line);
+  border-radius: 20px; box-shadow: var(--shadow); overflow: hidden; transition: box-shadow .25s ease;
+}
+.pgroup:hover { box-shadow: var(--shadow-h); }
+.pghead {
+  display: flex; align-items: center; gap: 22px; padding: 26px 28px; cursor: pointer; user-select: none;
+  background: transparent; border: none; width: 100%; text-align: left; font-family: inherit; color: inherit;
+}
+.pgicon {
+  flex: none; width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center;
+  background: color-mix(in srgb, var(--c) 10%, #fff); color: var(--c);
+  transition: transform .28s cubic-bezier(.2,.7,.3,1), background .28s ease;
+}
+.pgicon svg { width: 30px; height: 30px; }
+.pghead:hover .pgicon { transform: scale(1.08) rotate(-4deg); background: var(--orange-2); color: var(--orange); }
+.pgbody { flex: 1; min-width: 0; }
+.pgspan {
+  display: inline-flex; align-items: center; gap: 7px; font-size: 11.5px; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--c); margin-bottom: 6px;
+}
+.pgbody h3 { font-size: 21px; margin-bottom: 5px; transition: color .2s ease; }
+.pghead:hover .pgbody h3 { color: var(--c); }
+.pgcount { flex: none; display: flex; flex-direction: column; align-items: center; gap: 2px; font-family: var(--font-d); color: var(--c); }
+.pgcount b { font-size: 22px; line-height: 1; }
+.pgcount span { font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.pgchev {
+  flex: none; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: var(--bg); color: var(--ink); transition: transform .3s cubic-bezier(.2,.7,.3,1), background .2s ease;
+}
+.pgchev svg { width: 14px; height: 14px; }
+.pghead:hover .pgchev { background: var(--orange-2); color: var(--orange); }
+.pghead[aria-expanded="true"] .pgchev { transform: rotate(180deg); }
+.pgpanel { max-height: 0; overflow: hidden; transition: max-height .45s cubic-bezier(.2,.7,.3,1); }
+.pgrid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap: 16px;
+  padding: 0 28px 28px; border-top: 1px solid var(--line); margin-top: 2px; padding-top: 22px;
+}
+
+/* Sub-programme card (new design, replaces the old .cata-grid card layout) */
+.pcard {
+  --c: var(--orange); position: relative; display: flex; flex-direction: column; align-items: flex-start;
+  background: var(--bg); border-radius: 14px; padding: 22px;
+  transition: transform .25s cubic-bezier(.2,.7,.3,1), box-shadow .25s ease, background .25s ease;
+}
+.pcard:hover { transform: translateY(-4px); box-shadow: 0 14px 30px -14px rgba(27,42,74,.22); background: #fff; }
+.pcard::before {
+  content: ""; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px; border-radius: 3px;
+  background: var(--c); opacity: .55; transition: opacity .25s ease;
+}
+.pcard:hover::before { opacity: 1; }
+.pcard .ntag {
+  display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
+  background: color-mix(in srgb, var(--c) 12%, #fff); color: var(--c); border-radius: 999px; padding: 5px 12px;
+}
+.pcard .ptitle { font-size: 17.5px; margin: 11px 0 0; }
+.pcard .pdesc { font-size: 13.8px; color: var(--muted); }
+.pcard .pfeat { list-style: none; margin: 13px 0 2px; padding: 0; width: 100%; }
+.pcard .pfeat li { position: relative; padding: 4px 0 4px 20px; font-size: 13.5px; color: var(--muted); }
+.pcard .pfeat li::before { content: ""; position: absolute; left: 2px; top: 13px; width: 6px; height: 6px; border-radius: 2px; background: var(--c); transform: rotate(45deg); }
+.pcard .meta { margin-top: 12px; }
+.pcard .meta span { background: #fff; font-size: 12px; padding: 5px 11px; }
+.pcard:hover .meta span { background: var(--bg); }
+
+/* ---------- How to Enrol: numbered-circle stepper ---------- */
+.stepper { position: relative; display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; padding-top: 4px; }
+.stepper::before {
+  content: ""; position: absolute; top: 32px; left: 12.5%; right: 12.5%;
+  border-top: 2px dashed color-mix(in srgb, var(--orange) 35%, var(--line)); z-index: 0;
+}
+.step { position: relative; z-index: 1; text-align: center; padding: 0 12px; }
+.step-circle {
+  position: relative; margin: 0 auto 20px; width: 64px; height: 64px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--soft); border: 2px solid var(--orange); color: var(--orange);
+  font-family: var(--font-d); font-weight: 800; font-size: 18px; letter-spacing: -.01em;
+  transition: background .32s cubic-bezier(.2,.7,.3,1), color .32s ease, transform .32s cubic-bezier(.2,.7,.3,1), box-shadow .32s ease;
+}
+.step:hover .step-circle { background: var(--orange); color: #fff; transform: scale(1.1); box-shadow: 0 12px 26px -10px rgba(234,108,31,.55); }
+.step h3 { font-size: 16.5px; margin-bottom: 6px; transition: color .25s ease; }
+.step:hover h3 { color: var(--orange); }
+.step p { font-size: 13.5px; color: var(--muted); max-width: 24ch; margin: 0 auto; }
+@media (max-width: 820px) { .stepper { grid-template-columns: 1fr 1fr; row-gap: 34px; } .stepper::before { display: none; } }
+@media (max-width: 560px) {
+  .stepper { grid-template-columns: 1fr; gap: 26px; text-align: left; }
+  .step { display: flex; gap: 16px; align-items: flex-start; text-align: left; padding: 0; }
+  .step-circle { margin: 0; flex: none; }
+  .step p { max-width: none; }
+}
+
+/* ---------- Reviews: animated rating badge + premium testimonial cards ---------- */
+.rating-badge { display: flex; flex-direction: column; align-items: center; gap: 9px; margin: 26px auto 0; text-align: center; }
+.rating-badge .rnum { font-family: var(--font-d); font-weight: 800; font-size: 46px; color: var(--ink); line-height: 1; letter-spacing: -.02em; }
+.rating-badge .stars-wrap { position: relative; width: 138px; height: 23px; flex: none; }
+.stars-base, .stars-fill { position: absolute; top: 0; left: 0; display: flex; gap: 3px; white-space: nowrap; overflow: hidden; }
+.stars-base svg, .stars-fill svg { width: 23px; height: 23px; flex: none; }
+.stars-base { color: #E7E3D7; }
+.stars-fill { color: var(--orange); width: 0; transition: width 1.15s cubic-bezier(.2,.7,.3,1) .15s; }
+.rating-badge.reveal.in .stars-fill { width: var(--pct); }
+.rating-copy { font-size: 13.5px; color: var(--muted); font-weight: 500; }
+
+.reviews-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 24px; margin-top: 44px; }
+@media (max-width: 960px) { .reviews-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 680px) { .reviews-grid { grid-template-columns: 1fr; } }
+.rcard-premium {
+  position: relative; background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 32px 30px;
+  transition: transform .3s cubic-bezier(.2,.7,.3,1), box-shadow .3s ease, border-color .3s ease;
+}
+.rcard-premium:hover { transform: translateY(-5px); box-shadow: var(--shadow-h); border-color: #E4DFD1; }
+.rstars { display: flex; gap: 3px; margin-bottom: 16px; }
+.rstars svg { width: 14px; height: 14px; color: var(--orange); }
+.rcard-premium .rtext { font-size: 14.8px; color: var(--ink); line-height: 1.7; margin-bottom: 26px; min-height: 110px; }
+.rfoot { display: flex; align-items: center; gap: 13px; padding-top: 18px; border-top: 1px solid var(--line); }
+.rfoot b { display: block; font-size: 14px; font-weight: 700; font-family: var(--font-d); }
+.rfoot span { display: block; font-size: 12px; color: var(--muted); margin-top: 1px; }
 
 @media (prefers-reduced-motion: reduce) {
-  .cata-bdy, .pdetail, .cata-ic, .pmore-ic, .pf-btn::after { transition: none; }
+  .fdetails, .pgpanel, .fcard .fdetails-toggle .chev, .pghead .pgchev, .pf-btn::after { transition: none; }
+}
+
+/* ============================================================
+   ABOUT PAGE - Founder/Co-Founder profiles + Faculty grid. Same
+   design language (tokens, card/shadow, buttons) as the Courses page.
+   ============================================================ */
+
+/* ---------- Founder/Co-Founder profile section: large photo in a premium
+   frame + low-opacity decorative background icons (same technique as the
+   Home/Testimonials/Alumni "Proven Track Record" .tr-icon motif, tuned
+   for a light section instead of a dark one). ---------- */
+.profile-section { position: relative; overflow: hidden; }
+.profile-decor { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.profile-decor-icon { position: absolute; width: 130px; height: 130px; color: var(--orange); opacity: .06; stroke-width: .7; }
+.pd-1 { top: 6%; left: 3%; transform: rotate(-10deg); }
+.pd-2 { bottom: 8%; left: 42%; width: 90px; height: 90px; color: var(--navy); transform: rotate(8deg); }
+.pd-3 { top: 12%; right: 5%; width: 100px; height: 100px; transform: rotate(10deg); }
+.profile-section .wrap { position: relative; z-index: 1; }
+@media (max-width: 700px) { .profile-decor-icon { display: none; } }
+
+.founder-frame {
+  position: relative; border-radius: var(--radius); overflow: hidden;
+  box-shadow: var(--shadow-h); border: 6px solid var(--paper); outline: 1px solid var(--line);
+}
+.founder-frame img { width: 100%; height: auto; display: block; aspect-ratio: 4/5; object-fit: cover; }
+
+/* ---------- Faculty grid: 3-4 cols desktop, 2 tablet, 1 mobile ---------- */
+.faculty-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px,1fr)); gap: 24px; margin-top: 34px; }
+.faculty-card {
+  background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: 28px 24px; text-align: center;
+  transition: transform .25s cubic-bezier(.2,.7,.3,1), box-shadow .25s ease, border-color .25s ease;
+}
+.faculty-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-h); border-color: #DCD7C9; }
+.faculty-card .pcrop { width: 96px; height: 96px; border-radius: 50%; margin: 0 auto 16px; }
+.faculty-card h3 { font-size: 17px; margin-bottom: 2px; }
+.faculty-role {
+  display: block; font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--orange); margin-bottom: 8px;
+}
+.faculty-qual { font-size: 13px; color: var(--ink); font-weight: 600; margin-bottom: 6px; }
+.faculty-desc { font-size: 13.5px; color: var(--muted); margin: 0; }
+
+@media (max-width: 640px) {
+  .founder-frame img { aspect-ratio: 3/2; }
 }

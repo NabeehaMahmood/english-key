@@ -88,6 +88,7 @@ CREATE TABLE content_blocks (
 INSERT INTO content_blocks (page_slug, block_key, content) VALUES
     ('contact', 'intro', 'Send us a message and our team will get back to you soon, usually within 3 hours. Prefer to chat now? WhatsApp is the fastest way to reach us. All classes are online, on Pakistan Standard Time.'),
     ('courses', 'how_to_enrol_steps', '01. Choose your course|Select the English Language Summer Course.\n02. Make payment|Transfer the fee to our Askari Bank or EasyPaisa account.\n03. Send proof|WhatsApp the payment screenshot to 0311-1537563.\n04. Get confirmed|Receive the class link and joining instructions.'),
+    ('courses', 'featured_intro', 'English Language Summer Course, Summer Intensive 2026|Equally beneficial for all boards from Class 8th onwards. Covers essential topics to build a solid base in Grammar and Creative Writing.'),
     ('courses', 'terms_conditions', 'Fee once paid is non-refundable.\nClasses are conducted online via Zoom.\nStudents must ensure a stable internet connection.\nRecordings may be shared with enrolled students only.\nEnrolment closes once seats are filled.\nSharing class resources with others is prohibited.\nContacting classmates on their numbers is not allowed.'),
     ('about', 'quote', 'We built this academy the way we run our home, with care, discipline, and the belief that every child deserves a first-class chance.'),
     ('about', 'uzma_bio', 'Uzma Arif is the Founder and CEO of EnglishKeys Academy, a leading online educational platform dedicated to transforming the way quality education reaches students across Pakistan. She holds an M.Sc. in Psychology from Quaid-i-Azam University, a B.Ed. from the Virtual University of Pakistan, and a Diploma in TEFL from Allama Iqbal Open University. Before establishing EnglishKeys Academy, she served as a Language Instructor and Section Head at some of Pakistan''s prestigious educational institutions, where she developed extensive experience in teaching, academic leadership, and curriculum development.\n\nDuring her professional journey, Ms. Uzma Arif realized that quality education should not remain confined to conventional classrooms. Driven by the vision of making education accessible beyond geographical and financial barriers, she co-founded EnglishKeys Academy with her husband, Mr. Naeem Haider, the Lead Instructor, on 18 July 2020. Their mission was to provide affordable, high-quality education to students, particularly those from underserved and underprivileged areas of Pakistan.\n\nWhat began as a small initiative has steadily grown into one of Pakistan''s most trusted online educational brands, earning the confidence of thousands of students and parents nationwide. Today, EnglishKeys Academy specializes exclusively in Federal Board (FBISE) education, offering comprehensive preparation for Grades 9-12 compulsory subjects. Beyond SSC and HSSC education, the academy also delivers professional and competitive exam preparation programs, including MDCAT, IELTS, TEFL, PTE, and English preparation for CSS and PMS aspirants.'),
@@ -97,6 +98,35 @@ INSERT INTO content_blocks (page_slug, block_key, content) VALUES
     ('home', 'track_record_description', 'Not testimonials, verifiable federal board results.'),
     ('home', 'founders_heading', 'Founders’ Vision'),
     ('home', 'why_heading', 'A planned, year-round path from foundation to final paper.');
+
+-- ---------------------------------------------------------------------
+-- Reusable inner-page Hero banner. One fixed row per inner page (not
+-- admin add/deletable - the set of pages is fixed in code), rendered via
+-- renderPageHero() in includes/hero.php so About/Courses/Testimonials/
+-- Alumni/Blog/Notes/Contact/Enroll all share one consistent hero design.
+-- Admin manages these under Admin -> Page Heroes. The Home page's own
+-- distinct hero (<section class="hero"> in index.php) does not use this.
+CREATE TABLE page_heroes (
+    page_slug VARCHAR(60) PRIMARY KEY,
+    kicker VARCHAR(120),
+    title VARCHAR(255) NOT NULL,
+    title_highlight VARCHAR(255),
+    subtitle TEXT,
+    breadcrumb VARCHAR(255),
+    description TEXT,
+    show_description TINYINT(1) NOT NULL DEFAULT 0,
+    background_image VARCHAR(255)
+) ENGINE=InnoDB;
+
+INSERT INTO page_heroes (page_slug, kicker, title, title_highlight, subtitle) VALUES
+    ('courses', 'Courses', 'Built around the FBISE syllabus,', 'nothing wasted.', 'Complete preparation for Classes 9-12 across four subjects, plus seasonal intensives, bootcamps and crash courses.'),
+    ('about', 'About Us', 'Where words', 'build futures.', 'EnglishKeys Academy exists to bring first-position-quality preparation to every FBISE student in Pakistan, taught live, with the discipline and care of a single expert instructor.'),
+    ('testimonials', 'Testimonials', 'Real students. Real results.', 'Real words.', 'Every quote on this page is a genuine, permission-granted review from students, parents and alumni.'),
+    ('alumni', 'Alumnus Corner', 'Once EnglishKeys,', 'always EnglishKeys.', 'Our alumni carry the academy''s standard into medical colleges, universities and careers. This corner belongs to them, their journeys, milestones and advice for the students following behind.'),
+    ('blog', 'Blog', 'Exam tips, study routines &', 'board updates.', 'Short, practical articles on exam technique and grammar, written to help FBISE students score higher. New pieces published through the term.'),
+    ('notes', 'Free Resources', 'Notes that', 'open doors.', 'A selection from the EnglishKeys notes portal, free for every visitor, no login required. Premium notes and model papers unlock with an active subscription.'),
+    ('contact', 'Contact Us', 'Questions?', 'We''re here to help.', 'Send us a message and our team will get back to you soon, usually within 3 hours. Prefer to chat now? WhatsApp is the fastest way to reach us. All classes are online, on Pakistan Standard Time.'),
+    ('enroll', 'Enrolment', 'Enrol at EnglishKeys,', 'start this week.', 'Tell us who''s enrolling and which subjects you want. We reply within 3 hours to confirm your seat and share payment details. All classes are online, on Pakistan Standard Time.');
 
 -- ---------------------------------------------------------------------
 -- Repeatable stat cards shown in the dark band below the hero. Admin
@@ -189,22 +219,23 @@ CREATE TABLE teachers (
     detail_bio TEXT,
     subject VARCHAR(150),
     role_title VARCHAR(150),
+    qualification VARCHAR(160),
     credentials TEXT,
     sort_order INT NOT NULL DEFAULT 0,
     is_active TINYINT(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB;
 
-INSERT INTO teachers (name, photo, bio, detail_bio, subject, role_title, credentials, sort_order) VALUES
+INSERT INTO teachers (name, photo, bio, detail_bio, subject, role_title, qualification, credentials, sort_order) VALUES
 ('Uzma Arif', 'assets/uploads/teachers/uzma-arif.jpeg',
  'The vision behind EnglishKeys, an M.Sc. Psychology (Quaid-i-Azam University) educator and former section head who co-founded the academy in 2020 to carry quality education beyond geographical and financial barriers.',
  'Uzma Arif is the Founder and CEO of EnglishKeys Academy, a leading online educational platform dedicated to transforming the way quality education reaches students across Pakistan. She holds an M.Sc. in Psychology from Quaid-i-Azam University, a B.Ed. from the Virtual University of Pakistan, and a Diploma in TEFL from Allama Iqbal Open University. Before establishing EnglishKeys Academy, she served as a Language Instructor and Section Head at some of Pakistan''s prestigious educational institutions.\n\nDriven by the vision of making education accessible beyond geographical and financial barriers, she co-founded EnglishKeys Academy with her husband, Mr. Naeem Haider, on 18 July 2020.',
- 'Founder & CEO', 'Founder and CEO',
+ 'Founder & CEO', 'Founder and CEO', 'M.Sc. Psychology, Quaid-i-Azam University',
  'M.Sc. Psychology, Quaid-i-Azam University\nB.Ed., Virtual University of Pakistan\nDiploma in TEFL, Allama Iqbal Open University\nLanguage Instructor & Section Head, prestigious institutions of Pakistan\nCo-founded EnglishKeys Academy, 18 July 2020\nPrograms: SSC/HSSC (FBISE), MDCAT, IELTS, TEFL, PTE, CSS & PMS English',
  1),
 ('Mr. Naeem Haider', 'assets/uploads/teachers/naeem-haider.jpeg',
  'The teacher behind the results, an M.Phil. English Linguistics scholar teaching since 2012, who leads every class personally and built the method behind three consecutive HSSC first positions.',
  'Mr. Naeem Haider, Co-Founder, Director and Lead Instructor of EnglishKeys Academy, has taught languages since 2012, guiding over 100,000 students in the last five years alone. A distinguished scholar of English linguistics and literature, he built the academy''s teaching on a simple belief: a student who understands the examiner''s mind never fears the paper.\n\nEvery class is led by him personally, no rotating panel, no stock-photo instructors. The credentials are the product.',
- 'Co-Founder & Lead Instructor', 'Co-Founder, Director and Lead Instructor',
+ 'Co-Founder & Lead Instructor', 'Co-Founder, Director and Lead Instructor', 'M.Phil. English Linguistics, Distinction',
  'M.Phil. English Linguistics, Distinction\nMS English, Distinction\nMA English Literature, Silver Medalist\nMA Urdu Literature\nMA Islamic Studies\nB.Ed. (Bachelor of Education)\nDiploma in TEFL\nEMI, University of Southampton\nTEYL, George Mason University, USA',
  2);
 
@@ -213,6 +244,13 @@ INSERT INTO teachers (name, photo, bio, detail_bio, subject, role_title, credent
 -- Haider, the second row inserted above.
 INSERT INTO site_settings (setting_key, setting_value) VALUES
     ('founders_vision_teacher_id', (SELECT id FROM teachers WHERE name LIKE '%Naeem%' ORDER BY sort_order, id LIMIT 1));
+
+-- About page's dedicated Founder / Co-Founder profile sections (admin-
+-- selectable in Admin -> Our Team). Independent of founders_vision_teacher_id
+-- above, which only controls the Home page's quote card.
+INSERT INTO site_settings (setting_key, setting_value) VALUES
+    ('about_founder_teacher_id', (SELECT id FROM teachers WHERE role_title LIKE '%CEO%' ORDER BY sort_order, id LIMIT 1)),
+    ('about_cofounder_teacher_id', (SELECT id FROM teachers WHERE role_title LIKE '%Co-Founder%' ORDER BY sort_order, id LIMIT 1));
 
 -- ---------------------------------------------------------------------
 -- The 5 filter tabs on testimonials.php. card_style picks the card
@@ -326,10 +364,28 @@ CREATE TABLE alumni (
     is_active TINYINT(1) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB;
 
-INSERT INTO alumni (name, achievement, batch_info, sort_order) VALUES
-('Hafiza Tanzeela Sahar', 'HSSC 1st Position - Federal Board', 'Class of 2023', 1),
-('Seerat Fatima', 'HSSC 1st Position - Federal Board', 'Class of 2024', 2),
-('Aleena Tahir', 'HSSC 1st Position - RMU MBBS Merit #2', 'Class of 2025', 3);
+-- ---------------------------------------------------------------------
+-- "Proven Track Record" achiever cards. Single source of truth for the
+-- dark achiever band shown on Home ("Proven Track Record"), Testimonials
+-- ("Alumnus Corner") and Alumni (top band), rendered everywhere via
+-- renderTrackRecordCard() in includes/functions.php. Admin manages these
+-- under Admin -> Homepage Track Record.
+CREATE TABLE track_records (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    year VARCHAR(10) NOT NULL,
+    position_badge VARCHAR(60) NOT NULL DEFAULT '1st Position',
+    student_name VARCHAR(150) NOT NULL,
+    achievement_title VARCHAR(200) NOT NULL,
+    description TEXT,
+    image VARCHAR(255),
+    sort_order INT NOT NULL DEFAULT 0,
+    is_active TINYINT(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB;
+
+INSERT INTO track_records (year, position_badge, student_name, achievement_title, sort_order) VALUES
+('2023', '1ST POSITION', 'Hafiza Tanzeela Sahar', 'HSSC 1st Position - Federal Board', 1),
+('2024', '1ST POSITION', 'Seerat Fatima', 'HSSC 1st Position - Federal Board', 2),
+('2025', '1ST POSITION', 'Aleena Tahir', 'HSSC 1st Position - RMU MBBS Merit #2', 3);
 
 -- ---------------------------------------------------------------------
 CREATE TABLE contact_messages (

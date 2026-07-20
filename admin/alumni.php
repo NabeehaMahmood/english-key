@@ -65,7 +65,7 @@ $pending = $db->query("SELECT * FROM alumni WHERE is_active = 0 ORDER BY id DESC
 $published = $db->query("SELECT * FROM alumni WHERE is_active = 1 ORDER BY sort_order, id")->fetchAll();
 ?>
 <h1>Alumni</h1>
-<p>Achievers (Hat-Trick band) and student-submitted stories. Public story submissions land here as pending, unpublished entries.</p>
+<p>Student-submitted alumni stories for the Alumni Stories wall. Public story submissions land here as pending, unpublished entries. The achiever band shown on Home, Testimonials and this page is now managed under <a href="home-track-record.php">Homepage Track Record</a>.</p>
 
 <?php if ($pending): ?>
 <h2>Pending Story Submissions</h2>
@@ -104,18 +104,18 @@ $published = $db->query("SELECT * FROM alumni WHERE is_active = 1 ORDER BY sort_
   <input type="hidden" name="action" value="save">
   <input type="hidden" name="id" value="<?= (int)($editing['id'] ?? 0) ?>">
 
-  <h2><?= $editing ? 'Edit Entry' : 'Add Achiever' ?></h2>
+  <h2><?= $editing ? 'Edit Entry' : 'Add Alumni Story' ?></h2>
 
   <label>Name
     <input type="text" name="name" value="<?= e($editing['name'] ?? '') ?>" required>
   </label>
-  <label>Achievement (e.g. "HSSC 1st Position - Federal Board")
+  <label>Achievement (e.g. "HSSC 1st Position - Federal Board"), shown next to the batch on the story card
     <input type="text" name="achievement" value="<?= e($editing['achievement'] ?? '') ?>">
   </label>
   <label>Batch / Class (e.g. "Class of 2025")
     <input type="text" name="batch_info" value="<?= e($editing['batch_info'] ?? '') ?>">
   </label>
-  <label>Story (leave blank for achiever band entries; fill in for alumni story wall entries)
+  <label>Story
     <textarea name="story" rows="5"><?= e($editing['story'] ?? '') ?></textarea>
   </label>
   <label>Private Contact (not shown publicly)
@@ -141,13 +141,13 @@ $published = $db->query("SELECT * FROM alumni WHERE is_active = 1 ORDER BY sort_
 
 <h2>Published</h2>
 <table class="admin-table">
-  <thead><tr><th>Name</th><th>Batch</th><th>Type</th><th>Actions</th></tr></thead>
+  <thead><tr><th>Name</th><th>Batch</th><th>Status</th><th>Actions</th></tr></thead>
   <tbody>
     <?php foreach ($published as $p): ?>
       <tr>
         <td><?= e($p['name']) ?></td>
         <td><?= e($p['batch_info']) ?></td>
-        <td><?= $p['story'] ? 'Story' : 'Achiever' ?></td>
+        <td><?= $p['story'] ? 'Shown on Stories wall' : 'No story (not shown)' ?></td>
         <td>
           <a href="alumni.php?edit=<?= (int)$p['id'] ?>">Edit</a>
           <form method="post" class="inline-form" onsubmit="return confirm('Delete this entry?');">

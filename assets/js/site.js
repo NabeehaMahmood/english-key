@@ -10,6 +10,29 @@
     });
   }
 
+  // Animated count-up for elements like the Courses page rating badge
+  // (<span class="count-num" data-target="4.8" data-decimals="1">). Runs
+  // once per element, the moment its .reveal ancestor becomes visible.
+  function animateCount(el) {
+    if (el.dataset.done) return;
+    el.dataset.done = '1';
+    var target = parseFloat(el.dataset.target);
+    if (isNaN(target)) return;
+    var decimals = el.dataset.decimals ? parseInt(el.dataset.decimals, 10) : 0;
+    var duration = 1200;
+    var start = null;
+    function step(ts) {
+      if (!start) start = ts;
+      var p = Math.min((ts - start) / duration, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      var val = target * eased;
+      el.textContent = decimals ? val.toFixed(decimals) : Math.round(val);
+      if (p < 1) requestAnimationFrame(step);
+      else el.textContent = decimals ? target.toFixed(decimals) : target;
+    }
+    requestAnimationFrame(step);
+  }
+
   // Elements can opt into a staggered fade via data-delay="0.12" (seconds) -
   // same attribute the approved HTML references use. Applied as a CSS
   // transition-delay right before the reveal fires, so unstaggered .reveal
@@ -22,6 +45,7 @@
           var delay = entry.target.getAttribute('data-delay');
           if (delay) entry.target.style.transitionDelay = delay + 's';
           entry.target.classList.add('in');
+          entry.target.querySelectorAll('.count-num').forEach(animateCount);
           observer.unobserve(entry.target);
         }
       });
@@ -76,68 +100,101 @@
 })();
 
 /* ------------------------------------------------------------------
-   Courses page: programme category accordion (.cata-hdr) and per-card
-   "View details" toggle (.pmore). Click-driven (not hover-only) so it
-   works on touch. Both use real <button> + aria-expanded/aria-controls;
-   these blocks find nothing on other pages and quietly do nothing.
+   Courses page: Featured-card "View details" (.fcard / .fdetails-toggle).
+   Hovering a card reveals its details instantly; only one card's details
+   stay open at a time. Click still works for touch/keyboard users. Finds
+   nothing on other pages and quietly does nothing there.
    ------------------------------------------------------------------ */
 (function () {
-  var headers = document.querySelectorAll('.cata-hdr');
-  if (!headers.length) return;
+  var cards = document.querySelectorAll('.fcard');
+  if (!cards.length) return;
 
-  function setOpen(btn, panel, container, open) {
+  function setOpen(btn, panel, open) {
     btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    container.classList.toggle('open', open);
+    panel.classList.toggle('open', open);
     panel.style.maxHeight = open ? (panel.scrollHeight + 'px') : '0px';
   }
 
-  for (var i = 0; i < headers.length; i++) {
-    (function (btn) {
-      var panel = document.getElementById(btn.getAttribute('aria-controls'));
-      var cata = btn.closest('.cata');
-      if (!panel || !cata) return;
-      btn.addEventListener('click', function () {
-        setOpen(btn, panel, cata, btn.getAttribute('aria-expanded') !== 'true');
+  var entries = [];
+  cards.forEach(function (card) {
+    var btn = card.querySelector('.fdetails-toggle');
+    var panel = btn ? document.getElementById(btn.getAttribute('aria-controls')) : null;
+    if (!btn || !panel) return;
+    entries.push({ btn: btn, panel: panel, closeTimer: null });
+  });
+
+  entries.forEach(function (entry) {
+    function open() {
+      entries.forEach(function (other) {
+        if (other === entry) return;
+        clearTimeout(other.closeTimer);
+        setOpen(other.btn, other.panel, false);
       });
-    })(headers[i]);
-  }
+      setOpen(entry.btn, entry.panel, true);
+    }
+    function close() { setOpen(entry.btn, entry.panel, false); }
+
+    var card = entry.btn.closest('.fcard');
+    card.addEventListener('mouseenter', function () { clearTimeout(entry.closeTimer); open(); });
+    card.addEventListener('mouseleave', function () { entry.closeTimer = setTimeout(close, 180); });
+    entry.btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      if (entry.btn.getAttribute('aria-expanded') === 'true') close(); else open();
+    });
+  });
 
   window.addEventListener('resize', function () {
-    var open = document.querySelectorAll('.cata.open .cata-bdy');
-    for (var i = 0; i < open.length; i++) {
-      open[i].style.maxHeight = open[i].scrollHeight + 'px';
-    }
+    document.querySelectorAll('.fdetails.open').forEach(function (panel) {
+      panel.style.maxHeight = panel.scrollHeight + 'px';
+    });
   });
 })();
 
+/* ------------------------------------------------------------------
+   Courses page: programme group accordion (.pghead / .pgpanel). Hovering
+   a group expands it; click is the accessible fallback for touch/
+   keyboard. The first group starts open. Finds nothing on other pages.
+   ------------------------------------------------------------------ */
 (function () {
-  var toggles = document.querySelectorAll('.pmore');
-  if (!toggles.length) return;
+  var groups = document.querySelectorAll('.pgroup');
+  if (!groups.length) return;
 
-  function setOpen(btn, panel, card, open) {
+  function setOpen(btn, panel, open) {
     btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    var label = btn.querySelector('.pmore-label');
-    if (label) label.textContent = open ? 'Hide details' : 'View details';
-    card.classList.toggle('open', open);
     panel.style.maxHeight = open ? (panel.scrollHeight + 'px') : '0px';
   }
 
-  for (var i = 0; i < toggles.length; i++) {
-    (function (btn) {
-      var panel = document.getElementById(btn.getAttribute('aria-controls'));
-      var card = btn.closest('.pcard');
-      if (!panel || !card) return;
-      btn.addEventListener('click', function () {
-        setOpen(btn, panel, card, btn.getAttribute('aria-expanded') !== 'true');
-      });
-    })(toggles[i]);
-  }
+  groups.forEach(function (group, i) {
+    var btn = group.querySelector('.pghead');
+    var panel = btn ? document.getElementById(btn.getAttribute('aria-controls')) : null;
+    if (!btn || !panel) return;
+    var closeTimer = null;
+
+    function open() {
+      clearTimeout(closeTimer);
+      if (btn.getAttribute('aria-expanded') === 'true') return;
+      setOpen(btn, panel, true);
+    }
+    function close() {
+      if (btn.getAttribute('aria-expanded') !== 'true') return;
+      setOpen(btn, panel, false);
+    }
+
+    group.addEventListener('mouseenter', function () { clearTimeout(closeTimer); open(); });
+    group.addEventListener('mouseleave', function () { closeTimer = setTimeout(close, 220); });
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (btn.getAttribute('aria-expanded') === 'true') close(); else open();
+    });
+
+    if (i === 0) open();
+  });
 
   window.addEventListener('resize', function () {
-    var open = document.querySelectorAll('.pcard.open .pdetail');
-    for (var i = 0; i < open.length; i++) {
-      open[i].style.maxHeight = open[i].scrollHeight + 'px';
-    }
+    document.querySelectorAll('.pghead[aria-expanded="true"]').forEach(function (btn) {
+      var panel = document.getElementById(btn.getAttribute('aria-controls'));
+      if (panel) panel.style.maxHeight = panel.scrollHeight + 'px';
+    });
   });
 })();
 

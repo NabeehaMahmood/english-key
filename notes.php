@@ -4,13 +4,7 @@ require_once __DIR__ . '/includes/header.php';
 $notes = getDb()->query('SELECT * FROM notes WHERE is_active = 1 ORDER BY sort_order')->fetchAll();
 ?>
 
-<div class="phero">
-  <div class="wrap reveal">
-    <div class="kick">Free Resources</div>
-    <h1>Notes that <span class="hl">open doors.</span></h1>
-    <p class="sub">A selection from the EnglishKeys notes portal, free for every visitor, no login required. Premium notes and model papers unlock with an active subscription.</p>
-  </div>
-</div>
+<?php renderPageHero('notes'); ?>
 
 <section>
   <div class="wrap">
