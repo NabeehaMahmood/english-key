@@ -132,20 +132,13 @@ h1 { font-size: clamp(32px, 4.8vw, 52px); }
 .micro { color: var(--muted); font-size: 13px; margin-top: 8px; }
 .hctas { display: flex; gap: 14px; margin: 22px 0 10px; flex-wrap: wrap; }
 
-/* ---------- Stats band (base; about.php uses .band/.bg4 plainly, Home page overrides below) ---------- */
-.band { background: var(--navy); padding: 34px 0; }
-.bg4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center; }
-.bs b { display: block; font-family: 'Manrope', sans-serif; font-size: 1.7rem; color: #fff; }
-.bs span { font-size: 12.5px; color: #b9c2de; }
-@media (max-width: 640px) { .bg4 { grid-template-columns: repeat(2, 1fr); } }
-
-/* ---------- Home page stats band: reference-exact gradient + typography, admin-editable count ---------- */
-.page-home .band { background: linear-gradient(140deg, #26346F, #17204F); padding: 56px 0; }
-.page-home .bg-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 28px; text-align: left; }
-.page-home .bs { border-left: 4px solid #F0A468; padding-left: 16px; }
-.page-home .bs b { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: clamp(26px, 3vw, 38px); display: block; letter-spacing: -.02em; }
-.page-home .bs span { color: #D7DEF5; font-size: 12px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
-@media (max-width: 640px) { .page-home .bg-auto { grid-template-columns: 1fr 1fr; gap: 30px 20px; } }
+/* ---------- Shared stats band (renderHomeStatsBand(), includes/functions.php): one look, every page ---------- */
+.band { background: linear-gradient(140deg, #26346F, #17204F); padding: 56px 0; }
+.bg-auto { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 28px; text-align: left; }
+.bs { border-left: 4px solid #F0A468; padding-left: 16px; }
+.bs b { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: clamp(26px, 3vw, 38px); display: block; letter-spacing: -.02em; color: #fff; }
+.bs span { color: #D7DEF5; font-size: 12px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+@media (max-width: 640px) { .bg-auto { grid-template-columns: 1fr 1fr; gap: 30px 20px; } }
 
 /* ---------- Sections & grids ---------- */
 section { padding: 56px 0; }

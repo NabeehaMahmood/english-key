@@ -13,7 +13,6 @@ $googleCount = getSetting('google_review_count');
 $aboutQuote = getContentBlock('about', 'quote');
 
 $whyCards = $db->query('SELECT * FROM home_why_cards WHERE is_active = 1 ORDER BY sort_order, id')->fetchAll();
-$homeStats = $db->query('SELECT * FROM home_stats WHERE is_active = 1 ORDER BY sort_order, id')->fetchAll();
 
 $heroCta1Label = getSetting('hero_cta1_label', 'Explore Courses');
 $heroCta1Link = getSetting('hero_cta1_link', 'courses.php');
@@ -69,15 +68,7 @@ $whyHeading = getContentBlock('home', 'why_heading')['content'] ?: 'A planned, y
   </div>
 </section>
 
-<?php if ($homeStats): ?>
-<div class="band">
-  <div class="wrap bg-auto reveal">
-    <?php foreach ($homeStats as $stat): ?>
-      <div class="bs"><b><?= e($stat['value']) ?></b><span><?= e($stat['label']) ?></span></div>
-    <?php endforeach; ?>
-  </div>
-</div>
-<?php endif; ?>
+<?php renderHomeStatsBand(); ?>
 
 <?php if ($subjects): ?>
 <section id="courses">

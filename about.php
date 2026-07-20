@@ -20,23 +20,12 @@ if ($excludeIds) {
 // CSS grid - no template change ever needed.
 $trackRecords = getTrackRecords();
 
-$statLearners = getSetting('stat_learners');
-$statPositions = getSetting('stat_positions');
-$statYears = getSetting('stat_years');
-$statSince = getSetting('stat_since');
 $methodSteps = getContentBlock('about', 'method_steps');
 ?>
 
 <?php renderPageHero('about'); ?>
 
-<div class="band">
-  <div class="wrap bg4 reveal">
-    <div class="bs"><b><?= e($statLearners) ?></b><span>Learners in our community</span></div>
-    <div class="bs"><b><?= e($statPositions) ?></b><span>Consecutive HSSC 1st positions</span></div>
-    <div class="bs"><b><?= e($statYears) ?></b><span>Teaching FBISE online</span></div>
-    <div class="bs"><b><?= e($statSince) ?></b><span>Teaching languages since</span></div>
-  </div>
-</div>
+<?php renderHomeStatsBand(); ?>
 
 <?php $teamCards = array_filter([$founder, $cofounder]); if ($teamCards): ?>
 <section id="team">

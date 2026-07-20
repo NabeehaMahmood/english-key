@@ -46,7 +46,7 @@ $stats = $db->query('SELECT * FROM home_stats ORDER BY sort_order, id')->fetchAl
 ?>
 <div class="admin-tabs-page">
 <h1>Homepage Stats</h1>
-<p class="admin-page-intro">The stat cards shown in the dark band below the hero (e.g. "210K+ / Learners in our community"). Add, edit, delete, reorder with Sort Order, and hide with Visible.</p>
+<p class="admin-page-intro">The stat cards shown in the dark band below the hero (e.g. "210K+ / Learners in our community"). This is the single source for that band on the Home page, the About page, and any future page - add, edit, delete, reorder with Sort Order, and hide with Visible.</p>
 
 <nav class="admin-tabbar" role="tablist" aria-label="Homepage Stats sections">
   <button type="button" class="admin-tab" data-tab-group="main" data-tab-target="add-stat" role="tab" aria-selected="false"><?= icon('plus', 'tab-icon') ?> <?= $editing ? 'Edit Stat' : 'Add Stat' ?></button>

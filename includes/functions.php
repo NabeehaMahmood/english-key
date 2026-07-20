@@ -207,6 +207,35 @@ function renderTrackRecordCard(array $r, string $class = 'tcard', string $delayA
 }
 
 /**
+ * The stat cards shown in the dark band below the Home hero (e.g. "210K+ /
+ * Learners in our community"). Single source of truth: Admin -> Homepage
+ * Stats. Pair with renderHomeStatsBand() below so any page that needs this
+ * exact band (Home, About, ...) shares one query and one markup/CSS path -
+ * add/edit/delete/hide/reorder in the admin panel updates every page.
+ */
+function getHomeStats(): array
+{
+    return getDb()->query('SELECT * FROM home_stats WHERE is_active = 1 ORDER BY sort_order, id')->fetchAll();
+}
+
+/**
+ * Echoes the full stats band (including its .band/.wrap wrapper), or
+ * nothing at all if there are no active stats. Call as <?php renderHomeStatsBand(); ?>
+ */
+function renderHomeStatsBand(): void
+{
+    $stats = getHomeStats();
+    if (!$stats) {
+        return;
+    }
+    echo '<div class="band"><div class="wrap bg-auto reveal">';
+    foreach ($stats as $stat) {
+        echo '<div class="bs"><b>' . e($stat['value']) . '</b><span>' . e($stat['label']) . '</span></div>';
+    }
+    echo '</div></div>';
+}
+
+/**
  * Renders one testimonial card. $cardStyle comes from the testimonial's
  * category (testimonial_categories.card_style) and picks the markup
  * variant: 'standard' (stars only), 'marks' (orange marks badge from
