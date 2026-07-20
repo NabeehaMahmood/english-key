@@ -218,6 +218,22 @@ function animateCount(el) {
 })();
 
 /* ------------------------------------------------------------------
+   Alumni Stories: "Read More" / "Show Less" expand toggle for the
+   3-line-clamped story preview. Finds nothing and does nothing on any
+   page without a .story-toggle button.
+   ------------------------------------------------------------------ */
+(function () {
+  document.querySelectorAll('.story-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var card = btn.closest('.story-card');
+      if (!card) return;
+      var expanded = card.classList.toggle('expanded');
+      btn.textContent = expanded ? 'Show Less' : 'Read More';
+    });
+  });
+})();
+
+/* ------------------------------------------------------------------
    Programme groups (client_courses_final.html): hover to auto-expand,
    click kept as a fallback for touch/keyboard. First group opens on
    load. Finds nothing and does nothing on any other page.

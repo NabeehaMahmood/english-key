@@ -478,6 +478,34 @@ a.scard:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
 .rcard b { color: var(--navy); font-family: 'Manrope', sans-serif; }
 @media (prefers-reduced-motion: reduce) { .rcard:hover { transform: none; } }
 
+/* ---------- Alumni Stories (premium cards) ---------- */
+.story-card {
+  border: 1.5px solid var(--line); border-radius: 18px; padding: 28px 26px; background: #fff;
+  display: flex; flex-direction: column;
+  transition: transform .28s cubic-bezier(.2,.7,.3,1), box-shadow .28s ease, border-color .28s ease;
+}
+.story-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-h); border-color: var(--orange); }
+.story-head { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+.story-avatar { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; flex: none; border: 2px solid var(--orange-soft); }
+.story-avatar-ph {
+  width: 52px; height: 52px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center;
+  background: var(--orange-soft); color: var(--orange); font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 18px;
+}
+.story-name { display: block; color: var(--navy); font-family: 'Manrope', sans-serif; font-size: 15px; }
+.story-batch { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+.story-text {
+  color: var(--text); font-size: 14.5px; line-height: 1.7; margin: 0 0 12px;
+  display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.story-card.expanded .story-text { -webkit-line-clamp: unset; line-clamp: unset; overflow: visible; }
+.story-toggle {
+  align-self: flex-start; background: none; border: none; padding: 0; margin: 0 0 16px;
+  color: var(--orange); font-weight: 700; font-size: 13.5px; cursor: pointer; font-family: inherit;
+}
+.story-toggle:hover { text-decoration: underline; }
+.story-foot { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+@media (prefers-reduced-motion: reduce) { .story-card:hover { transform: none; } }
+
 /* ---------- Reviews (client_courses_final.html: rating badge + premium cards) ---------- */
 .rating-badge { display: flex; flex-direction: column; align-items: center; gap: 9px; margin: 26px auto 0; text-align: center; }
 .rating-badge .rnum { font-family: var(--font-d); font-weight: 800; font-size: 46px; color: var(--navy); line-height: 1; letter-spacing: -.02em; }
