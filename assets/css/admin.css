@@ -229,6 +229,26 @@
   .blog-editor-sidebar { position: static; }
 }
 
+/* Courses admin tables: thumbnail preview, numeric/status alignment,
+   and a clearer empty state. Reuses the existing .status-badge and
+   .admin-table patterns rather than introducing new visual language. */
+.table-thumb {
+  width: 44px; height: 44px; object-fit: cover; border-radius: 8px;
+  border: 1px solid #e2e6ee; display: block;
+}
+.table-thumb-placeholder {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 44px; height: 44px; border-radius: 8px;
+  border: 1px dashed #d8dce6; color: var(--muted, #5D6678);
+  font-size: 0.62rem; text-align: center; line-height: 1.2; padding: 2px;
+}
+.admin-table td.col-center, .admin-table th.col-center { text-align: center; }
+.admin-table td.cell-title { font-weight: 700; color: var(--navy, #1B2A4A); }
+.admin-table-empty {
+  text-align: center; color: var(--muted, #5D6678);
+  font-style: italic; padding: 26px 14px !important;
+}
+
 .actions-cell { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .actions-cell .inline-form { display: contents; }
 .actions-cell > a,

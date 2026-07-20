@@ -168,15 +168,18 @@ foreach ($courses as $c) {
 
   <table class="admin-table">
     <thead>
-      <tr><th>Title</th><th>Tag Line</th><th>Price/Fee</th><th>Visible</th><th>Actions</th></tr>
+      <tr><th>Title</th><th>Tag Line</th><th>Price/Fee</th><th class="col-center">Sort</th><th class="col-center">Status</th><th>Actions</th></tr>
     </thead>
     <tbody>
       <?php foreach ($coursesByCategory['featured'] as $course): ?>
         <tr>
-          <td><?= e($course['title']) ?></td>
+          <td class="cell-title"><?= e($course['title']) ?></td>
           <td><?= e($course['tag_line']) ?></td>
           <td><?= e($course['price']) ?></td>
-          <td><?= $course['is_active'] ? 'Yes' : 'No' ?></td>
+          <td class="col-center"><?= (int)$course['sort_order'] ?></td>
+          <td class="col-center">
+            <span class="status-badge <?= $course['is_active'] ? 'status-published' : 'status-draft' ?>"><?= $course['is_active'] ? 'Visible' : 'Hidden' ?></span>
+          </td>
           <td class="actions-cell">
             <a href="courses.php?category=featured&edit=<?= (int)$course['id'] ?>">Edit</a>
             <form method="post" class="inline-form" onsubmit="return confirm('Delete this course?');">
@@ -189,7 +192,7 @@ foreach ($courses as $c) {
           </td>
         </tr>
       <?php endforeach; ?>
-      <?php if (!$coursesByCategory['featured']): ?><tr><td colspan="5">No featured courses yet.</td></tr><?php endif; ?>
+      <?php if (!$coursesByCategory['featured']): ?><tr><td colspan="6" class="admin-table-empty">No featured courses yet — add one using the form above.</td></tr><?php endif; ?>
     </tbody>
   </table>
 </div>
@@ -240,15 +243,25 @@ foreach ($courses as $c) {
 
   <table class="admin-table">
     <thead>
-      <tr><th>Title</th><th>Level</th><th>Accent</th><th>Visible</th><th>Actions</th></tr>
+      <tr><th>Thumbnail</th><th>Title</th><th>Level</th><th>Accent</th><th class="col-center">Sort</th><th class="col-center">Status</th><th>Actions</th></tr>
     </thead>
     <tbody>
       <?php foreach ($coursesByCategory['subject'] as $course): ?>
         <tr>
-          <td><?= e($course['title']) ?></td>
+          <td>
+            <?php if (!empty($course['image'])): ?>
+              <img src="../<?= e($course['image']) ?>" alt="" class="table-thumb">
+            <?php else: ?>
+              <span class="table-thumb-placeholder">No image</span>
+            <?php endif; ?>
+          </td>
+          <td class="cell-title"><?= e($course['title']) ?></td>
           <td><?= e($course['level']) ?></td>
           <td><span style="display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;background:<?= e($course['accent_color'] ?: '#ccc') ?>"></span> <?= e($course['accent_color']) ?></td>
-          <td><?= $course['is_active'] ? 'Yes' : 'No' ?></td>
+          <td class="col-center"><?= (int)$course['sort_order'] ?></td>
+          <td class="col-center">
+            <span class="status-badge <?= $course['is_active'] ? 'status-published' : 'status-draft' ?>"><?= $course['is_active'] ? 'Visible' : 'Hidden' ?></span>
+          </td>
           <td class="actions-cell">
             <a href="courses.php?category=subject&edit=<?= (int)$course['id'] ?>">Edit</a>
             <form method="post" class="inline-form" onsubmit="return confirm('Delete this course?');">
@@ -261,7 +274,7 @@ foreach ($courses as $c) {
           </td>
         </tr>
       <?php endforeach; ?>
-      <?php if (!$coursesByCategory['subject']): ?><tr><td colspan="5">No core subjects yet.</td></tr><?php endif; ?>
+      <?php if (!$coursesByCategory['subject']): ?><tr><td colspan="7" class="admin-table-empty">No core subjects yet — add one using the form above.</td></tr><?php endif; ?>
     </tbody>
   </table>
 </div>
@@ -324,15 +337,18 @@ foreach ($courses as $c) {
 
   <table class="admin-table">
     <thead>
-      <tr><th>Title</th><th>Group</th><th>Price/Fee</th><th>Visible</th><th>Actions</th></tr>
+      <tr><th>Title</th><th>Group</th><th>Price/Fee</th><th class="col-center">Sort</th><th class="col-center">Status</th><th>Actions</th></tr>
     </thead>
     <tbody>
       <?php foreach ($coursesByCategory['programme'] as $course): ?>
         <tr>
-          <td><?= e($course['title']) ?></td>
-          <td><?= e($course['group_name'] ?: '') ?></td>
+          <td class="cell-title"><?= e($course['title']) ?></td>
+          <td><?= e($course['group_name'] ?: '—') ?></td>
           <td><?= e($course['price']) ?></td>
-          <td><?= $course['is_active'] ? 'Yes' : 'No' ?></td>
+          <td class="col-center"><?= (int)$course['sort_order'] ?></td>
+          <td class="col-center">
+            <span class="status-badge <?= $course['is_active'] ? 'status-published' : 'status-draft' ?>"><?= $course['is_active'] ? 'Visible' : 'Hidden' ?></span>
+          </td>
           <td class="actions-cell">
             <a href="courses.php?category=programme&edit=<?= (int)$course['id'] ?>">Edit</a>
             <form method="post" class="inline-form" onsubmit="return confirm('Delete this course?');">
@@ -345,7 +361,7 @@ foreach ($courses as $c) {
           </td>
         </tr>
       <?php endforeach; ?>
-      <?php if (!$coursesByCategory['programme']): ?><tr><td colspan="5">No programmes yet.</td></tr><?php endif; ?>
+      <?php if (!$coursesByCategory['programme']): ?><tr><td colspan="6" class="admin-table-empty">No programmes yet — add one using the form above.</td></tr><?php endif; ?>
     </tbody>
   </table>
 </div>
