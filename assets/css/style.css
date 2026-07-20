@@ -694,6 +694,53 @@ a.scard:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
 .ef-side .ef-hint { color: #aeb9d4; }
 @media (max-width: 860px) { .ef-wrap { grid-template-columns: 1fr; } .ef-grid, .ef-checks { grid-template-columns: 1fr; } }
 
+/* ---------- Enrol page refinements (scoped to #enrol-form so the Contact
+   page, which reuses these same .ef-* classes, is left untouched) ---------- */
+#enrol-form .ef-form { padding: 34px 32px; }
+#enrol-form .ef-h { letter-spacing: .02em; }
+#enrol-form .ef-field input,
+#enrol-form .ef-field select,
+#enrol-form .ef-field textarea {
+  transition: border-color .18s ease, box-shadow .18s ease, background-color .18s ease;
+}
+#enrol-form .ef-field input:hover,
+#enrol-form .ef-field select:hover,
+#enrol-form .ef-field textarea:hover {
+  border-color: color-mix(in srgb, var(--navy) 45%, var(--line));
+}
+#enrol-form .flash-error { display: flex; align-items: flex-start; gap: 10px; }
+
+/* Captcha widget */
+.ef-captcha-row { display: flex; align-items: stretch; gap: 10px; flex-wrap: wrap; }
+.ef-captcha-question {
+  display: flex; align-items: center; justify-content: center;
+  min-width: 116px; padding: 0 16px;
+  font-family: 'Manrope', sans-serif; font-size: 17px; font-weight: 800; letter-spacing: .03em;
+  color: var(--navy); background: var(--bg); border: 1.5px dashed var(--line); border-radius: 11px;
+  user-select: none;
+}
+.ef-captcha-refresh {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 46px; height: 46px; padding: 0;
+  background: #fff; border: 1.5px solid var(--line); border-radius: 11px;
+  color: var(--navy); cursor: pointer;
+  transition: border-color .18s ease, color .18s ease, background-color .18s ease, transform .3s ease;
+}
+.ef-captcha-refresh:hover { border-color: var(--orange); color: var(--orange); background: var(--orange-soft); }
+.ef-captcha-refresh:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+.ef-captcha-refresh.is-loading { opacity: .55; pointer-events: none; }
+.ef-captcha-refresh.is-spinning svg { transform: rotate(180deg); }
+.ef-captcha-refresh svg { width: 19px; height: 19px; transition: transform .35s ease; }
+.ef-captcha-row input { flex: 1 1 140px; min-width: 0; }
+@media (max-width: 480px) {
+  #enrol-form .ef-form { padding: 24px 20px; }
+  .ef-captcha-question { min-width: 96px; font-size: 15.5px; padding: 0 12px; }
+  .ef-captcha-refresh { width: 44px; height: 44px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ef-captcha-refresh, .ef-captcha-refresh svg { transition: none; }
+}
+
 /* ---------- Alumni story form ---------- */
 .alform { display: flex; flex-direction: column; gap: 14px; background: #fff; border: 1.5px solid var(--line); border-radius: 16px; padding: 24px; }
 .fg2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }

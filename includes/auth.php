@@ -88,3 +88,44 @@ function honeypotTripped(): bool
 {
     return !empty($_POST['website']);
 }
+
+// --- Enrol page captcha only (kept separate from humanCheck* above, which
+// Contact's form also relies on, so improving the Enrol captcha can't change
+// Contact's behaviour). Same lazy-generate / one-time-unset session idiom. ---
+
+/**
+ * Generates a random arithmetic captcha with a varying operator (not just
+ * fixed addition), stores the expected answer server-side in the session,
+ * and returns the question text to display. Called on every enrol page
+ * render and again on every refresh-captcha request, so a fresh
+ * question/answer pair always backs whatever is currently on screen.
+ */
+function enrolCaptchaQuestion(): string
+{
+    $operators = ['+', '-', '×'];
+    $operator = $operators[array_rand($operators)];
+
+    if ($operator === '-') {
+        $a = random_int(6, 15);
+        $b = random_int(2, $a - 1); // keep the result non-negative
+        $answer = $a - $b;
+    } elseif ($operator === '×') {
+        $a = random_int(2, 9);
+        $b = random_int(2, 9);
+        $answer = $a * $b;
+    } else {
+        $a = random_int(2, 12);
+        $b = random_int(2, 12);
+        $answer = $a + $b;
+    }
+
+    $_SESSION['enrol_captcha_answer'] = $answer;
+    return "$a $operator $b";
+}
+
+function enrolCaptchaPassed(): bool
+{
+    $expected = $_SESSION['enrol_captcha_answer'] ?? null;
+    unset($_SESSION['enrol_captcha_answer']);
+    return $expected !== null && (int)($_POST['captcha_answer'] ?? -1) === (int)$expected;
+}

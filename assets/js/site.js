@@ -344,3 +344,30 @@ function animateCount(el) {
     resizeTimer = setTimeout(build, 200);
   });
 })();
+
+/* ---------- Enrol form: refresh the arithmetic captcha without a page
+   reload, fetching a fresh question from captcha-refresh.php ---------- */
+(function () {
+  var btn = document.getElementById('captchaRefresh');
+  var question = document.getElementById('captchaQuestion');
+  var input = document.getElementById('captcha_answer');
+  if (!btn || !question || !input) return;
+
+  btn.addEventListener('click', function () {
+    if (btn.classList.contains('is-loading')) return;
+    btn.classList.add('is-loading');
+
+    fetch('captcha-refresh.php', { credentials: 'same-origin' })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        question.textContent = data.question + ' = ?';
+        input.value = '';
+        input.focus();
+        btn.classList.add('is-spinning');
+        setTimeout(function () { btn.classList.remove('is-spinning'); }, 350);
+      })
+      .finally(function () {
+        btn.classList.remove('is-loading');
+      });
+  });
+})();

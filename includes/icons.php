@@ -47,6 +47,8 @@ function icon(string $name, string $class = 'icon', bool $gradient = false): str
         'meta-seats' => ['<path d="M2 6a2 2 0 0 0 2-2h8a2 2 0 0 0 2 2v4a2 2 0 0 0-2 2H4a2 2 0 0 0-2-2V6z"/><path d="M8 4v8" stroke-dasharray="2 2"/>', 16, 1.5],
         // Small review star (client_courses_final.html .rstars/.rating-badge, fill not stroke)
         'star-sm' => ['<path d="M8 1l2.2 4.5 4.8.7-3.5 3.4.8 4.9L8 12.2 3.7 14.5l.8-4.9L1 6.2l4.8-.7L8 1z" fill="currentColor" stroke="none"/>', 16, 0],
+        // Enrol form: refresh-captcha button
+        'refresh' => ['<path d="M16.5 10a6.5 6.5 0 1 1-2.3-4.95"/><path d="M17 3.5v4h-4"/>', 20, 1.6],
     ];
 
     [$inner, $box, $strokeWidth] = $icons[$name] ?? ['', 20, 1.6];
