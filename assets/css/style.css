@@ -545,23 +545,63 @@ a.scard:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
 .tcard span { font-size: 12.5px; color: #b9c2de; }
 
 /* ---------- Alumni achievers (premium cards) ---------- */
-@media (max-width: 1180px) and (min-width: 961px) { .ag4 { grid-template-columns: repeat(3, 1fr); } }
+.ag4 { grid-template-columns: repeat(3, 1fr); gap: 24px; }
 @media (max-width: 960px) { .ag4 { grid-template-columns: repeat(2, 1fr); gap: 16px; } }
 
+/* Premium dark navy/charcoal glass card floating on the dark section -
+   deep glass surface (not a white card), navy/orange identity carried by
+   the border, avatar ring, batch pill and corner ribbon. */
 .acard {
-  position: relative; background: rgba(255,255,255,.05);
-  border: 1px solid rgba(255,255,255,.14); border-radius: 18px;
-  padding: 30px 18px 22px; text-align: center;
-  box-shadow: 0 10px 28px -16px rgba(0,0,0,.5);
+  position: relative; overflow: hidden;
+  background: linear-gradient(160deg, rgba(26,31,53,.94) 0%, rgba(22,34,74,.88) 100%);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  border: 1px solid rgba(255,255,255,.10); border-radius: 18px;
+  padding: 34px 20px 26px; text-align: center;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.07),
+    inset 0 0 0 1px rgba(255,255,255,.03),
+    0 14px 32px -18px rgba(3,6,16,.65);
   transition: transform .32s cubic-bezier(.2,.7,.3,1), box-shadow .32s ease, border-color .32s ease, background .32s ease;
+}
+/* Premium folded corner ribbon: a larger diagonal banner (not the old flat
+   triangle), metallic gold-to-orange gradient with a soft diagonal sheen
+   and darker "fold" shadow at each cut end, clipped to the card's rounded
+   corner by .acard's own overflow:hidden. */
+.acard::before {
+  content: ""; position: absolute; top: 20px; right: -46px; z-index: 0;
+  width: 160px; height: 34px; pointer-events: none;
+  transform: rotate(45deg); transform-origin: center;
+  background:
+    linear-gradient(105deg, rgba(255,255,255,.6) 0%, rgba(255,255,255,0) 26%, rgba(255,255,255,0) 60%, rgba(255,255,255,.22) 100%),
+    linear-gradient(90deg, rgba(70,28,4,.38) 0%, transparent 14%, transparent 86%, rgba(70,28,4,.38) 100%),
+    linear-gradient(155deg, #FFD9A0 0%, #F4A05C 26%, #EA6C1F 55%, #C97418 72%, #9C4A0C 100%);
+  box-shadow:
+    0 4px 10px -2px rgba(3,6,16,.55),
+    inset 0 1px 0 rgba(255,255,255,.55),
+    inset 0 -1px 0 rgba(58,18,0,.4);
+}
+/* Trophy + two decorative stars, centered on the ribbon fold. Drawn as an
+   inline SVG (not the emoji glyph) so the trophy renders solid white
+   rather than the platform's multicolour emoji art. */
+.acard::after {
+  content: ""; position: absolute; top: 28px; right: -1px; z-index: 1;
+  width: 70px; height: 19px;
+  transform: rotate(45deg); transform-origin: center;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 16'%3E%3Cpath d='M10.2,8 L7.64,7.36 L7,4.8 L6.36,7.36 L3.8,8 L6.36,8.64 L7,11.2 L7.64,8.64 Z' fill='%23fff'/%3E%3Cg fill='%23fff'%3E%3Cpath d='M24,3 L36,3 L34,9 Q30,11 26,9 Z'/%3E%3Crect x='29' y='9' width='2' height='3'/%3E%3Crect x='26' y='12' width='8' height='1.8' rx='0.8'/%3E%3C/g%3E%3Ccircle cx='22.3' cy='5' r='2' fill='none' stroke='%23fff' stroke-width='1.1'/%3E%3Ccircle cx='37.7' cy='5' r='2' fill='none' stroke='%23fff' stroke-width='1.1'/%3E%3Cpath d='M56.2,8 L53.64,7.36 L53,4.8 L52.36,7.36 L49.8,8 L52.36,8.64 L53,11.2 L53.64,8.64 Z' fill='%23fff'/%3E%3C/svg%3E") no-repeat center / contain;
+  filter: drop-shadow(0 1px 1.5px rgba(0,0,0,.4));
+  pointer-events: none;
 }
 .acard:hover {
   transform: translateY(-7px);
-  background: rgba(255,255,255,.08);
-  border-color: rgba(234,108,31,.5);
-  box-shadow: 0 26px 48px -18px rgba(234,108,31,.32), 0 12px 30px -14px rgba(0,0,0,.55);
+  border-color: rgba(234,108,31,.4);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.1),
+    0 30px 58px -20px rgba(3,6,16,.72),
+    0 20px 42px -18px rgba(234,108,31,.3);
 }
 .acard-photo {
+  position: relative; z-index: 1;
   width: 68px; height: 68px; border-radius: 50%; object-fit: cover; display: block;
   margin: 4px auto 14px; border: 3px solid rgba(234,108,31,.5);
   box-shadow: 0 8px 18px -8px rgba(0,0,0,.5);
@@ -571,15 +611,16 @@ a.scard:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
   background: var(--orange-soft); color: var(--orange);
   font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 24px;
 }
-.acard b { display: block; color: #fff; font-family: 'Manrope', sans-serif; font-size: 15px; margin-bottom: 4px; }
-.acard .acard-batch { display: block; color: #b9c2de; font-size: 12px; margin-bottom: 2px; }
+.acard b { position: relative; z-index: 1; display: block; color: #fff; font-family: 'Manrope', sans-serif; font-size: 15px; margin-bottom: 4px; }
+.acard .acard-batch { position: relative; z-index: 1; display: block; color: #b9c2de; font-size: 12px; margin-bottom: 2px; }
 .acard .acard-year {
-  display: inline-block; background: var(--orange-soft); color: var(--orange);
+  position: relative; z-index: 1; display: inline-block; background: var(--orange-soft); color: var(--orange);
   font-size: 10.5px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
   padding: 3px 10px; border-radius: 999px; margin-top: 6px; margin-bottom: 12px;
 }
 .acard .acard-achv {
-  color: #dce3f2; font-size: 13px; line-height: 1.6; margin: 0; padding-top: 12px;
+  position: relative; z-index: 1;
+  color: #fff; font-size: 13px; line-height: 1.6; margin: 0; padding-top: 12px;
   border-top: 1px solid rgba(255,255,255,.14);
 }
 @media (prefers-reduced-motion: reduce) { .acard:hover { transform: none; } }
@@ -814,7 +855,54 @@ a.scard:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
 .fg2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .alform label { display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; font-weight: 700; color: var(--navy); }
 .alform input, .alform textarea { font: inherit; font-size: 15px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--bg); }
+.alform input:focus, .alform textarea:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 3px rgba(234,108,31,.15); background: #fff; }
 @media (max-width: 700px) { .fg2 { grid-template-columns: 1fr; } }
+
+/* Share Your Story: collapsed-by-default CTA + expanding form panel */
+.share-cta { max-width: 640px; }
+.btn-share { margin-top: 8px; padding: 15px 30px; font-size: 15.5px; }
+.btn-share .chev { font-size: 10px; display: inline-block; transition: transform .3s cubic-bezier(.2,.7,.3,1); }
+.btn-share[aria-expanded="true"] .chev { transform: rotate(180deg); }
+
+.share-panel {
+  max-height: 0; overflow: hidden; opacity: 0; margin-top: 0;
+  transition: max-height .45s cubic-bezier(.2,.7,.3,1), opacity .3s ease, margin-top .3s ease;
+}
+.share-panel.open { opacity: 1; margin-top: 30px; }
+/* Without JS the panel simply stays visible rather than being unreachable. */
+html:not(.js) .share-panel { max-height: none; opacity: 1; margin-top: 30px; }
+html:not(.js) .btn-share { display: none; }
+
+/* Profile photo upload: styled native file input, no custom JS widget */
+.al-upload input[type="file"] {
+  font: inherit; font-size: 14px; padding: 10px 12px;
+  border: 1.5px dashed var(--line); border-radius: 10px; background: var(--bg);
+  cursor: pointer; transition: border-color .18s ease, background-color .18s ease;
+}
+.al-upload input[type="file"]:hover, .al-upload input[type="file"]:focus-visible {
+  border-color: var(--orange); background: var(--orange-soft);
+}
+.al-upload input[type="file"]::file-selector-button {
+  font-family: var(--font-b); font-weight: 700; font-size: 12.5px;
+  padding: 8px 16px; margin-right: 12px; border: none; border-radius: 999px;
+  background: var(--navy); color: #fff; cursor: pointer; transition: background .18s ease;
+}
+.al-upload input[type="file"]:hover::file-selector-button { background: #12203C; }
+.al-hint { font-size: 12px; font-weight: 500; color: var(--muted); }
+
+/* Character counter for the story textarea */
+.al-counter { align-self: flex-end; font-size: 12px; font-weight: 600; color: var(--muted); margin-top: -6px; }
+
+/* Publish consent checkbox */
+.al-consent {
+  flex-direction: row !important; align-items: flex-start; gap: 10px;
+  background: var(--bg); border: 1.5px solid var(--line); border-radius: 12px;
+  padding: 14px 16px; cursor: pointer; font-weight: 500 !important; color: var(--text) !important;
+}
+.al-consent input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--orange); flex: none; }
+.al-consent span { font-size: 13.5px; line-height: 1.5; }
+
+.al-actions { display: flex; }
 
 /* ---------- Gallery grid (generic) ---------- */
 .gallery-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 20px; }

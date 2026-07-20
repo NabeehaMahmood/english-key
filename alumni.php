@@ -5,6 +5,13 @@ require_once __DIR__ . '/includes/functions.php';
 $db = getDb();
 $errors = [];
 
+// Defaults for a fresh (GET) load. On a failed POST these are overwritten
+// below with the submitted values, so the form re-renders with everything
+// the user typed intact - only the captcha is ever reset (same pattern as
+// enroll.php).
+$name = $batch = $achievement = $contact = $story = '';
+$consent = false;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCsrf();
 
@@ -17,11 +24,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $achievement = trim($_POST['achievement'] ?? '');
     $contact = trim($_POST['contact'] ?? '');
     $story = trim($_POST['story'] ?? '');
+    $consent = !empty($_POST['consent']);
 
     if ($name === '') $errors[] = 'Please enter your full name.';
     if ($batch === '') $errors[] = 'Please enter your class/batch.';
     if ($story === '') $errors[] = 'Please write your story.';
-    if (!humanCheckPassed()) $errors[] = 'Human check failed, please try again.';
+    if (!enrolCaptchaPassed()) $errors[] = 'Security check failed, please solve the sum and try again.';
 
     if (!$errors) {
         try {
@@ -42,7 +50,7 @@ require_once __DIR__ . '/includes/header.php';
 
 $achievers = $db->query("SELECT * FROM alumni WHERE is_active = 1 AND (story IS NULL OR story = '') ORDER BY sort_order")->fetchAll();
 $stories = $db->query("SELECT * FROM alumni WHERE is_active = 1 AND story IS NOT NULL AND story != '' ORDER BY sort_order DESC")->fetchAll();
-$humanQuestion = humanCheckQuestion();
+$captchaQuestion = enrolCaptchaQuestion();
 ?>
 
 <div class="phero phero-navy">
@@ -152,35 +160,58 @@ $displayStories = $stories ?: $dummyStories;
   </div>
 </section>
 
+<?php $shareOpen = !empty($errors); ?>
 <section class="soft" id="share">
   <div class="wrap">
-    <div class="reveal">
+    <div class="share-cta reveal">
       <div class="kick">Share Your Story</div>
       <h2 class="t">Add your story to the wall.</h2>
       <p class="sub">Fill in your basic information, add a photo if you like, and write your story. Our team checks every submission before it goes live.</p>
+      <button type="button" class="btn btn-o btn-share" id="shareToggle" aria-expanded="<?= $shareOpen ? 'true' : 'false' ?>" aria-controls="sharePanel">
+        Share Your Story <span class="chev" aria-hidden="true">&#9660;</span>
+      </button>
     </div>
-    <?php if ($errors): ?>
-      <div class="flash flash-error"><ul><?php foreach ($errors as $err): ?><li><?= e($err) ?></li><?php endforeach; ?></ul></div>
-    <?php endif; ?>
-    <form class="alform" method="post" action="alumni.php#share" enctype="multipart/form-data">
-      <?= csrfField() ?>
-      <input type="text" name="website" value="" style="position:absolute;left:-9999px" tabindex="-1" autocomplete="off" aria-hidden="true">
-      <div class="fg2">
-        <label>Full name *<input type="text" name="name" maxlength="60" required></label>
-        <label>Class / batch *<input type="text" name="batch" maxlength="30" required placeholder="e.g. Class of 2026"></label>
-      </div>
-      <div class="fg2">
-        <label>Result / current status<input type="text" name="achievement" maxlength="80" placeholder="e.g. HSSC 1st Position"></label>
-        <label>WhatsApp or email (private, for verification only)<input type="text" name="contact" maxlength="80" placeholder="not shown on the website"></label>
-      </div>
-      <label>Your photo (optional, JPG/PNG/WEBP, max 5 MB)<input type="file" name="photo" accept="image/jpeg,image/png,image/webp"></label>
-      <label>Your story *<textarea name="story" maxlength="1200" rows="6" required placeholder="Your journey, your result, or a word of advice for current students..."></textarea></label>
-      <div class="fg2">
-        <label>Human check: what is <?= e($humanQuestion) ?>? *<input type="text" name="human" maxlength="3" required inputmode="numeric"></label>
-        <div style="display:flex;align-items:flex-end"><button class="btn btn-o" type="submit">Publish my story</button></div>
-      </div>
-      <p style="font-size:12.5px;color:var(--muted)">Stories are reviewed by our team before they appear on the website. By submitting, you give <?= e($siteName) ?> permission to publish your name, photo and story on this page.</p>
-    </form>
+
+    <div class="share-panel<?= $shareOpen ? ' open' : '' ?>" id="sharePanel">
+      <?php if ($errors): ?>
+        <div class="flash flash-error"><ul><?php foreach ($errors as $err): ?><li><?= e($err) ?></li><?php endforeach; ?></ul></div>
+      <?php endif; ?>
+      <form class="alform" method="post" action="alumni.php#share" enctype="multipart/form-data">
+        <?= csrfField() ?>
+        <input type="text" name="website" value="" style="position:absolute;left:-9999px" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <div class="fg2">
+          <label>Full name *<input type="text" name="name" maxlength="60" value="<?= e($name) ?>" required></label>
+          <label>Class / batch *<input type="text" name="batch" maxlength="30" value="<?= e($batch) ?>" required placeholder="e.g. Class of 2026"></label>
+        </div>
+        <div class="fg2">
+          <label>Result / current status<input type="text" name="achievement" maxlength="80" value="<?= e($achievement) ?>" placeholder="e.g. HSSC 1st Position"></label>
+          <label>WhatsApp or email (private, for verification only)<input type="text" name="contact" maxlength="80" value="<?= e($contact) ?>" placeholder="not shown on the website"></label>
+        </div>
+        <label class="al-upload">Profile photo (optional)
+          <input type="file" name="photo" accept="image/jpeg,image/png,image/webp" id="alPhoto">
+          <span class="al-hint">JPG, PNG or WEBP, max 5 MB.</span>
+        </label>
+        <label>Your story *
+          <textarea name="story" maxlength="1200" rows="6" required placeholder="Your journey, your result, or a word of advice for current students..." id="alStory"><?= e($story) ?></textarea>
+        </label>
+        <div class="al-counter"><span id="alCounterNum">0</span>/1200 characters</div>
+        <label>Security check *
+          <div class="ef-captcha-row">
+            <span class="ef-captcha-question" id="captchaQuestion" aria-live="polite"><?= e($captchaQuestion) ?> = ?</span>
+            <button type="button" class="ef-captcha-refresh" id="captchaRefresh" aria-label="Get a new question">
+              <?= icon('refresh') ?>
+            </button>
+            <input id="captcha_answer" name="captcha_answer" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" autocomplete="off" aria-describedby="alCaptchaHint" required>
+          </div>
+        </label>
+        <div class="al-hint" id="alCaptchaHint">Solve the sum above to confirm you're not a robot. Don't like this one? Tap refresh for another.</div>
+        <label class="al-consent">
+          <input type="checkbox" name="consent" <?= $consent ? 'checked' : '' ?> required>
+          <span>I agree to let <?= e($siteName) ?> publish my name, photo and story on this page. Every submission is reviewed by our team before it goes live.</span>
+        </label>
+        <div class="al-actions"><button class="btn btn-o" type="submit">Publish my story</button></div>
+      </form>
+    </div>
   </div>
 </section>
 

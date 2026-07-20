@@ -234,6 +234,56 @@ function animateCount(el) {
 })();
 
 /* ------------------------------------------------------------------
+   Alumni "Share Your Story": the form stays collapsed behind a CTA
+   button until clicked, then slides open (reusing slideToggle) and
+   scrolls into view. Server can pre-render the panel open (class
+   "open" + aria-expanded="true") after a failed submission so
+   validation errors are visible without an extra click. Finds
+   nothing and does nothing on any page without #shareToggle.
+   ------------------------------------------------------------------ */
+(function () {
+  var btn = document.getElementById('shareToggle');
+  var panel = document.getElementById('sharePanel');
+  if (!btn || !panel) return;
+
+  function setOpen(open) {
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    slideToggle(panel, open);
+    if (open) {
+      setTimeout(function () {
+        panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 80);
+    }
+  }
+
+  btn.addEventListener('click', function () {
+    setOpen(btn.getAttribute('aria-expanded') !== 'true');
+  });
+
+  if (btn.getAttribute('aria-expanded') === 'true') {
+    panel.classList.add('open');
+    panel.style.maxHeight = panel.scrollHeight + 'px';
+  }
+
+  window.addEventListener('resize', function () {
+    if (panel.classList.contains('open')) panel.style.maxHeight = panel.scrollHeight + 'px';
+  });
+})();
+
+/* ------------------------------------------------------------------
+   Alumni story form: live character counter for the story textarea.
+   Finds nothing and does nothing on any page without #alStory.
+   ------------------------------------------------------------------ */
+(function () {
+  var story = document.getElementById('alStory');
+  var counter = document.getElementById('alCounterNum');
+  if (!story || !counter) return;
+  function update() { counter.textContent = story.value.length; }
+  story.addEventListener('input', update);
+  update();
+})();
+
+/* ------------------------------------------------------------------
    Programme groups (client_courses_final.html): hover to auto-expand,
    click kept as a fallback for touch/keyboard. First group opens on
    load. Finds nothing and does nothing on any other page.
