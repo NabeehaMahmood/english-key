@@ -154,6 +154,25 @@ INSERT INTO courses (title, slug, category, tag_line, description, duration, lev
 ('Crash Courses', 'crash-courses', 'programme', 'Final Days - Crash', 'Short, high-intensity revision right before each paper. A 2-day 2nd-Annual crash in English, and a 1-day Annual crash across all four subjects, following the date sheet.', '1-2 days', 'Classes 9-12 (FBISE)', NULL, 'Classes 9-12', 'Online', NULL, '2nd Annual: English - 2 days\nAnnual: all 4 subjects - 1-day intensives\nHigh-yield topics & answer technique', 'Open - unlimited', '#7A3FD0', NULL, 3, 14);
 
 -- ---------------------------------------------------------------------
+-- Student Course Handout: the single downloadable/viewable PDF behind the
+-- "View Course Outline" / "Download Course Outline" buttons on the public
+-- Courses page. Only one row is ever kept - uploading a new file replaces
+-- the existing row (and its old file on disk) in place rather than
+-- inserting a second one; is_active lets the admin hide the buttons
+-- without deleting the file.
+CREATE TABLE course_handouts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(150) NOT NULL DEFAULT 'Course Handout',
+    description VARCHAR(500),
+    file_path VARCHAR(255) NOT NULL,
+    original_filename VARCHAR(255) NOT NULL,
+    file_size INT UNSIGNED NOT NULL,
+    is_active TINYINT(1) NOT NULL DEFAULT 1,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 CREATE TABLE teachers (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(150) NOT NULL,

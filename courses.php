@@ -15,10 +15,11 @@ $googleUrl = getSetting('google_reviews_url');
 $googleRating = getSetting('google_rating');
 $googleCount = getSetting('google_review_count');
 
-// Handout links are backend-driven via site_settings; '#' is a safe
-// placeholder until those keys are populated, so the buttons never 404.
-$courseOutlineViewUrl = getSetting('course_outline_view_url', '#');
-$courseOutlineDownloadUrl = getSetting('course_outline_download_url', '#');
+// The "View/Download Course Outline" buttons are wired to whatever PDF is
+// currently active in the admin's Student Course Handout screen - no
+// hardcoded link, no site_settings placeholder. The whole panel is skipped
+// below when nothing has been uploaded/enabled yet.
+$handout = getActiveHandout();
 
 /**
  * One detail order used everywhere a featured course's meta chips appear -
@@ -143,6 +144,7 @@ function featuredMeta(array $c): string
 </section>
 <?php endif; ?>
 
+<?php if ($handout): ?>
 <section class="handout-panel">
   <div class="wrap">
     <div class="handout-card reveal" data-anim="fade-up">
@@ -153,16 +155,16 @@ function featuredMeta(array $c): string
       </div>
       <div class="handout-body">
         <div class="kick">Course Handout</div>
-        <p class="handout-desc">Download or view the latest detailed course outline, syllabus and study structure prepared by EnglishKeys Academy.</p>
+        <p class="handout-desc"><?= e($handout['description'] ?: 'Download or view the latest detailed course outline, syllabus and study structure prepared by EnglishKeys Academy.') ?></p>
       </div>
       <div class="handout-actions">
-        <a class="btn btn-l handout-btn" href="<?= e($courseOutlineViewUrl) ?>" target="_blank" rel="noopener">
+        <a class="btn btn-l handout-btn" href="<?= e($handout['file_path']) ?>" target="_blank" rel="noopener">
           <svg class="icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M1.5 10S4.5 4.5 10 4.5 18.5 10 18.5 10 15.5 15.5 10 15.5 1.5 10 1.5 10z"/><circle cx="10" cy="10" r="2.5"/>
           </svg>
           View Course Outline
         </a>
-        <a class="btn btn-o handout-btn" href="<?= e($courseOutlineDownloadUrl) ?>" download rel="noopener">
+        <a class="btn btn-o handout-btn" href="<?= e($handout['file_path']) ?>" download="<?= e($handout['original_filename']) ?>" rel="noopener">
           <svg class="icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M10 3v9.5M6 9l4 4 4-4"/><path d="M3.5 15.5v1a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-1"/>
           </svg>
@@ -172,6 +174,7 @@ function featuredMeta(array $c): string
     </div>
   </div>
 </section>
+<?php endif; ?>
 
 <?php if ($programmes):
   // Bucket programmes by their admin-assigned group (courses.programme_group_id

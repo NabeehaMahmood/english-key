@@ -102,6 +102,86 @@ function handleImageUpload(string $fieldName, string $subdir): ?string
 }
 
 /**
+ * Validates and moves an uploaded PDF into assets/uploads/{subdir}. Returns
+ * null if no file was chosen (so an edit that doesn't replace the file keeps
+ * the existing one), or an array of ['path', 'original_filename', 'size'] on
+ * success. Throws RuntimeException on validation failure.
+ */
+function handlePdfUpload(string $fieldName, string $subdir): ?array
+{
+    if (empty($_FILES[$fieldName]['name']) || $_FILES[$fieldName]['error'] === UPLOAD_ERR_NO_FILE) {
+        return null;
+    }
+
+    $file = $_FILES[$fieldName];
+
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        throw new RuntimeException('Upload failed (error code ' . $file['error'] . ').');
+    }
+    if ($file['size'] > HANDOUT_MAX_BYTES) {
+        throw new RuntimeException('File is too large. Max size is ' . (HANDOUT_MAX_BYTES / 1024 / 1024) . 'MB.');
+    }
+
+    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    if (!in_array($ext, HANDOUT_ALLOWED_EXT, true)) {
+        throw new RuntimeException('Unsupported file type. Only PDF files are allowed.');
+    }
+
+    $mime = mime_content_type($file['tmp_name']);
+    if ($mime !== 'application/pdf') {
+        throw new RuntimeException('Uploaded file is not a valid PDF.');
+    }
+
+    // Belt-and-suspenders on top of the fileinfo MIME check: confirm the
+    // actual %PDF- signature so a renamed non-PDF can't slip through on a
+    // host where fileinfo is misconfigured.
+    $handle = fopen($file['tmp_name'], 'rb');
+    $header = $handle ? fread($handle, 5) : '';
+    if ($handle) {
+        fclose($handle);
+    }
+    if ($header !== '%PDF-') {
+        throw new RuntimeException('Uploaded file is not a valid PDF.');
+    }
+
+    $filename = bin2hex(random_bytes(16)) . '.pdf';
+    $destDir = __DIR__ . '/../assets/uploads/' . $subdir;
+    if (!is_dir($destDir)) {
+        mkdir($destDir, 0755, true);
+    }
+    $destPath = $destDir . '/' . $filename;
+
+    if (!move_uploaded_file($file['tmp_name'], $destPath)) {
+        throw new RuntimeException('Failed to save uploaded file.');
+    }
+
+    return [
+        'path' => 'assets/uploads/' . $subdir . '/' . $filename,
+        'original_filename' => basename($file['name']),
+        'size' => (int)$file['size'],
+    ];
+}
+
+/**
+ * The single active Student Course Handout (public Courses page "View /
+ * Download Course Outline" buttons), or null if none has been uploaded /
+ * enabled yet.
+ */
+function getActiveHandout(): ?array
+{
+    $stmt = getDb()->query("SELECT * FROM course_handouts WHERE is_active = 1 ORDER BY id DESC LIMIT 1");
+    return $stmt->fetch() ?: null;
+}
+
+function formatFileSize(int $bytes): string
+{
+    if ($bytes >= 1024 * 1024) {
+        return round($bytes / 1024 / 1024, 2) . ' MB';
+    }
+    return round($bytes / 1024, 1) . ' KB';
+}
+
+/**
  * Whitelist-sanitizes rich blog content HTML (typed or pasted into the
  * TinyMCE editor) with HTMLPurifier. Only structural/semantic tags are kept;
  * inline styles and classes are stripped so every post renders consistently

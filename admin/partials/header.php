@@ -12,6 +12,7 @@ $navItems = [
     'home-content.php' => 'Homepage Content',
     'page-content.php' => 'Page Content',
     'courses.php' => 'Courses',
+    'student-course-handout.php' => 'Student Course Handout',
     'programme-groups.php' => 'Programme Groups',
     'teachers.php' => 'Our Team',
     'testimonials.php' => 'Testimonials',

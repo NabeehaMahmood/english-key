@@ -28,6 +28,10 @@ define('MAIL_FROM', 'no-reply@example.com');  // must be a real mailbox on your 
 define('UPLOAD_MAX_BYTES', 5 * 1024 * 1024); // 5MB
 define('UPLOAD_ALLOWED_EXT', ['jpg', 'jpeg', 'png', 'webp']);
 
+// --- Student Course Handout upload (PDF only) ---
+define('HANDOUT_MAX_BYTES', 20 * 1024 * 1024); // 20MB
+define('HANDOUT_ALLOWED_EXT', ['pdf']);
+
 date_default_timezone_set(SITE_TIMEZONE);
 
 // --- Composer dependencies (HTMLPurifier, for sanitizing rich blog content) ---
