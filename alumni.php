@@ -47,7 +47,6 @@ $humanQuestion = humanCheckQuestion();
 
 <div class="phero phero-navy">
   <div class="wrap reveal">
-    <div class="kick">Alumnus Corner</div>
     <h1>Once EnglishKeys, <span class="hl">always EnglishKeys.</span></h1>
     <p class="sub">Our alumni carry the academy's standard into medical colleges, universities and careers. This corner belongs to them, their journeys, milestones and advice for the students following behind.</p>
   </div>
@@ -56,13 +55,18 @@ $humanQuestion = humanCheckQuestion();
 <?php if ($achievers): ?>
 <section class="dark" style="padding:64px 0">
   <div class="wrap">
-    <div class="g3 reveal">
+    <div class="g4 ag4 reveal">
       <?php foreach ($achievers as $a): ?>
-        <div class="tcard">
-          <span class="tpos">CLASS OF <?= e(substr($a['batch_info'], -4)) ?></span>
-          <div class="tyr"><?= e(substr($a['batch_info'], -4)) ?></div>
+        <div class="acard">
+          <?php if (!empty($a['photo'])): ?>
+            <img src="<?= e($a['photo']) ?>" alt="<?= e($a['name']) ?>" class="acard-photo">
+          <?php else: ?>
+            <div class="acard-photo acard-photo-ph"><?= e(mb_strtoupper(mb_substr($a['name'], 0, 1))) ?></div>
+          <?php endif; ?>
           <b><?= e($a['name']) ?></b>
-          <span><?= e($a['achievement']) ?></span>
+          <span class="acard-batch"><?= e($a['batch_info']) ?></span>
+          <span class="acard-year">Batch <?= e(substr($a['batch_info'], -4)) ?></span>
+          <?php if ($a['achievement']): ?><p class="acard-achv"><?= e($a['achievement']) ?></p><?php endif; ?>
         </div>
       <?php endforeach; ?>
     </div>
