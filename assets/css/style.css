@@ -552,8 +552,13 @@ a.scard:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
 .story-foot { margin-top: auto; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
 @media (max-width: 480px) {
   .story-card { padding: 28px 22px 24px; border-radius: 18px; }
-  .story-head { gap: 13px; margin-bottom: 16px; padding-bottom: 15px; }
+  .story-head {
+    flex-direction: column; align-items: flex-start;
+    gap: 12px; margin-bottom: 16px; padding-bottom: 15px;
+  }
+  .story-head > div:last-child { width: 100%; }
   .story-avatar, .story-avatar-ph { width: 48px; height: 48px; }
+  .story-name, .story-batch, .story-badge { overflow-wrap: break-word; }
 }
 @media (prefers-reduced-motion: reduce) {
   .story-card:hover, .story-card:hover .story-avatar, .story-card:hover .story-avatar-ph, .story-card:hover .story-badge { transform: none; }
