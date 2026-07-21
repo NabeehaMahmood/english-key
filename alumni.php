@@ -101,7 +101,7 @@ $captchaQuestion = enrolCaptchaQuestion();
     <?php if (!$stories): ?>
       <p class="sub reveal">No stories have been published yet. Be the first to share yours below.</p>
     <?php endif; ?>
-    <div class="g3">
+    <div class="story-grid">
       <?php foreach ($stories as $s): ?>
         <div class="story-card reveal">
           <div class="story-head">

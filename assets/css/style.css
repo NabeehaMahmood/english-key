@@ -479,8 +479,14 @@ a.scard:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
 @media (prefers-reduced-motion: reduce) { .rcard:hover { transform: none; } }
 
 /* ---------- Alumni Stories (premium glass cards) ---------- */
+.story-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; align-items: stretch;
+}
+@media (max-width: 1100px) { .story-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .story-grid { gap: 16px; } }
 .story-card {
   position: relative;
+  min-width: 0;
   border: 1px solid rgba(27,42,74,.08); border-radius: 22px; padding: 36px 32px 28px;
   background: linear-gradient(165deg, rgba(255,255,255,.97) 0%, rgba(255,255,255,.88) 100%);
   backdrop-filter: blur(18px) saturate(150%);
@@ -516,14 +522,16 @@ a.scard:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
 .story-name {
   display: block; color: var(--navy); font-family: var(--font-d, 'Manrope', sans-serif);
   font-weight: 800; font-size: 16px; line-height: 1.3; letter-spacing: -.01em;
+  overflow-wrap: anywhere;
 }
-.story-batch { display: block; color: var(--muted); font-size: 12.5px; font-weight: 500; letter-spacing: .01em; }
+.story-batch { display: block; color: var(--muted); font-size: 12.5px; font-weight: 500; letter-spacing: .01em; overflow-wrap: anywhere; }
 .story-badge {
   align-self: flex-start; display: inline-flex; align-items: center; gap: 7px;
   background: linear-gradient(135deg, #FF9F5A 0%, var(--orange) 58%, #D6590F 100%);
   color: #fff; border: 1px solid rgba(180,68,10,.25);
   font-size: 11.5px; font-weight: 800; letter-spacing: .03em; line-height: 1.3;
   padding: 7px 15px 7px 11px; border-radius: 999px; margin-bottom: 18px; max-width: 100%;
+  overflow-wrap: anywhere;
   box-shadow: 0 8px 16px -9px rgba(214,89,15,.6);
   transition: transform .3s cubic-bezier(.22,.75,.32,1), box-shadow .3s ease;
 }
@@ -532,6 +540,7 @@ a.scard:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
 .story-text {
   color: var(--text); font-size: 14.5px; line-height: 1.75; margin: 0 0 12px;
   display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  overflow-wrap: anywhere;
 }
 .story-card.expanded .story-text { -webkit-line-clamp: unset; line-clamp: unset; overflow: visible; }
 .story-toggle {
