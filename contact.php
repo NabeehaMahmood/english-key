@@ -7,6 +7,14 @@ $phone2 = getSetting('phone_2');
 $email = getSetting('email');
 $whatsapp = getSetting('whatsapp_number');
 $officeHours = getSetting('office_hours');
+
+$howTo = getContentBlock('courses', 'how_to_enrol_steps');
+$termsConditions = getContentBlock('courses', 'terms_conditions');
+$bankName = getSetting('bank_name');
+$bankTitle = getSetting('bank_title');
+$bankIban = getSetting('bank_iban');
+$easypaisaName = getSetting('easypaisa_name');
+$easypaisaNumber = getSetting('easypaisa_number');
 ?>
 
 <div class="phero">
@@ -45,6 +53,64 @@ $officeHours = getSetting('office_hours');
       <div class="ef-mini"><b>Email</b><p><?= e($email) ?></p></div>
       <p class="ef-hint">All classes are online, on Pakistan Standard Time. <?= e($officeHours) ?>.</p>
     </aside>
+  </div>
+</section>
+
+<?php if ($howTo['content']): ?>
+<section class="soft" id="how-to-enrol">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="kick">How to Enrol</div>
+      <h2 class="t">Four simple steps to your seat.</h2>
+    </div>
+    <div class="stepper reveal" style="margin-top:36px">
+      <?php $n = 0; foreach (explode("\n", $howTo['content']) as $line):
+        if (trim($line) === '') continue;
+        [$title, $desc] = array_pad(explode('|', $line, 2), 2, ''); $n++;
+        $title = preg_replace('/^\d+\.\s*/', '', $title); ?>
+        <div class="step">
+          <div class="step-circle">0<?= $n ?></div>
+          <h3><?= e(trim($title)) ?></h3>
+          <p><?= e(trim($desc)) ?></p>
+        </div>
+      <?php endforeach; ?>
+    </div>
+  </div>
+</section>
+<?php endif; ?>
+
+<section class="soft">
+  <div class="wrap">
+    <div class="g2 reveal">
+      <div class="card">
+        <h3 style="font-size:19px;margin-bottom:18px"><span class="gic-sm"><?= icon('card', 'icon') ?></span> Payment details</h3>
+        <?php if ($bankName): ?>
+          <div style="background:linear-gradient(135deg,var(--bg),#fff);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:12px;border-left:4px solid var(--navy)">
+            <b style="display:block;margin-bottom:4px;font-size:15px"><?= e($bankName) ?></b>
+            <span style="font-size:14px;color:var(--muted)">Title: <?= e($bankTitle) ?><br>IBAN: <?= e($bankIban) ?></span>
+          </div>
+        <?php endif; ?>
+        <?php if ($easypaisaName): ?>
+          <div style="background:linear-gradient(135deg,var(--bg),#fff);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:12px;border-left:4px solid var(--orange)">
+            <b style="display:block;margin-bottom:4px;font-size:15px">EasyPaisa</b>
+            <span style="font-size:14px;color:var(--muted)">Name: <?= e($easypaisaName) ?><br>Number: <?= e($easypaisaNumber) ?></span>
+          </div>
+        <?php endif; ?>
+        <div class="notebar" style="margin-top:14px">
+          <?= icon('meta-calendar', 'icon notebar-icon') ?>
+          <p>Send your payment screenshot on WhatsApp to activate your seat the same day.</p>
+          <a class="btn btn-o" href="<?= e(waLink($whatsapp)) ?>" target="_blank" rel="noopener">Send screenshot on WhatsApp</a>
+        </div>
+      </div>
+      <?php if ($termsConditions['content']): ?>
+      <div class="card">
+        <h3 style="font-size:19px;margin-bottom:18px"><span class="gic-sm"><?= icon('document', 'icon') ?></span> Terms &amp; conditions</h3>
+        <?php foreach (explode("\n", $termsConditions['content']) as $term): if (trim($term) === '') continue; ?>
+          <div class="check"><?= e(trim($term)) ?></div>
+        <?php endforeach; ?>
+      </div>
+      <?php endif; ?>
+    </div>
   </div>
 </section>
 

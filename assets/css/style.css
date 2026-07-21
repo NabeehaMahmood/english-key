@@ -119,8 +119,6 @@ header.site .btn { padding: 9px 18px; font-size: 14px; }
   .btn-hero-cta { animation: none; }
 }
 
-/* ---------- Page hero (courses/notes/alumni/blog/contact banner - unchanged) ---------- */
-.phero { padding: 70px 0 50px; background: linear-gradient(180deg, var(--orange-soft), #fff); }
 /* ---------- Hero / page hero ---------- */
 .hero { padding: 70px 0 50px; background: linear-gradient(180deg, var(--orange-soft), #fff); }
 /* client_courses_final.html: deep navy hero with two drifting accent glows */
@@ -152,7 +150,6 @@ header.site .btn { padding: 9px 18px; font-size: 14px; }
   padding: .03em .22em; border-radius: 6px; transform: rotate(-1.1deg);
   box-shadow: 0 8px 20px -8px rgba(234,108,31,.65);
 }
-.hero, .phero { padding: 70px 0 50px; background: linear-gradient(180deg, var(--orange-soft), #fff); }
 
 /* Blog hero: dark navy variant matching resources/blog.html */
 .phero-dark {
