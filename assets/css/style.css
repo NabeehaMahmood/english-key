@@ -466,6 +466,55 @@ a.scard:focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
 }
 @media (prefers-reduced-motion: reduce) { .pgpanel, .pgicon, .pgchev, .pcard:hover { transition: none; } }
 
+/* ---------- Courses FAQ accordion (reuses .pgroup/.pgchev conventions) ---------- */
+.faq-list { display: flex; flex-direction: column; gap: 14px; }
+
+.faq-item {
+  background: var(--paper); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden;
+  transition: box-shadow .3s ease, border-color .3s ease;
+}
+.faq-item:hover { box-shadow: var(--shadow-h); border-color: rgba(234,108,31,.2); }
+
+.faq-q {
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+  width: 100%; padding: 22px 26px; cursor: pointer; user-select: none;
+  background: transparent; border: none; text-align: left; font-family: inherit; color: inherit;
+}
+.faq-q span:first-child { font-family: var(--font-d); font-weight: 700; font-size: 16px; color: var(--navy); transition: color .2s ease; }
+.faq-q:hover span:first-child { color: var(--orange); }
+
+.faq-toggle {
+  flex: none; position: relative; width: 32px; height: 32px; border-radius: 50%;
+  background: var(--bg); transition: background .25s ease;
+}
+.faq-q:hover .faq-toggle { background: var(--orange-soft); }
+.faq-toggle::before, .faq-toggle::after {
+  content: ""; position: absolute; top: 50%; left: 50%; background: var(--navy);
+  transition: background .2s ease, transform .3s cubic-bezier(.2,.7,.3,1), opacity .2s ease;
+}
+.faq-toggle::before { width: 12px; height: 2px; transform: translate(-50%, -50%); }
+.faq-toggle::after { width: 2px; height: 12px; transform: translate(-50%, -50%); }
+.faq-q:hover .faq-toggle::before, .faq-q:hover .faq-toggle::after { background: var(--orange); }
+.faq-q[aria-expanded="true"] .faq-toggle { background: var(--orange); }
+.faq-q[aria-expanded="true"] .faq-toggle::before, .faq-q[aria-expanded="true"] .faq-toggle::after { background: #fff; }
+.faq-q[aria-expanded="true"] .faq-toggle::after { transform: translate(-50%, -50%) rotate(90deg); opacity: 0; }
+
+.faq-a { max-height: 0; overflow: hidden; opacity: 0; transition: max-height .45s cubic-bezier(.2,.7,.3,1), opacity .3s ease; }
+.faq-a.open { opacity: 1; }
+.faq-a-inner { padding: 0 26px 24px; border-top: 1px solid var(--line); margin-top: 2px; padding-top: 16px; }
+.faq-a-inner p { margin: 0; color: var(--muted); font-size: 14.5px; line-height: 1.65; }
+.faq-a-inner p strong { color: var(--navy); }
+
+@media (max-width: 680px) {
+  .faq-q { padding: 16px 18px; gap: 14px; }
+  .faq-q span:first-child { font-size: 14.5px; }
+  .faq-toggle { width: 27px; height: 27px; }
+  .faq-a-inner { padding: 0 18px 20px; padding-top: 14px; }
+  .faq-a-inner p { font-size: 13.5px; }
+}
+@media (prefers-reduced-motion: reduce) { .faq-item, .faq-a, .faq-toggle, .faq-toggle::before, .faq-toggle::after { transition: none; } }
+
 .rcard {
   border: 1.5px solid var(--blue); border-radius: 14px; padding: 26px 24px; background: #fff;
   display: flex; flex-direction: column; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;

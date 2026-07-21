@@ -57,6 +57,7 @@ function featuredMeta(array $c): string
   <?php if ($subjects): ?><a href="#subjects"><span>Core Subjects</span></a><?php endif; ?>
   <?php if ($programmes): ?><a href="#programmes"><span>Programmes</span></a><?php endif; ?>
   <a href="#enrol"><span>How to Enrol</span></a>
+  <a href="#faqs"><span>FAQs</span></a>
   <?php if ($testimonials): ?><a href="#reviews"><span>Reviews</span></a><?php endif; ?>
 </nav>
 
@@ -253,6 +254,45 @@ function featuredMeta(array $c): string
       <?php endforeach; ?>
     </div>
     <?php endif; ?>
+  </div>
+</section>
+
+<?php
+// Static FAQ content for the Courses page (client-supplied copy - kept
+// verbatim, including numbering and the "A:" answer marker).
+$faqs = [
+    ['q' => 'Q1. How do I register for a course at EnglishKeys Academy?', 'a' => "You can register by calling/texting our registration number (0311-1537563), through advertisement posters shared in our WhatsApp/Facebook/Instagram socials. Get the payment details, pay the prescribed fee, and share the receipt on the academy\u{2019}s number."],
+    ['q' => 'Q2. Is there an entry test before joining a Bootcamp or Marathon?', 'a' => "No formal entry test is required for most programs. However, a short assessment may be conducted at the start of each course to help us understand each student's current level and group them accordingly."],
+    ['q' => 'Q3. What are the class timings for each program?', 'a' => 'Class timings vary by program and batch and are shared with registered students when a course is announced. Our courses are usually conducted in the evening; please ask our front desk representative for the current schedule.'],
+    ['q' => 'Q4. What is the fee for each course, and how can I pay?', 'a' => 'Fee details for each program are shared at the time of registration and may vary by class level and course duration. Fees can be paid online via bank transfer / mobile wallet — receipts are provided for all payments.'],
+    ['q' => 'Q5. Are seats really limited? How can I confirm if a seat is available?', 'a' => 'Yes, most Bootcamps and special courses (Summer Camp, MDCAT Prep, Deen Camp, Full-Length Papers) have limited seats to maintain teaching quality. Please call 0311-1537563 to confirm seat availability before making payment.'],
+    ['q' => 'Q6. What happens if my child misses a class?', 'a' => 'Make-up notes, and recordings (where applicable) can be arranged for students who miss a class due to genuine reasons. Please inform the academy in advance where possible.'],
+    ['q' => 'Q7. Do you provide study material, notes, or past papers?', 'a' => 'Yes, class-specific notes, practice worksheets, and past papers are provided as part of the course material for Bootcamps, Marathons, and Crash Courses.'],
+    ['q' => 'Q8. How are students assessed, and how are results communicated to parents?', 'a' => 'Students are assessed through weekly quizzes, class tests, and full-length papers depending on the program. Results and performance feedback are shared with parents periodically through report cards, calls, or WhatsApp updates.'],
+    ['q' => 'Q9. What is the policy on fee refunds or transfers between batches?', 'a' => 'Fees once paid are generally non-refundable; however, students may be allowed to transfer to another batch of the same program (subject to seat availability) by informing the administration in advance, before the commencement of course and issuance of resource pack.'],
+    ['q' => 'Q10. Are online classes available for students who cannot attend in person?', 'a' => "All our classes are online. We don\u{2019}t offer physical, on-campus classes. Please contact the academy directly to check for the available slots."],
+    ['q' => 'Q11. What measures are in place for student safety and discipline?', 'a' => "EnglishKeys Academy maintains a disciplined, respectful learning environment, with attendance monitoring and direct communication with parents in case of any concerns regarding a student's conduct or wellbeing."],
+];
+?>
+<section id="faqs">
+  <div class="wrap">
+    <div class="reveal">
+      <div class="kick">FAQs</div>
+      <h2 class="t">Frequently Asked Questions (FAQs)</h2>
+    </div>
+    <div class="faq-list reveal" style="margin-top:36px">
+      <?php foreach ($faqs as $i => $f): $n = $i + 1; ?>
+      <div class="faq-item">
+        <button type="button" class="faq-q" aria-expanded="false" aria-controls="faq-panel-<?= $n ?>" id="faq-btn-<?= $n ?>">
+          <span><?= e($f['q']) ?></span>
+          <span class="faq-toggle" aria-hidden="true"></span>
+        </button>
+        <div class="faq-a" id="faq-panel-<?= $n ?>" role="region" aria-labelledby="faq-btn-<?= $n ?>">
+          <div class="faq-a-inner"><p><strong>A:</strong> <?= e($f['a']) ?></p></div>
+        </div>
+      </div>
+      <?php endforeach; ?>
+    </div>
   </div>
 </section>
 

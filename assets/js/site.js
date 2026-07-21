@@ -359,6 +359,39 @@ function animateCount(el) {
 })();
 
 /* ------------------------------------------------------------------
+   Courses page FAQ accordion: one panel open at a time, reuses the
+   shared slideToggle() helper defined above. Finds nothing and does
+   nothing on any page without .faq-list.
+   ------------------------------------------------------------------ */
+(function () {
+  var buttons = document.querySelectorAll('.faq-q');
+  if (!buttons.length) return;
+
+  buttons.forEach(function (btn) {
+    var panel = document.getElementById(btn.getAttribute('aria-controls'));
+
+    btn.addEventListener('click', function () {
+      var isOpen = btn.getAttribute('aria-expanded') === 'true';
+
+      buttons.forEach(function (other) {
+        if (other === btn || other.getAttribute('aria-expanded') !== 'true') return;
+        other.setAttribute('aria-expanded', 'false');
+        slideToggle(document.getElementById(other.getAttribute('aria-controls')), false);
+      });
+
+      btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+      slideToggle(panel, !isOpen);
+    });
+  });
+
+  window.addEventListener('resize', function () {
+    document.querySelectorAll('.faq-a.open').forEach(function (panel) {
+      panel.style.maxHeight = panel.scrollHeight + 'px';
+    });
+  });
+})();
+
+/* ------------------------------------------------------------------
    "On this page" jump nav: scroll-spy. Highlights whichever section
    is currently under the sticky header + sticky jumpnav as the user
    scrolls, using IntersectionObserver rather than a scroll listener.
