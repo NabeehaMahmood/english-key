@@ -108,7 +108,7 @@ $footerProgrammes = getDb()->query("
 </footer>
 
 <?php if ($whatsapp): ?>
-<a class="whatsapp-float" href="https://wa.me/<?= e($whatsapp) ?>" target="_blank" rel="noopener" aria-label="Message us on WhatsApp">
+<a class="whatsapp-float" href="<?= e(waLink($whatsapp)) ?>" target="_blank" rel="noopener" aria-label="Message us on WhatsApp">
   <span class="wa-ring"></span>
   <span class="wa-ring wa-ring-2"></span>
   <span class="wa-icon">
@@ -117,6 +117,16 @@ $footerProgrammes = getDb()->query("
   <span class="wa-tooltip">Chat with us</span>
 </a>
 <?php endif; ?>
+
+<?php
+// Numbers the offline chat widget's small hardcoded safety-net answers
+// (assets/js/chatbot.js) reference via {{token}}, pulled live so they never
+// go stale. The real, fully-automatic answering happens through the AI
+// (chat.php -> buildChatFacts()), which needs no data feed here at all.
+$chatInfo = buildChatTokens();
+?>
+<script>window.EKA_INFO = <?= json_encode($chatInfo, JSON_UNESCAPED_SLASHES) ?>;</script>
+<script src="assets/js/chatbot.js" defer></script>
 <script src="assets/js/site.js" defer></script>
 </body>
 </html>
