@@ -198,11 +198,23 @@ function getTrackRecords(?int $limit = null): array
  */
 function renderTrackRecordCard(array $r, string $class = 'tcard', string $delayAttr = ''): string
 {
-    return '<div class="' . e($class) . '"' . $delayAttr . '>'
+    if (empty($r['image'])) {
+        return '<div class="' . e($class) . '"' . $delayAttr . '>'
+            . '<span class="tpos">' . e($r['position_badge']) . '</span>'
+            . '<div class="tyr">' . e($r['year']) . '</div>'
+            . '<b>' . e($r['student_name']) . '</b>'
+            . '<span>' . e($r['achievement_title']) . '</span>'
+            . '</div>';
+    }
+
+    return '<div class="' . e($class) . ' tcard--has-image"' . $delayAttr . '>'
+        . '<img class="tcard-photo" src="' . e($r['image']) . '" alt="' . e($r['student_name']) . '" loading="lazy">'
+        . '<div class="tcard-info">'
         . '<span class="tpos">' . e($r['position_badge']) . '</span>'
         . '<div class="tyr">' . e($r['year']) . '</div>'
         . '<b>' . e($r['student_name']) . '</b>'
         . '<span>' . e($r['achievement_title']) . '</span>'
+        . '</div>'
         . '</div>';
 }
 

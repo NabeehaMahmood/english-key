@@ -34,15 +34,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if ($id > 0) {
-            if ($image) {
+            $removeImage = $image === null && !empty($_POST['remove_image']);
+
+            if ($image || $removeImage) {
                 $oldImage = $db->prepare('SELECT image FROM track_records WHERE id = ?');
                 $oldImage->execute([$id]);
                 $oldImage = $oldImage->fetchColumn();
 
-                $db->prepare('UPDATE track_records SET year=?, position_badge=?, student_name=?, achievement_title=?, description=?, image=?, sort_order=?, is_active=? WHERE id=?')
-                   ->execute([$year, $positionBadge, $studentName, $achievementTitle, $description, $image, $sortOrder, $isActive, $id]);
+                $newImage = $removeImage ? null : $image;
 
-                if ($oldImage && $oldImage !== $image) {
+                $db->prepare('UPDATE track_records SET year=?, position_badge=?, student_name=?, achievement_title=?, description=?, image=?, sort_order=?, is_active=? WHERE id=?')
+                   ->execute([$year, $positionBadge, $studentName, $achievementTitle, $description, $newImage, $sortOrder, $isActive, $id]);
+
+                if ($oldImage && $oldImage !== $newImage) {
                     deleteUploadedImage($oldImage);
                 }
             } else {
@@ -105,12 +109,18 @@ $records = $db->query('SELECT * FROM track_records ORDER BY sort_order, id')->fe
       <input type="checkbox" name="is_active" <?= (!isset($editing) || $editing['is_active']) ? 'checked' : '' ?>>
       Visible on site
     </label>
-    <label>Photo (optional; shown as a thumbnail in the "All Records" list below, not yet shown on the public site cards)
+    <label>Photo (optional; shown as a large photo on the public site cards when uploaded)
       <?php if (!empty($editing['image'])): ?>
         <div><img src="../<?= e($editing['image']) ?>" style="max-height:80px;"></div>
       <?php endif; ?>
       <input type="file" name="image" accept=".jpg,.jpeg,.png,.webp">
     </label>
+    <?php if (!empty($editing['image'])): ?>
+    <label class="checkbox-label">
+      <input type="checkbox" name="remove_image" value="1">
+      Remove current image (leave unchecked to keep it, or choose a new file above to replace it)
+    </label>
+    <?php endif; ?>
 
     <button type="submit"><?= $editing ? 'Update' : 'Add Record' ?></button>
     <?php if ($editing): ?><a href="home-track-record.php#all-records" class="button-secondary">Cancel</a><?php endif; ?>

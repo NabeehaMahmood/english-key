@@ -200,6 +200,9 @@ section.dark .sub { color: #b9c2de; }
 .tcard .tyr { font-family: 'Manrope', sans-serif; font-size: 44px; font-weight: 800; color: #F5A468; line-height: 1; margin-bottom: 12px; }
 .tcard b { font-size: 18px; display: block; margin-bottom: 4px; color: #fff; }
 .tcard span { color: #C3CCE9; font-size: 14px; }
+.tcard--has-image { display: flex; align-items: center; gap: 18px; }
+.tcard-photo { width: 100px; height: 100px; object-fit: cover; border-radius: 10px; flex-shrink: 0; }
+.tcard-info { flex: 1; min-width: 0; }
 
 .gbar { background: #fff; border-radius: 16px; padding: 26px; margin-top: 30px; display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
 .gbar .big { font-family: 'Manrope', sans-serif; font-size: 2rem; font-weight: 800; color: var(--orange); }
@@ -271,6 +274,10 @@ section.dark .sub { color: #b9c2de; }
 .cl { display: flex; gap: 12px; margin-bottom: 14px; font-size: 14px; }
 .cl .ic { color: #fff; }
 .cl .ic .icon { width: 20px; height: 20px; }
+.cl .ic[data-brand] .icon { transition: color .25s ease, transform .25s ease, filter .25s ease; }
+.cl:hover .ic[data-brand="whatsapp"] .icon { color: var(--whatsapp); transform: scale(1.12); filter: drop-shadow(0 0 6px rgba(37,211,102,.5)); }
+.cl:hover .ic[data-brand="email"] .icon { color: var(--orange); transform: scale(1.12); filter: drop-shadow(0 0 6px rgba(234,108,31,.4)); }
+@media (prefers-reduced-motion: reduce) { .cl .ic[data-brand] .icon { transition: none; } }
 .cl small { display: block; color: #b9c2de; font-size: 12px; }
 @media (max-width: 980px) { .cgrid { grid-template-columns: 1fr; } }
 
@@ -348,6 +355,10 @@ footer::before {
 .fsoc a:hover { background: var(--orange); border-color: var(--orange); }
 .fsoc svg { width: 18px; height: 18px; fill: #E6EBFA; }
 .fsoc a:hover svg { fill: #fff; }
+.fsoc a[data-brand="facebook"]:hover { background: #1877F2; border-color: #1877F2; }
+.fsoc a[data-brand="instagram"]:hover { background: linear-gradient(135deg, #f58529, #dd2a7b, #8134af, #515bd4); border-color: #dd2a7b; }
+.fsoc a[data-brand="youtube"]:hover { background: #FF0000; border-color: #FF0000; }
+.fsoc a[data-brand="linkedin"]:hover { background: #0A66C2; border-color: #0A66C2; }
 footer h4 {
   font-family: 'Manrope', sans-serif; font-size: 12.5px; font-weight: 800; letter-spacing: .18em;
   text-transform: uppercase; color: #F5AE70; margin-bottom: 16px;
@@ -852,5 +863,5 @@ footer h4::after { content: ""; display: block; width: 26px; height: 2px; backgr
 .faculty-desc { font-size: 14px; color: var(--muted); margin: 0; }
 
 @media (max-width: 640px) {
-  .founder-frame img { aspect-ratio: 3/2; }
+  .founder-frame img { aspect-ratio: auto; height: auto; }
 }

@@ -140,7 +140,7 @@ foreach ($profiles as $p): $t = $p['t'];
       <div class="kick">Our Method</div>
       <h2 class="t">A learning cycle that ends in first-class answers.</h2>
     </div>
-    <div class="g3 reveal" style="margin-top:30px;grid-template-columns:repeat(3,1fr)">
+    <div class="g3 reveal" style="margin-top:30px">
       <?php $n = 0; foreach (explode("\n", $methodSteps['content']) as $line):
         [$title, $desc] = array_pad(explode('|', $line, 2), 2, ''); $n++; ?>
         <div class="mcard">

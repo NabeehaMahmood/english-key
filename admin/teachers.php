@@ -37,15 +37,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if ($id > 0) {
-            if ($photo) {
+            $removePhoto = $photo === null && !empty($_POST['remove_image']);
+
+            if ($photo || $removePhoto) {
                 $oldPhoto = $db->prepare('SELECT photo FROM teachers WHERE id = ?');
                 $oldPhoto->execute([$id]);
                 $oldPhoto = $oldPhoto->fetchColumn();
 
-                $db->prepare('UPDATE teachers SET name=?, photo=?, role_title=?, qualification=?, subject=?, bio=?, detail_bio=?, credentials=?, sort_order=?, is_active=? WHERE id=?')
-                   ->execute([$name, $photo, $roleTitle, $qualification, $subject, $bio, $detailBio, $credentials, $sortOrder, $isActive, $id]);
+                $newPhoto = $removePhoto ? null : $photo;
 
-                if ($oldPhoto && $oldPhoto !== $photo) {
+                $db->prepare('UPDATE teachers SET name=?, photo=?, role_title=?, qualification=?, subject=?, bio=?, detail_bio=?, credentials=?, sort_order=?, is_active=? WHERE id=?')
+                   ->execute([$name, $newPhoto, $roleTitle, $qualification, $subject, $bio, $detailBio, $credentials, $sortOrder, $isActive, $id]);
+
+                if ($oldPhoto && $oldPhoto !== $newPhoto) {
                     deleteUploadedImage($oldPhoto);
                 }
             } else {
@@ -120,6 +124,12 @@ function renderTeacherForm(?array $row, string $heading, string $returnTab, bool
         <?php endif; ?>
         <input type="file" name="photo" accept=".jpg,.jpeg,.png,.webp">
       </label>
+      <?php if (!empty($row['photo'])): ?>
+      <label class="checkbox-label">
+        <input type="checkbox" name="remove_image" value="1">
+        Remove current image (leave unchecked to keep it, or choose a new file above to replace it)
+      </label>
+      <?php endif; ?>
 
       <button type="submit"><?= $row ? 'Update' : 'Add Team Member' ?></button>
       <?php if ($allowCancel): ?><a href="teachers.php#<?= e($returnTab) ?>" class="button-secondary">Cancel</a><?php endif; ?>
@@ -158,11 +168,12 @@ function renderTeacherForm(?array $row, string $heading, string $returnTab, bool
 
   <table class="admin-table">
     <thead>
-      <tr><th>Name</th><th>Role</th><th>Visible</th><th>Actions</th></tr>
+      <tr><th>Photo</th><th>Name</th><th>Role</th><th>Visible</th><th>Actions</th></tr>
     </thead>
     <tbody>
       <?php foreach ($teachers as $teacher): ?>
         <tr>
+          <td><?php if ($teacher['photo']): ?><img src="../<?= e($teacher['photo']) ?>" alt="" style="max-height:40px;max-width:40px;border-radius:6px;object-fit:cover"><?php else: ?>&mdash;<?php endif; ?></td>
           <td><?= e($teacher['name']) ?></td>
           <td><?= e($teacher['role_title']) ?></td>
           <td><?= $teacher['is_active'] ? 'Yes' : 'No' ?></td>
