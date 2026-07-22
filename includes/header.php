@@ -39,9 +39,6 @@ $flash = getFlashMessage();
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="ekaGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" style="stop-color:var(--navy)"/><stop offset="100%" style="stop-color:var(--orange)"/></linearGradient></defs></svg>
 <script>document.documentElement.classList.add('js');</script>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="ekaGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#1E2A66"/><stop offset="100%" stop-color="#E56A19"/></linearGradient></defs></svg>
-<header class="nav">
-  <div class="nav-in">
-    <a href="index.php">
 <header class="site nav">
   <div class="wrap nav-in">
     <a class="logo" href="index.php">
