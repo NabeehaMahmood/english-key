@@ -3,7 +3,7 @@ require_once __DIR__ . '/includes/header.php';
 
 $db = getDb();
 $subjects = $db->query("SELECT * FROM courses WHERE category = 'subject' AND is_active = 1 ORDER BY sort_order LIMIT 4")->fetchAll();
-$achievers = $db->query('SELECT * FROM alumni WHERE is_active = 1 ORDER BY sort_order LIMIT 3')->fetchAll();
+$trackRecords = getTrackRecords();
 $testimonials = $db->query('SELECT * FROM testimonials WHERE is_active = 1 ORDER BY sort_order LIMIT 3')->fetchAll();
 
 // A3: single query, 3 testimonials total (parent quotes now live on testimonials.php only).
@@ -22,7 +22,6 @@ $googleCount = getSetting('google_review_count');
 $aboutQuote = getContentBlock('about', 'quote');
 
 $whyCards = $db->query('SELECT * FROM home_why_cards WHERE is_active = 1 ORDER BY sort_order, id')->fetchAll();
-$homeStats = $db->query('SELECT * FROM home_stats WHERE is_active = 1 ORDER BY sort_order, id')->fetchAll();
 
 $heroCta1Label = getSetting('hero_cta1_label', 'Explore Courses');
 $heroCta1Link = getSetting('hero_cta1_link', 'courses.php');
@@ -94,6 +93,7 @@ $whyHeading = getContentBlock('home', 'why_heading')['content'] ?: 'A planned, y
   </div>
 </section>
 
+<?php renderHomeStatsBand(); ?>
 <?php if ($homeStats): ?>
 <div class="band">
   <div class="wrap bg-auto reveal">
@@ -138,7 +138,7 @@ $whyHeading = getContentBlock('home', 'why_heading')['content'] ?: 'A planned, y
 </section>
 <?php endif; ?>
 
-<?php if ($achievers): ?>
+<?php if ($trackRecords): ?>
 <section class="dark trackrecord" id="results">
   <div class="tr-bg" aria-hidden="true">
     <?php if ($trackBgImage): ?>
@@ -153,14 +153,9 @@ $whyHeading = getContentBlock('home', 'why_heading')['content'] ?: 'A planned, y
       <h2 class="t"><?= e($trackRest) ?><span class="hl"><?= e($trackLast) ?></span></h2>
       <p class="sub"><?= e($trackDescription) ?></p>
     </div>
-    <div class="g3">
-      <?php foreach ($achievers as $i => $a): ?>
-        <div class="tcard reveal"<?= revealDelay($i) ?>>
-          <span class="tpos">1ST POSITION</span>
-          <div class="tyr"><?= e(substr($a['batch_info'], -4)) ?></div>
-          <b><?= e($a['name']) ?></b>
-          <span><?= e($a['achievement']) ?></span>
-        </div>
+    <div class="g3 reveal">
+      <?php foreach ($trackRecords as $i => $r): ?>
+        <?= renderTrackRecordCard($r, 'tcard reveal', revealDelay($i)) ?>
       <?php endforeach; ?>
     </div>
     <?php if ($googleUrl): ?>

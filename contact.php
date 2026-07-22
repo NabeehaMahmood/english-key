@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/header.php';
 
-$intro = getContentBlock('contact', 'intro');
 $phone = getSetting('phone');
 $phone2 = getSetting('phone_2');
 $email = getSetting('email');
@@ -17,13 +16,7 @@ $easypaisaName = getSetting('easypaisa_name');
 $easypaisaNumber = getSetting('easypaisa_number');
 ?>
 
-<div class="phero">
-  <div class="wrap reveal">
-    <div class="kick">Contact Us</div>
-    <h1>Questions? <span class="hl">We're here to help.</span></h1>
-    <p class="sub"><?= e($intro['content']) ?></p>
-  </div>
-</div>
+<?php renderPageHero('contact'); ?>
 
 <section>
   <div class="wrap ef-wrap">

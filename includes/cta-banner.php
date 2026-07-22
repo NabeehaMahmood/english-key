@@ -14,8 +14,8 @@ $ctaEmail = getSetting('email');
     </div>
     <div class="ccard reveal">
       <h3>Admissions Open, FBISE 9-12</h3>
-      <div class="cl"><span class="ic"><?= icon('chat') ?></span><div>WhatsApp: +<?= e($ctaWhatsapp) ?><small>Reply within 3 hours</small></div></div>
-      <div class="cl"><span class="ic"><?= icon('mail') ?></span><div><?= e($ctaEmail) ?><small>Email us anytime</small></div></div>
+      <div class="cl"><span class="ic" data-brand="whatsapp"><?= icon('whatsapp') ?></span><div>WhatsApp: +<?= e($ctaWhatsapp) ?><small>Reply within 3 hours</small></div></div>
+      <div class="cl"><span class="ic" data-brand="email"><?= icon('mail') ?></span><div><?= e($ctaEmail) ?><small>Email us anytime</small></div></div>
       <div class="cl"><span class="ic"><?= icon('book') ?></span><div>English · Urdu · Islamiat · Tarjuma<small>Live classes + notes portal access</small></div></div>
     </div>
   </div>

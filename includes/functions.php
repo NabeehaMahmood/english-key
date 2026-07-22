@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/icons.php';
+require_once __DIR__ . '/hero.php';
 
 function e(?string $value): string
 {
@@ -144,6 +145,19 @@ function handleImageUpload(string $fieldName, string $subdir): ?string
 }
 
 /**
+ * Deletes a previously uploaded image from disk given its DB-stored
+ * relative path (e.g. "assets/uploads/gallery/xxx.jpg"). Safe no-op if
+ * the path is empty or the file no longer exists.
+ */
+function deleteUploadedImage(?string $path): void
+{
+    if (!$path) {
+        return;
+    }
+    $fullPath = __DIR__ . '/../' . $path;
+    if (is_file($fullPath)) {
+        @unlink($fullPath);
+    }
  * Validates and moves an uploaded PDF into assets/uploads/{subdir}. Same
  * shape as handleImageUpload() but for note sample files (PDF-only, larger
  * size cap). Returns the relative path to store in the DB, or null if no
@@ -272,6 +286,112 @@ function getFlashMessage(): ?array
 }
 
 /**
+ * The About page's Founder and Co-Founder highlights, resolved via the
+ * dedicated site_settings pointers ('about_founder_teacher_id' /
+ * 'about_cofounder_teacher_id', editable in Admin -> Our Team) so the
+ * page never depends on fragile Role Title text matching or Sort Order.
+ * Falls back to Role Title containing "CEO" / "Co-Founder" if a pointer
+ * isn't set or points to a missing/inactive row. Distinct from
+ * site_settings('founders_vision_teacher_id'), which independently picks
+ * whose quote shows in the Home page's "Founders' Vision" section.
+ * Returns ['founder' => ?array, 'cofounder' => ?array].
+ */
+function getFounderAndCofounder(PDO $db): array
+{
+    $fetchById = function (int $id) use ($db): ?array {
+        if ($id <= 0) return null;
+        $stmt = $db->prepare('SELECT * FROM teachers WHERE id = ? AND is_active = 1');
+        $stmt->execute([$id]);
+        return $stmt->fetch() ?: null;
+    };
+
+    $founder = $fetchById((int) getSetting('about_founder_teacher_id'));
+    if (!$founder) {
+        $founder = $db->query("SELECT * FROM teachers WHERE is_active = 1 AND role_title LIKE '%CEO%' ORDER BY sort_order, id LIMIT 1")->fetch() ?: null;
+    }
+
+    $cofounder = $fetchById((int) getSetting('about_cofounder_teacher_id'));
+    if (!$cofounder) {
+        $cofounder = $db->query("SELECT * FROM teachers WHERE is_active = 1 AND role_title LIKE '%Co-Founder%' ORDER BY sort_order, id LIMIT 1")->fetch() ?: null;
+    }
+    if ($founder && $cofounder && $founder['id'] === $cofounder['id']) {
+        $cofounder = null;
+    }
+
+    return ['founder' => $founder, 'cofounder' => $cofounder];
+}
+
+/**
+ * The "Proven Track Record" achiever cards, single source of truth for
+ * Home ("Proven Track Record"), Testimonials ("Alumnus Corner"), Alumni
+ * (top band) and About ("The Hat-Trick"). Pair with renderTrackRecordCard()
+ * below. No $limit (the default) fetches every active record, so the grid
+ * grows automatically as records are added, wrapping into new rows via
+ * CSS grid, no template change ever needed.
+ */
+function getTrackRecords(?int $limit = null): array
+{
+    $sql = 'SELECT * FROM track_records WHERE is_active = 1 ORDER BY sort_order, id';
+    if ($limit !== null) {
+        $sql .= ' LIMIT ' . (int) $limit;
+    }
+    return getDb()->query($sql)->fetchAll();
+}
+
+/**
+ * Renders one track-record achiever card (the .tcard markup). $class and
+ * $delayAttr are passed in per call site so each page keeps its existing
+ * reveal-animation behaviour unchanged.
+ */
+function renderTrackRecordCard(array $r, string $class = 'tcard', string $delayAttr = ''): string
+{
+    if (empty($r['image'])) {
+        return '<div class="' . e($class) . '"' . $delayAttr . '>'
+            . '<span class="tpos">' . e($r['position_badge']) . '</span>'
+            . '<div class="tyr">' . e($r['year']) . '</div>'
+            . '<b>' . e($r['student_name']) . '</b>'
+            . '<span>' . e($r['achievement_title']) . '</span>'
+            . '</div>';
+    }
+
+    return '<div class="' . e($class) . ' tcard--has-image"' . $delayAttr . '>'
+        . '<img class="tcard-photo" src="' . e($r['image']) . '" alt="' . e($r['student_name']) . '" loading="lazy">'
+        . '<div class="tcard-info">'
+        . '<span class="tpos">' . e($r['position_badge']) . '</span>'
+        . '<div class="tyr">' . e($r['year']) . '</div>'
+        . '<b>' . e($r['student_name']) . '</b>'
+        . '<span>' . e($r['achievement_title']) . '</span>'
+        . '</div>'
+        . '</div>';
+}
+
+/**
+ * The stat cards shown in the dark band below the Home hero (e.g. "210K+ /
+ * Learners in our community"). Single source of truth: Admin -> Homepage
+ * Stats. Pair with renderHomeStatsBand() below so any page that needs this
+ * exact band (Home, About, ...) shares one query and one markup/CSS path -
+ * add/edit/delete/hide/reorder in the admin panel updates every page.
+ */
+function getHomeStats(): array
+{
+    return getDb()->query('SELECT * FROM home_stats WHERE is_active = 1 ORDER BY sort_order, id')->fetchAll();
+}
+
+/**
+ * Echoes the full stats band (including its .band/.wrap wrapper), or
+ * nothing at all if there are no active stats. Call as <?php renderHomeStatsBand(); ?>
+ */
+function renderHomeStatsBand(): void
+{
+    $stats = getHomeStats();
+    if (!$stats) {
+        return;
+    }
+    echo '<div class="band"><div class="wrap bg-auto reveal">';
+    foreach ($stats as $stat) {
+        echo '<div class="bs"><b>' . e($stat['value']) . '</b><span>' . e($stat['label']) . '</span></div>';
+    }
+    echo '</div></div>';
  * Live values the offline chat widget's small hardcoded safety-net answers
  * (assets/js/chatbot.js) reference via {{token}}, shipped to the browser
  * as window.EKA_INFO (see includes/footer.php). This only needs to cover

@@ -18,18 +18,14 @@ $categories = array_values(array_filter($categories, static function ($cat) use 
     return !empty($byCategory[$cat['id']]);
 }));
 
-$achievers = $db->query('SELECT * FROM alumni WHERE is_active = 1 ORDER BY sort_order LIMIT 3')->fetchAll();
+$trackRecords = getTrackRecords();
+
+$testimonialsSubtitle = $googleUrl
+    ? sprintf('Every quote on this page is a genuine, permission-granted review from students, parents and alumni, part of our %s★ rating from %s Google reviews.', $googleRating, $googleCount)
+    : '';
 ?>
 <main class="page-testimonials">
-<div class="phero">
-  <div class="wrap reveal">
-    <div class="kick">Testimonials</div>
-    <h1>Real students. Real results. <span class="hl">Real words.</span></h1>
-    <?php if ($googleUrl): ?>
-      <p class="sub">Every quote on this page is a genuine, permission-granted review from students, parents and alumni, part of our <?= e($googleRating) ?><?= icon('star', 'icon star-icon') ?> rating from <?= e($googleCount) ?> Google reviews.</p>
-    <?php endif; ?>
-  </div>
-</div>
+<?php renderPageHero('testimonials', ['subtitle' => $testimonialsSubtitle]); ?>
 
 <?php if ($categories): ?>
   <div class="wrap" style="margin:38px auto 8px">
@@ -65,7 +61,7 @@ $achievers = $db->query('SELECT * FROM alumni WHERE is_active = 1 ORDER BY sort_
   </section>
 <?php endif; ?>
 
-<?php if ($achievers): ?>
+<?php if ($trackRecords): ?>
 <section class="dark" id="alumnus-corner">
   <div class="wrap">
     <div class="reveal">
@@ -74,13 +70,8 @@ $achievers = $db->query('SELECT * FROM alumni WHERE is_active = 1 ORDER BY sort_
       <p class="sub">Our alumni carry the academy&rsquo;s standard into medical colleges, universities and careers. This corner belongs to them, their journeys, milestones and advice for the students following behind.</p>
     </div>
     <div class="g3 reveal">
-      <?php foreach ($achievers as $i => $a): ?>
-        <div class="tcard"<?= revealDelay($i) ?>>
-          <span class="tpos">CLASS OF <?= e(substr($a['batch_info'], -4)) ?></span>
-          <div class="tyr"><?= e(substr($a['batch_info'], -4)) ?></div>
-          <b><?= e($a['name']) ?></b>
-          <span><?= e($a['achievement']) ?></span>
-        </div>
+      <?php foreach ($trackRecords as $i => $r): ?>
+        <?= renderTrackRecordCard($r, 'tcard reveal', revealDelay($i)) ?>
       <?php endforeach; ?>
     </div>
     <div class="gbar reveal" style="margin-top:26px">

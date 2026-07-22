@@ -158,6 +158,7 @@ if ($defaultSubjectSlug === null && !empty($classSubjects[$classes[0] ?? 0])) {
 $visibleLimit = 6;
 ?>
 
+<?php renderPageHero('notes'); ?>
 <div class="phero phero-dark">
   <div class="wrap reveal">
     <div class="kick">Free Resources</div>
