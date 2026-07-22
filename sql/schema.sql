@@ -60,7 +60,6 @@ INSERT INTO site_settings (setting_key, setting_value) VALUES
     ('fc_popup_btn2_label', 'See All Courses'),
     ('fc_popup_btn2_link', 'courses.php'),
     ('hero_fact4_value', '15+'),
-    ('accent_color', '#E56A19'),
     ('accent_color', '#EA6C1F'),
     ('stat_learners', '210K+'),
     ('stat_positions', '3x'),
@@ -210,33 +209,12 @@ CREATE TABLE courses (
     modules TEXT,
     seats_info VARCHAR(100),
     accent_color VARCHAR(20),
-    programme_group VARCHAR(60),
     programme_group_id INT NULL,
     sort_order INT NOT NULL DEFAULT 0,
     is_active TINYINT(1) NOT NULL DEFAULT 1,
     FOREIGN KEY (programme_group_id) REFERENCES programme_groups(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
-INSERT INTO courses (title, slug, category, tag_line, description, duration, level, price, eligibility, mode, schedule_info, highlights, modules, seats_info, accent_color, sort_order) VALUES
-('English', 'english', 'subject', 'Live Classes - Smart Notes - Model Papers', 'Grammar, comprehension, translation and composition, taught by an M.Phil. English Linguistics scholar.', NULL, 'Classes 9-12', NULL, 'Classes 9-12', NULL, NULL, NULL, NULL, NULL, '#1E2A66', 1),
-('Urdu', 'urdu', 'subject', 'Capsule Notes - MCQ Bank - Model Papers', 'Nazm, ghazal, mazmoon and grammar with full past-paper coverage and answer-writing technique.', NULL, 'Classes 9-12', NULL, 'Classes 9-12', NULL, NULL, NULL, NULL, NULL, '#E56A19', 2),
-('Islamiat', 'islamiat', 'subject', 'Both Mediums - Live Classes - Model Papers', 'Concept-first teaching of the full syllabus with smart revision notes in English and Urdu medium.', NULL, 'Classes 9-12', NULL, 'Classes 9-12', NULL, NULL, NULL, NULL, NULL, '#7A3FD0', 3),
-('Tarjuma-tul-Quran', 'tarjuma-tul-quran', 'subject', 'Surah-Wise - Both Mediums - MCQ Bank', 'Surah-wise translation, Shaan-e-Nuzul and MCQ preparation built around the FBISE exam format.', NULL, 'Classes 9-12', NULL, 'Classes 9-12', NULL, NULL, NULL, NULL, NULL, '#1B7FB4', 4),
-('English Language Summer Course', 'summer-intensive-2026', 'featured', 'Summer Intensive 2026', 'Equally beneficial for students of all boards from Class 8th onwards. It does not teach the syllabus of a specific class; instead it covers all essential topics of the broader curriculum to build a solid base in the language, focusing on Grammar and Creative Writing.', '20 live sessions - 2 hours each', 'All boards, Class 8th onwards', 'Rs. 5,000', 'All boards, Class 8th onwards', 'Online via Zoom', 'Starts:06 July 2026|Ends:31 July 2026|Schedule:Monday-Friday|Time:07:00-09:00 PM (PKT)|Sessions:20 live, 2 hours each', 'All boards - Class 8th onwards\n20 live, interactive sessions\n2 hours per session\nGrammar foundation + advanced writing\nExpert feedback on all exercises\nTopic-wise assessment', 'Days 01-10 - Module 1|English Grammar|Nouns, Pronouns, Verbs & Verbals\nAdverbs, Adjectives, Prepositions\nArticles, Phrases & Clauses\nTenses, Narration, Voices\nError Correction\n---\nDays 11-20 - Module 2|Creative Writing|Paragraph, Essay & Narrative Writing\nReport, Application & Letter Writing\nComprehension & Poetry Analysis', 'Seats are strictly limited, register early.', '#E56A19', 5),
-('Summer Camp', 'summer-camp', 'programme', 'Jul 2026 - All boards', 'A foundation course focused on grammar and creative writing, one course for every student, Class 8th onwards. Twenty live 2-hour evening sessions (7:00-9:00 PM), building a solid base in the language before the academic year begins.', '6-31 Jul 2026', 'All levels - All boards', 'Rs. 5,000', 'All boards', 'Online', NULL, 'Grammar foundation + advanced writing\nExpert feedback on every exercise\nTopic-wise assessment', NULL, 'Limited seats', '#E56A19', 6),
-('MDCAT / NUMS English Prep', 'mdcat-nums-english-prep', 'programme', 'Jul 2026 - Medical', 'A concept- and practice-based intensive that targets the English portion of medical entry tests, vocabulary, grammar and comprehension tuned precisely to the exam.', '15 days - Jul 2026', 'Medical aspirants', NULL, 'Medical aspirants', 'Online', NULL, '15-day focused intensive\nConcept building + heavy practice\nExam-style questions throughout', NULL, 'Limited seats', '#1B7FB4', 7),
-('Bootcamp 01', 'bootcamp-01', 'programme', 'Aug-Sep 2026', 'Class-specific, complete-syllabus coverage for FBISE 9th-12th in English and Urdu. Two months of structured teaching with weekly assessments and one full-length paper under real exam conditions.', '2 months', 'Classes 9-12 - English & Urdu', NULL, 'Classes 9-12', 'Online', NULL, 'Complete syllabus, class by class\nWeekly assessments\nOne full-length paper', NULL, 'Limited seats', '#26346F', 8),
-('Bootcamp 02', 'bootcamp-02', 'programme', 'Oct-Nov 2026', 'The second full-syllabus cohort of the year for English and Urdu, Classes 9-12. Same rigorous format, learn, practise, submit, get feedback, revise, timed for the mid-year stretch.', '2 months', 'Classes 9-12 - English & Urdu', NULL, 'Classes 9-12', 'Online', NULL, 'Complete syllabus, class by class\nWeekly assessments\nOne full-length paper', NULL, 'Limited seats', '#26346F', 9),
-('Bootcamp 03 - Final Bootcamp', 'bootcamp-03', 'programme', 'Dec 2026 - Jan 2027', 'The last complete-syllabus bootcamp before annual exams for English and Urdu, Classes 9-12, the final chance to cover everything thoroughly with assessments and a full-length paper.', '2 months', 'Classes 9-12 - English & Urdu', NULL, 'Classes 9-12', 'Online', NULL, 'Complete syllabus, class by class\nWeekly assessments\nOne full-length paper', NULL, 'Limited seats', '#26346F', 10),
-('Deen Camp', 'deen-camp', 'programme', 'Jan 2027 - Islamiat & Quran', 'Specialised, class-specific coverage of Islamiat (9th & 11th) and Tarjuma-tul-Quran (9th-12th), taught with depth and clarity, complete with weekly assessments and a full-length paper.', '1 month', 'Classes 9-12 (FBISE)', NULL, 'Classes 9-12', 'Online', NULL, 'Islamiat: Classes 9 & 11\nTarjuma-tul-Quran: Classes 9-12\nWeekly assessments + full-length paper', NULL, 'Limited seats', '#7A3FD0', 11),
-('Full-Length Papers', 'full-length-papers', 'programme', 'Feb 2027', 'A month of full-length practice papers across all four subjects, English, Urdu, Islamiat and Tarjuma-tul-Quran, with detailed marking and feedback, so exam day feels familiar.', '1 month', 'Classes 9-12 (FBISE)', NULL, 'Classes 9-12', 'Online', NULL, 'All four subjects, Classes 9-12\nReal exam conditions & timing\nDetailed marking + feedback', NULL, 'Limited seats', '#1E2A66', 12),
-('Exam Marathons', 'exam-marathons', 'programme', 'Pre-Board - Marathons', 'Detailed-but-quick revision of the whole syllabus in the final stretch before papers, a 2nd-Annual Marathon in English and an Annual Marathon in English & Urdu. Revision-focused, no assessments.', '15 days', 'Classes 9-12 (FBISE)', NULL, 'Classes 9-12', 'Online', NULL, '2nd Annual: English - 15 days\nAnnual: English & Urdu - 15 days (Mar 2027)\nRevision only, no assessments', NULL, 'Open - unlimited', '#E56A19', 13),
-('Crash Courses', 'crash-courses', 'programme', 'Final Days - Crash', 'Short, high-intensity revision right before each paper. A 2-day 2nd-Annual crash in English, and a 1-day Annual crash across all four subjects, following the date sheet.', '1-2 days', 'Classes 9-12 (FBISE)', NULL, 'Classes 9-12', 'Online', NULL, '2nd Annual: English - 2 days\nAnnual: all 4 subjects - 1-day intensives\nHigh-yield topics & answer technique', NULL, 'Open - unlimited', '#7A3FD0', 14);
-
-UPDATE courses SET programme_group = 'Full Syllabus' WHERE slug IN ('summer-camp', 'bootcamp-01', 'bootcamp-02', 'bootcamp-03');
-UPDATE courses SET programme_group = 'Exam Prep' WHERE slug IN ('mdcat-nums-english-prep', 'full-length-papers');
-UPDATE courses SET programme_group = 'Islamiat & Quran' WHERE slug IN ('deen-camp');
-UPDATE courses SET programme_group = 'Marathons & Crash' WHERE slug IN ('exam-marathons', 'crash-courses');
 -- programme_group (free text) is deprecated in favour of programme_group_id,
 -- kept only so older data isn't silently dropped; courses.php reads the FK.
 INSERT INTO courses (title, slug, category, tag_line, description, duration, level, price, eligibility, mode, schedule_info, highlights, seats_info, accent_color, programme_group, programme_group_id, sort_order) VALUES

@@ -158,6 +158,9 @@ function deleteUploadedImage(?string $path): void
     if (is_file($fullPath)) {
         @unlink($fullPath);
     }
+}
+
+/**
  * Validates and moves an uploaded PDF into assets/uploads/{subdir}. Same
  * shape as handleImageUpload() but for note sample files (PDF-only, larger
  * size cap). Returns the relative path to store in the DB, or null if no
@@ -392,6 +395,9 @@ function renderHomeStatsBand(): void
         echo '<div class="bs"><b>' . e($stat['value']) . '</b><span>' . e($stat['label']) . '</span></div>';
     }
     echo '</div></div>';
+}
+
+/**
  * Live values the offline chat widget's small hardcoded safety-net answers
  * (assets/js/chatbot.js) reference via {{token}}, shipped to the browser
  * as window.EKA_INFO (see includes/footer.php). This only needs to cover

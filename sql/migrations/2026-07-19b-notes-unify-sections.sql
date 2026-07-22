@@ -28,7 +28,7 @@ INSERT INTO note_sections (section_type, class_level, label, exam_label, accent_
 SELECT 'class', class_level, label, exam_label, accent_color, sort_order, is_active FROM note_classes;
 
 INSERT INTO note_sections (section_type, slug, label, description, icon_key, cta_label, cta_link, nav_style, sort_order, is_active)
-SELECT 'group', slug, name, description, icon_key, cta_label, cta_link, nav_style, sort_order, is_active FROM note_resource_groups;
+SELECT 'group', slug, name, description, icon_key, cta_label, cta_link, 'others', sort_order, is_active FROM note_resource_groups;
 
 -- Repoint note_extra_resources at note_sections (new ids won't match the
 -- old note_resource_groups ids), then drop the old FK/column/table.

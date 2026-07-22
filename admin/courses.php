@@ -31,7 +31,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $programmeGroup = trim($_POST['programme_group'] ?? '');
         $seatsInfo = trim($_POST['seats_info'] ?? '');
         $accentColor = trim($_POST['accent_color'] ?? '');
-        $programmeGroupId = ($category === 'programme' && !empty($_POST['programme_group_id'])) ? (int)$_POST['programme_group_id'] : null;
         $sortOrder = (int)($_POST['sort_order'] ?? 0);
         $isActive = isset($_POST['is_active']) ? 1 : 0;
         $slug = slugify($title);
@@ -58,16 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $db->prepare('INSERT INTO courses (title, slug, category, programme_group, tag_line, description, image, duration, level, price, eligibility, mode, schedule_info, highlights, modules, seats_info, accent_color, sort_order, is_active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
                ->execute([$title, $slug, $category, $programmeGroup, $tagLine, $description, $image, $duration, $level, $price, $eligibility, $mode, $scheduleInfo, $highlights, $modules, $seatsInfo, $accentColor, $sortOrder, $isActive]);
-                $db->prepare('UPDATE courses SET title=?, slug=?, category=?, tag_line=?, description=?, image=?, duration=?, level=?, price=?, eligibility=?, mode=?, schedule_info=?, highlights=?, seats_info=?, accent_color=?, programme_group_id=?, sort_order=?, is_active=? WHERE id=?')
-                   ->execute([$title, $slug, $category, $tagLine, $description, $image, $duration, $level, $price, $eligibility, $mode, $scheduleInfo, $highlights, $seatsInfo, $accentColor, $programmeGroupId, $sortOrder, $isActive, $id]);
-            } else {
-                $db->prepare('UPDATE courses SET title=?, slug=?, category=?, tag_line=?, description=?, duration=?, level=?, price=?, eligibility=?, mode=?, schedule_info=?, highlights=?, seats_info=?, accent_color=?, programme_group_id=?, sort_order=?, is_active=? WHERE id=?')
-                   ->execute([$title, $slug, $category, $tagLine, $description, $duration, $level, $price, $eligibility, $mode, $scheduleInfo, $highlights, $seatsInfo, $accentColor, $programmeGroupId, $sortOrder, $isActive, $id]);
-            }
-            redirectWithMessage('courses.php', 'Course updated.');
-        } else {
-            $db->prepare('INSERT INTO courses (title, slug, category, tag_line, description, image, duration, level, price, eligibility, mode, schedule_info, highlights, seats_info, accent_color, programme_group_id, sort_order, is_active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)')
-               ->execute([$title, $slug, $category, $tagLine, $description, $image, $duration, $level, $price, $eligibility, $mode, $scheduleInfo, $highlights, $seatsInfo, $accentColor, $programmeGroupId, $sortOrder, $isActive]);
             redirectWithMessage('courses.php', 'Course added.');
         }
     }
@@ -79,13 +68,7 @@ if (isset($_GET['edit'])) {
     $editing = $stmt->fetch();
 }
 
-$courses = $db->query('
-    SELECT c.*, g.name AS group_name
-    FROM courses c
-    LEFT JOIN programme_groups g ON g.id = c.programme_group_id
-    ORDER BY c.category, c.sort_order, c.id
-')->fetchAll();
-$programmeGroups = $db->query('SELECT id, name FROM programme_groups ORDER BY sort_order, name')->fetchAll();
+$courses = $db->query('SELECT * FROM courses ORDER BY category, sort_order, id')->fetchAll();
 ?>
 <h1>Courses</h1>
 <p>One flexible list covers the 4 core subjects, the featured enrolling-now course, and seasonal programmes, filter each by category.</p>
@@ -143,14 +126,6 @@ $programmeGroups = $db->query('SELECT id, name FROM programme_groups ORDER BY so
   <label>Seats Info
     <input type="text" name="seats_info" value="<?= e($editing['seats_info'] ?? '') ?>" placeholder="e.g. Limited seats">
   </label>
-  <label>Programme Group (Seasonal Programme only, the collapsible section it appears under on the courses page. Leave as "None" to fall under "Other Programmes". Manage groups on the <a href="programme-groups.php">Programme Groups</a> screen)
-    <select name="programme_group_id">
-      <option value="">None (Other Programmes)</option>
-      <?php foreach ($programmeGroups as $g): ?>
-        <option value="<?= (int)$g['id'] ?>" <?= (int)($editing['programme_group_id'] ?? 0) === (int)$g['id'] ? 'selected' : '' ?>><?= e($g['name']) ?></option>
-      <?php endforeach; ?>
-    </select>
-  </label>
   <label>Accent Color (hex, used for subject cards)
     <input type="color" name="accent_color" value="<?= e($editing['accent_color'] ?? '#E56A19') ?>">
   </label>
@@ -174,14 +149,13 @@ $programmeGroups = $db->query('SELECT id, name FROM programme_groups ORDER BY so
 
 <table class="admin-table">
   <thead>
-    <tr><th>Title</th><th>Category</th><th>Group</th><th>Price/Fee</th><th>Visible</th><th>Actions</th></tr>
+    <tr><th>Title</th><th>Category</th><th>Price/Fee</th><th>Visible</th><th>Actions</th></tr>
   </thead>
   <tbody>
     <?php foreach ($courses as $course): ?>
       <tr>
         <td><?= e($course['title']) ?></td>
         <td><?= e($categories[$course['category']] ?? $course['category']) ?></td>
-        <td><?= e($course['group_name'] ?: '') ?></td>
         <td><?= e($course['price']) ?></td>
         <td><?= $course['is_active'] ? 'Yes' : 'No' ?></td>
         <td>
