@@ -26,6 +26,8 @@ $fields = [
     'bank_iban' => 'Bank IBAN',
     'easypaisa_name' => 'EasyPaisa Name',
     'easypaisa_number' => 'EasyPaisa Number',
+    'jazzcash_name' => 'JazzCash Name',
+    'jazzcash_number' => 'JazzCash Number',
     'footer_text' => 'Footer Text',
     'footer_note' => 'Footer Note (e.g. board/class/timezone line)',
     'accent_color' => 'Accent Color (hex)',
@@ -44,6 +46,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($logoPath) {
             $db->prepare('UPDATE site_settings SET setting_value = ? WHERE setting_key = ?')
                ->execute([$logoPath, 'logo_path']);
+        }
+        $qrPath = handleImageUpload('qr_code', 'payments');
+        if ($qrPath) {
+            $db->prepare('UPDATE site_settings SET setting_value = ? WHERE setting_key = ?')
+               ->execute([$qrPath, 'qr_code_image']);
         }
         redirectWithMessage('settings.php', 'Settings updated.');
     } catch (RuntimeException $e) {
@@ -78,6 +85,13 @@ foreach ($stmt->fetchAll() as $row) {
       <div><img src="../<?= e($settings['logo_path']) ?>" alt="Current logo" style="max-height:60px;"></div>
     <?php endif; ?>
     <input type="file" name="logo" accept=".jpg,.jpeg,.png,.webp">
+  </label>
+
+  <label>Payment QR Code (shown on the Courses page payment card)
+    <?php if (!empty($settings['qr_code_image'])): ?>
+      <div><img src="../<?= e($settings['qr_code_image']) ?>" alt="Current QR code" style="max-height:120px;"></div>
+    <?php endif; ?>
+    <input type="file" name="qr_code" accept=".jpg,.jpeg,.png,.webp">
   </label>
 
   <button type="submit">Save Settings</button>

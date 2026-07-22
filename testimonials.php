@@ -86,4 +86,5 @@ $testimonialsSubtitle = $googleUrl
 <?php endif; ?>
 </main>
 <?php require_once __DIR__ . '/includes/cta-banner.php'; ?>
+
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

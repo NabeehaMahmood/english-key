@@ -118,5 +118,4 @@ $humanQuestion = humanCheckQuestion();
   </div>
 </section>
 
-<?php require_once __DIR__ . '/includes/cta-banner.php'; ?>
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

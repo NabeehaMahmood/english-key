@@ -26,6 +26,48 @@ function revealDelay(int $index, float $step = 0.06, float $max = 0.3): string
     return $delay > 0 ? ' data-delay="' . $delay . '"' : '';
 }
 
+/**
+ * Appends -2, -3, etc. to $baseSlug until it no longer collides with an
+ * existing blog_posts row (other than $excludeId, so re-saving a post under
+ * its own unchanged title doesn't shift its slug).
+ */
+function uniqueBlogSlug(string $baseSlug, int $excludeId = 0): string
+{
+    $db = getDb();
+    $slug = $baseSlug;
+    $suffix = 2;
+    while (true) {
+        $stmt = $db->prepare('SELECT id FROM blog_posts WHERE slug = ? AND id != ?');
+        $stmt->execute([$slug, $excludeId]);
+        if (!$stmt->fetch()) {
+            return $slug;
+        }
+        $slug = $baseSlug . '-' . $suffix;
+        $suffix++;
+    }
+}
+
+/**
+ * Appends -2, -3, etc. to $baseSlug until it no longer collides with an
+ * existing note_subjects row (other than $excludeId), mirroring
+ * uniqueBlogSlug() for the notes-library subject nav.
+ */
+function uniqueSubjectSlug(string $baseSlug, int $excludeId = 0): string
+{
+    $db = getDb();
+    $slug = $baseSlug;
+    $suffix = 2;
+    while (true) {
+        $stmt = $db->prepare('SELECT id FROM note_subjects WHERE slug = ? AND id != ?');
+        $stmt->execute([$slug, $excludeId]);
+        if (!$stmt->fetch()) {
+            return $slug;
+        }
+        $slug = $baseSlug . '-' . $suffix;
+        $suffix++;
+    }
+}
+
 function getSetting(string $key, string $default = ''): string
 {
     static $cache = null;
@@ -37,6 +79,16 @@ function getSetting(string $key, string $default = ''): string
         }
     }
     return $cache[$key] ?? $default;
+}
+
+/**
+ * Builds a wa.me link with a pre-filled message, so "message us on
+ * WhatsApp" buttons open with useful context instead of a blank chat.
+ */
+function waLink(string $number, ?string $message = null): string
+{
+    $message = $message ?? 'Assalam-o-alaikum! I have a question about EnglishKeys Academy.';
+    return 'https://wa.me/' . $number . '?text=' . rawurlencode($message);
 }
 
 function getContentBlock(string $pageSlug, string $blockKey): array
@@ -106,6 +158,101 @@ function deleteUploadedImage(?string $path): void
     if (is_file($fullPath)) {
         @unlink($fullPath);
     }
+ * Validates and moves an uploaded PDF into assets/uploads/{subdir}. Same
+ * shape as handleImageUpload() but for note sample files (PDF-only, larger
+ * size cap). Returns the relative path to store in the DB, or null if no
+ * file was uploaded. Throws RuntimeException on validation failure.
+ */
+function handlePdfUpload(string $fieldName, string $subdir): ?string
+{
+    if (empty($_FILES[$fieldName]['name']) || $_FILES[$fieldName]['error'] === UPLOAD_ERR_NO_FILE) {
+        return null;
+    }
+
+    $file = $_FILES[$fieldName];
+
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        throw new RuntimeException('Upload failed (error code ' . $file['error'] . ').');
+    }
+    if ($file['size'] > UPLOAD_MAX_PDF_BYTES) {
+        throw new RuntimeException('PDF is too large. Max size is ' . (UPLOAD_MAX_PDF_BYTES / 1024 / 1024) . 'MB.');
+    }
+
+    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    if (!in_array($ext, UPLOAD_ALLOWED_PDF_EXT, true)) {
+        throw new RuntimeException('Unsupported file type. Only PDF files are allowed.');
+    }
+
+    $mime = mime_content_type($file['tmp_name']);
+    if ($mime !== 'application/pdf') {
+        throw new RuntimeException('Uploaded file is not a valid PDF.');
+    }
+
+    $filename = bin2hex(random_bytes(16)) . '.' . $ext;
+    $destDir = __DIR__ . '/../assets/uploads/' . $subdir;
+    if (!is_dir($destDir)) {
+        mkdir($destDir, 0755, true);
+    }
+    $destPath = $destDir . '/' . $filename;
+
+    if (!move_uploaded_file($file['tmp_name'], $destPath)) {
+        throw new RuntimeException('Failed to save uploaded file.');
+    }
+
+    return 'assets/uploads/' . $subdir . '/' . $filename;
+}
+
+/**
+ * Whitelist-sanitizes rich blog content HTML (typed or pasted into the
+ * TinyMCE editor) with HTMLPurifier. Only structural/semantic tags are kept;
+ * inline styles and classes are stripped so every post renders consistently
+ * through the site's own .article-body CSS rather than carrying over
+ * whatever fonts/colors the source of a paste happened to apply.
+ *
+ * `dir` (on block tags) and `class="ex"` (on `p`) are the two exceptions:
+ * the site's Urdu posts rely on dir="rtl" for right-to-left rendering, and
+ * "worked example" callouts rely on class="ex" — both used throughout the
+ * seeded posts in sql/schema.sql, so stripping them would silently break
+ * that formatting the next time such a post is edited and re-saved.
+ */
+function sanitizeBlogHtml(?string $html): string
+{
+    if ($html === null || trim($html) === '') {
+        return '';
+    }
+
+    $cacheDir = sys_get_temp_dir() . '/htmlpurifier-cache';
+    if (!is_dir($cacheDir)) {
+        mkdir($cacheDir, 0775, true);
+    }
+
+    $config = HTMLPurifier_Config::createDefault();
+    $config->set('Cache.SerializerPath', $cacheDir);
+    // div[class]/table[class] are needed for the .atable-wrap/.atable pair
+    // (assets/css/style.css) that makes a pasted/authored table scroll
+    // horizontally on narrow screens instead of breaking the page layout --
+    // without them here, that wrapper was silently stripped on every save,
+    // so a responsive table looked fine in the editor but reverted to a
+    // plain unscrollable one the moment it was published.
+    $config->set('HTML.Allowed', 'p[dir|class],br,strong,b,em,i,u,h2[dir],h3[dir],h4[dir],blockquote,ul[dir],ol[dir],li,a[href|target],img[src|alt|width|height],div[class],table[class],thead,tbody,tr,th,td,hr');
+    $config->set('Attr.AllowedClasses', ['ex', 'atable-wrap', 'atable']);
+    $config->set('HTML.TargetBlank', true);
+    $config->set('AutoFormat.RemoveEmpty', true);
+
+    $purifier = new HTMLPurifier($config);
+    return $purifier->purify($html);
+}
+
+/**
+ * Estimated reading time in minutes (~200 words/min). Splits on whitespace
+ * rather than str_word_count(), which only recognises Latin-script letters
+ * and would undercount Urdu/RTL posts to a handful of "words".
+ */
+function blogReadingMinutes(?string $htmlContent): int
+{
+    $text  = trim(strip_tags((string)$htmlContent));
+    $words = $text === '' ? [] : preg_split('/\s+/u', $text, -1, PREG_SPLIT_NO_EMPTY);
+    return max(1, (int)ceil(count($words) / 200));
 }
 
 /**
@@ -245,6 +392,101 @@ function renderHomeStatsBand(): void
         echo '<div class="bs"><b>' . e($stat['value']) . '</b><span>' . e($stat['label']) . '</span></div>';
     }
     echo '</div></div>';
+ * Live values the offline chat widget's small hardcoded safety-net answers
+ * (assets/js/chatbot.js) reference via {{token}}, shipped to the browser
+ * as window.EKA_INFO (see includes/footer.php). This only needs to cover
+ * what that fixed, minimal KB actually asks for — the real answering
+ * (buildChatFacts(), below) reads the DB directly and needs no token map.
+ */
+function buildChatTokens(): array
+{
+    $tokens = [
+        'waLink' => waLink(getSetting('whatsapp_number')),
+        'whatsapp' => getSetting('phone'),
+        'phone2' => getSetting('phone_2'),
+        'email' => getSetting('email'),
+        'bankLine' => getSetting('bank_name') . ' — Title: ' . getSetting('bank_title') . ', IBAN ' . getSetting('bank_iban'),
+        'easypaisaLine' => getSetting('easypaisa_number') ? (getSetting('easypaisa_name') . ', ' . getSetting('easypaisa_number')) : '',
+    ];
+
+    $summerCourse = getDb()->query("SELECT price, schedule_info FROM courses WHERE slug = 'summer-intensive-2026' LIMIT 1")->fetch();
+    $tokens['summerPrice'] = $summerCourse['price'] ?? '';
+    $sched = [];
+    foreach (explode('|', (string)($summerCourse['schedule_info'] ?? '')) as $part) {
+        [$k, $v] = array_pad(explode(':', $part, 2), 2, '');
+        $sched[trim($k)] = trim($v);
+    }
+    $scheduleStr = implode(', ', array_filter([$sched['Schedule'] ?? '', $sched['Time'] ?? '']));
+    $range = (!empty($sched['Starts']) && !empty($sched['Ends'])) ? ($sched['Starts'] . ' to ' . $sched['Ends']) : '';
+    $tokens['summerDates'] = trim($scheduleStr . ($range ? ' (' . $range . ')' : ''));
+
+    return $tokens;
+}
+
+/**
+ * Assembles the AI chat assistant's knowledge block from live DB data
+ * (site_settings, teachers, courses, alumni) instead of a hardcoded string,
+ * so editing content in the admin panel (fees, contact info, teachers,
+ * results) keeps the chatbot's answers in sync without a code change.
+ */
+function buildChatFacts(): string
+{
+    $db = getDb();
+
+    $about = "ABOUT\n"
+        . '- Online academy coaching FBISE (Federal Board) students. Tagline: "' . getSetting('tagline') . '."' . "\n"
+        . '- Teaching since ' . getSetting('stat_since') . '; co-founded in its current form on ' . getSetting('founded_date') . ".\n"
+        . '- 100% online, live classes on Zoom, ' . getSetting('address') . ".\n"
+        . '- Community of ' . getSetting('stat_learners') . "+ learners.\n"
+        . '- ' . getSetting('stat_youtube_subs') . " subscribers on YouTube.\n"
+        . '- Rated ' . getSetting('google_rating') . ' stars from ' . getSetting('google_review_count') . " Google reviews.";
+
+    $teachers = $db->query("SELECT name, role_title, credentials FROM teachers WHERE is_active = 1 ORDER BY sort_order")->fetchAll();
+    $founderLines = [];
+    foreach ($teachers as $t) {
+        $creds = str_replace("\n", ', ', (string)$t['credentials']);
+        $founderLines[] = '- ' . $t['name'] . ' — ' . $t['role_title'] . '. ' . $creds . '.';
+    }
+    $founders = "FOUNDERS (husband and wife)\n" . implode("\n", $founderLines);
+
+    $subjects = $db->query("SELECT title FROM courses WHERE category = 'subject' AND is_active = 1 ORDER BY sort_order")->fetchAll();
+    $programmes = $db->query("SELECT title, price, duration, eligibility, mode, schedule_info FROM courses WHERE category IN ('programme', 'featured') AND is_active = 1 ORDER BY sort_order")->fetchAll();
+    $progLines = [];
+    foreach ($programmes as $p) {
+        $bits = array_filter([$p['duration'], $p['eligibility'], $p['mode'], $p['price'] ? 'Fee: ' . $p['price'] : null]);
+        $schedule = $p['schedule_info'] ? ' (' . str_replace('|', ', ', $p['schedule_info']) . ')' : '';
+        $progLines[] = '- ' . $p['title'] . ': ' . implode(', ', $bits) . $schedule;
+    }
+    $subjectsCourses = "SUBJECTS & COURSES (Classes 9–12, FBISE)\n"
+        . '- Four core subjects: ' . implode(', ', array_column($subjects, 'title')) . ".\n"
+        . "- Programmes:\n" . implode("\n", $progLines);
+
+    $alumni = $db->query("SELECT name, achievement, batch_info FROM alumni WHERE is_active = 1 ORDER BY sort_order")->fetchAll();
+    $resultLines = [];
+    foreach ($alumni as $a) {
+        $resultLines[] = '- ' . $a['batch_info'] . ': ' . $a['name'] . ' — ' . $a['achievement'] . '.';
+    }
+    $results = "RESULTS (verifiable Federal Board results)\n" . implode("\n", $resultLines);
+
+    $notes = "NOTES\n- Free notes for every visitor on the Notes page (no login). Premium notes and model papers unlock with an active subscription; some notes are secured, view-only PDFs.";
+
+    $feesLines = ['- Bank: ' . getSetting('bank_name') . ', Title "' . getSetting('bank_title') . '", IBAN ' . getSetting('bank_iban') . '.'];
+    if (getSetting('easypaisa_number')) {
+        $feesLines[] = '- EasyPaisa: ' . getSetting('easypaisa_name') . ', ' . getSetting('easypaisa_number') . '.';
+    }
+    if (getSetting('jazzcash_number')) {
+        $feesLines[] = '- JazzCash: ' . getSetting('jazzcash_name') . ', ' . getSetting('jazzcash_number') . '.';
+    }
+    $fees = "FEES & PAYMENT\n" . implode("\n", $feesLines) . "\n- Ask on WhatsApp for fees of any programme not listed above.";
+
+    $whatsapp = getSetting('whatsapp_number');
+    $contact = "CONTACT\n"
+        . '- WhatsApp (fastest, reply within 3 hours): +' . $whatsapp . ' → https://wa.me/' . $whatsapp . "\n"
+        . '- Phone: ' . getSetting('phone') . ', ' . getSetting('phone_2') . '. Email: ' . getSetting('email') . ".\n"
+        . "- Pages: /courses /notes /blog /testimonials /alumni /about /contact /enroll\n"
+        . '- Enrol via the form at /enroll or on WhatsApp.';
+
+    return implode("\n\n", [$about, $founders, $subjectsCourses, $results, $notes, $fees, $contact]);
 }
 
 /**

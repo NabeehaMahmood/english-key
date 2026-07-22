@@ -15,13 +15,13 @@ $navItems = [
     'page-heroes.php' => 'Page Heroes',
     'page-content.php' => 'Page Content',
     'courses.php' => 'Courses',
+    'programme-groups.php' => 'Programme Groups',
     'teachers.php' => 'Our Team',
     'testimonials.php' => 'Testimonials',
     'blog.php' => 'Blog',
     'notes.php' => 'Notes',
     'alumni.php' => 'Alumni',
     'enrollments.php' => 'Enrollments',
-    'messages.php' => 'Messages',
 ];
 ?>
 <!DOCTYPE html>
@@ -46,7 +46,7 @@ $navItems = [
     </nav>
     <a href="logout.php" class="logout-link">Log Out</a>
   </aside>
-  <div class="admin-content">
+  <div class="admin-content<?= in_array($currentPage, ['blog.php', 'notes.php'], true) ? ' admin-content-wide' : '' ?>">
     <?php if ($flash): ?>
       <div class="flash flash-<?= e($flash['type']) ?>"><?= e($flash['message']) ?></div>
     <?php endif; ?>

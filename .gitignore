@@ -3,3 +3,11 @@ Thumbs.db
 
 html folders/
 ui-ux-pro-max-skill/
+vendor/
+resources/
+
+# Notes PDFs are 400MB+ and would bloat the repo -- keep the folder in git
+# (via .gitkeep) but not its contents. Real files live on each machine/
+# server separately; see resources/import-notes.php to (re)populate.
+assets/uploads/notes/*
+!assets/uploads/notes/.gitkeep

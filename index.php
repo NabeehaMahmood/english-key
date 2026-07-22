@@ -5,6 +5,15 @@ $db = getDb();
 $subjects = $db->query("SELECT * FROM courses WHERE category = 'subject' AND is_active = 1 ORDER BY sort_order LIMIT 4")->fetchAll();
 $trackRecords = getTrackRecords();
 $testimonials = $db->query('SELECT * FROM testimonials WHERE is_active = 1 ORDER BY sort_order LIMIT 3')->fetchAll();
+
+// A3: single query, 3 testimonials total (parent quotes now live on testimonials.php only).
+// Use sort_order in admin -> Testimonials to control which 3 surface here.
+$testimonials = $db->query('SELECT * FROM testimonials WHERE is_active = 1 ORDER BY sort_order LIMIT 3')->fetchAll();
+
+// A4: the homepage popup shows the FIRST featured course.
+// courses.php now lists every featured course (its brief removed the limit),
+// so the popup deliberately keeps LIMIT 1 and takes the lowest sort_order.
+// Agreed with the courses/alumni teammate; see the PR description.
 $featured = $db->query("SELECT * FROM courses WHERE category = 'featured' AND is_active = 1 ORDER BY sort_order LIMIT 1")->fetch();
 
 $googleUrl = getSetting('google_reviews_url');
@@ -42,6 +51,13 @@ $whyHeading = getContentBlock('home', 'why_heading')['content'] ?: 'A planned, y
 ?>
 <main class="page-home">
 <section class="hero">
+  <div class="floaties" aria-hidden="true">
+    <span class="fl fl1"></span><span class="fl fl2"></span><span class="fl fl3"></span><span class="fl fl4"></span>
+  </div>
+  <?php if ($googleRating): ?><span class="hb hb1" data-depth="20"><?= e($googleRating) ?><?= icon('star', 'icon star-icon') ?> Google</span><?php endif; ?>
+  <?php if ($statLearners): ?><span class="hb hb2" data-depth="-16"><?= e($statLearners) ?> learners</span><?php endif; ?>
+  <?php if ($statPositions): ?><span class="hb hb3" data-depth="12"><?= e($statPositions) ?> 1st position</span><?php endif; ?>
+
   <div class="wrap hg">
     <div class="reveal">
       <div class="kick"><?= e(getSetting('kicker')) ?></div>
@@ -52,6 +68,7 @@ $whyHeading = getContentBlock('home', 'why_heading')['content'] ?: 'A planned, y
       ?>
       <h1><?= e(implode(' ', $heroWords)) ?> <span class="hl hl-o"><?= e($heroLastWord) ?></span></h1>
       <p class="sub"><?= e(getSetting('hero_subtitle')) ?></p>
+      <p class="micro"><?= e(getSetting('hero_micro')) ?></p>
       <div class="hctas">
         <a class="btn btn-o ar" href="<?= e($heroCta1Link) ?>"><?= e($heroCta1Label) ?>&nbsp;</a>
         <a class="btn btn-l" href="<?= e($heroCta2Link) ?>"><?= e($heroCta2Label) ?></a>
@@ -63,12 +80,34 @@ $whyHeading = getContentBlock('home', 'why_heading')['content'] ?: 'A planned, y
         <div class="pbars" aria-hidden="true"><span class="pb1"></span><span class="pb2"></span><span class="pb3"></span></div>
         <div class="pframe"><img src="<?= e(getSetting('hero_image')) ?>" alt="Mr. Naeem Haider"></div>
         <div class="pr">Mr. Naeem Haider<small>Co-Founder &amp; Lead Instructor</small></div>
+    </div>
+    <div class="reveal">
+      <div class="pw">
+        <div class="pdeco" aria-hidden="true">
+          <span class="sh sh1"></span><span class="sh sh2"></span><span class="sh sh3"></span><span class="sh sh4"></span>
+        </div>
+        <div class="pframe pframe-photo"><img src="<?= e(getSetting('hero_image')) ?>" alt="Mr. Naeem Haider"></div>
+        <div class="pr pr-orange">Mr. Naeem Haider<small>Co-Founder &amp; Lead Instructor</small></div>
       </div>
     </div>
   </div>
 </section>
 
 <?php renderHomeStatsBand(); ?>
+<?php if ($homeStats): ?>
+<div class="band">
+  <div class="wrap bg-auto reveal">
+    <?php foreach ($homeStats as $stat): ?>
+      <div class="bs"><b><?= e($stat['value']) ?></b><span><?= e($stat['label']) ?></span></div>
+    <?php endforeach; ?>
+  <div class="wrap bg4 reveal">
+    <div class="bs"><b><?= e($statLearners) ?></b><span>Learners in our community</span></div>
+    <div class="bs"><b><?= e($statYoutube) ?></b><span>YouTube subscribers</span></div>
+    <div class="bs"><b><?= e($statYears) ?></b><span>Teaching FBISE online</span></div>
+    <div class="bs"><b><?= e($statSince) ?></b><span>Teaching languages since</span></div>
+  </div>
+</div>
+<?php endif; ?>
 
 <?php if ($subjects): ?>
 <section id="courses">
@@ -82,6 +121,10 @@ $whyHeading = getContentBlock('home', 'why_heading')['content'] ?: 'A planned, y
       <?php foreach ($subjects as $i => $s): ?>
         <div class="card scard reveal"<?= revealDelay($i) ?> style="--c:<?= e($s['accent_color']) ?>">
           <div class="num" style="color:<?= e($s['accent_color']) ?>">0<?= (int)$s['sort_order'] ?>, <?= e($s['level']) ?></div>
+    <div class="g2 reveal">
+      <?php foreach ($subjects as $s): ?>
+        <div class="card scard" style="--c:<?= e($s['accent_color']) ?>">
+          <div class="num">0<?= (int)$s['sort_order'] ?>, <?= e($s['level']) ?></div>
           <h3><?= e($s['title']) ?></h3>
           <p><?= e($s['description']) ?></p>
           <?php if ($s['tag_line']): ?>
@@ -133,6 +176,13 @@ $whyHeading = getContentBlock('home', 'why_heading')['content'] ?: 'A planned, y
       <div class="kick"><?= e($foundersHeading) ?></div>
       <p class="fv-quote">&ldquo;<?= e($aboutQuote['content']) ?>&rdquo;</p>
       <div class="fv-by"><b><?= e($foundersTeacher['name']) ?></b><?php if (!empty($foundersTeacher['role_title'])): ?><span><?= e($foundersTeacher['role_title']) ?></span><?php endif; ?></div>
+<?php if ($aboutQuote['content']): ?>
+<section class="vision soft">
+  <div class="wrap">
+    <div class="vquote reveal">
+      <div class="kick">Founders&rsquo; Vision</div>
+      <p>&ldquo;<?= e($aboutQuote['content']) ?>&rdquo;</p>
+      <div class="vby"><b>Mr. Naeem Haider &amp; Mrs. Naeem Haider</b><span>Founders, <?= e($siteName) ?></span></div>
     </div>
   </div>
 </section>
@@ -141,7 +191,7 @@ $whyHeading = getContentBlock('home', 'why_heading')['content'] ?: 'A planned, y
 <?php if ($whyCards): ?>
 <section class="why">
   <div class="wrap">
-    <div class="reveal">
+    <div class="reveal" style="max-width:720px">
       <div class="kick">Why EnglishKeys</div>
       <h2 class="t"><?= e($whyHeading) ?></h2>
     </div>
@@ -153,6 +203,28 @@ $whyHeading = getContentBlock('home', 'why_heading')['content'] ?: 'A planned, y
           <p style="color:var(--muted);font-size:14px"><?= e($card['description']) ?></p>
         </div>
       <?php endforeach; ?>
+      <h2 class="t">A planned, year-round path from <span class="hl">foundation to final paper.</span></h2>
+      <p class="sub">One expert, one syllabus-mapped plan and a community that keeps you accountable, everything designed to move you toward first position.</p>
+    </div>
+    <div class="g3 whygrid" style="margin-top:38px">
+      <div class="whycard reveal" style="--a:var(--orange)">
+        <span class="whyn">01</span>
+        <span class="whyi"><?= icon('cap', '') ?></span>
+        <h3>Taught by one expert, not a rotating panel</h3>
+        <p>Every class is led by Mr. Naeem Haider himself, an M.Phil. English Linguistics scholar with 14+ years of teaching.</p>
+      </div>
+      <div class="whycard reveal" style="--a:var(--purple)">
+        <span class="whyn">02</span>
+        <span class="whyi"><?= icon('target', '') ?></span>
+        <h3>Mapped exactly to the FBISE syllabus</h3>
+        <p>Nothing wasted. Smart notes, model papers and MCQ banks built around the current board pattern.</p>
+      </div>
+      <div class="whycard reveal" style="--a:var(--blue)">
+        <span class="whyn">03</span>
+        <span class="whyi"><?= icon('people', '') ?></span>
+        <h3>A community of <?= e($statLearners) ?> learners</h3>
+        <p>Followed across Facebook, YouTube and Instagram, a proven, trusted place to prepare.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -179,6 +251,9 @@ $whyHeading = getContentBlock('home', 'why_heading')['content'] ?: 'A planned, y
       <?php if ($googleUrl): ?><a class="btn btn-n ar" href="<?= e($googleUrl) ?>" target="_blank" rel="noopener">See Reviews on Google&nbsp;</a><?php endif; ?>
       <a class="btn btn-l ar" href="testimonials.php">See All Testimonials&nbsp;</a>
     </p>
+    <?php if ($googleUrl): ?>
+      <p style="margin-top:34px" class="reveal"><a class="btn btn-n" href="<?= e($googleUrl) ?>" target="_blank" rel="noopener">See all reviews on Google</a></p>
+    <?php endif; ?>
   </div>
 </section>
 <?php endif; ?>
@@ -193,12 +268,14 @@ $fcPopupBtn1Link = getSetting('fc_popup_btn1_link', 'enroll.php');
 $fcPopupBtn2Label = getSetting('fc_popup_btn2_label', 'See All Courses');
 $fcPopupBtn2Link = getSetting('fc_popup_btn2_link', 'courses.php');
 ?>
+
 <?php if ($featured): ?>
 <!-- A4: featured-course popup. Rendered only when an active featured course exists,
      so the JS in assets/js/site.js simply finds nothing on pages without it. -->
 <div class="fc-pop" id="fcPop" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="fcTitle">
   <div class="fc-back" data-fc-close></div>
   <div class="card fcard fc-card<?= $fcPopupBg ? ' fc-card-bg' : '' ?>" style="max-width:<?= $fcPopupWidth ?>px<?= $fcPopupBg ? ";background-image:linear-gradient(rgba(255,255,255,.93),rgba(255,255,255,.93)),url('" . e($fcPopupBg) . "')" : '' ?>">
+  <div class="card fcard fc-card">
     <button class="fc-x" type="button" data-fc-close aria-label="Close popup">&times;</button>
     <span class="fbadge">Enrolling Now</span>
     <h3 class="ptitle" id="fcTitle"><?= e($featured['title']) ?><?php if (!empty($featured['tag_line'])): ?>, <span class="hl"><?= e($featured['tag_line']) ?></span><?php endif; ?></h3>
@@ -225,9 +302,12 @@ $fcPopupBtn2Link = getSetting('fc_popup_btn2_link', 'courses.php');
     <div class="fcta">
       <a class="btn btn-o" href="<?= e($fcPopupBtn1Link) ?>"><?= e($fcPopupBtn1Label) ?></a>
       <a class="btn btn-l" href="<?= e($fcPopupBtn2Link) ?>"><?= e($fcPopupBtn2Label) ?></a>
+      <a class="btn btn-o" href="enroll.php">Enrol Now</a>
+      <a class="btn btn-l" href="courses.php">See All Courses</a>
     </div>
   </div>
 </div>
 <?php endif; ?>
 </main>
+
 <?php require_once __DIR__ . '/includes/footer.php'; ?>

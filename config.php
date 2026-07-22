@@ -27,8 +27,15 @@ define('MAIL_FROM', 'no-reply@example.com');  // must be a real mailbox on your 
 // --- Uploads ---
 define('UPLOAD_MAX_BYTES', 5 * 1024 * 1024); // 5MB
 define('UPLOAD_ALLOWED_EXT', ['jpg', 'jpeg', 'png', 'webp']);
+define('UPLOAD_MAX_PDF_BYTES', 20 * 1024 * 1024); // 20MB
+define('UPLOAD_ALLOWED_PDF_EXT', ['pdf']);
 
 date_default_timezone_set(SITE_TIMEZONE);
+
+// --- Composer dependencies (HTMLPurifier, for sanitizing rich blog content) ---
+if (file_exists(__DIR__ . '/vendor/autoload.php')) {
+    require_once __DIR__ . '/vendor/autoload.php';
+}
 
 // Surface errors during local/staging testing. Set APP_DEBUG=false as an
 // environment variable (or edit this line) before going live on Hostinger,

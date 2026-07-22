@@ -1,9 +1,14 @@
 <?php
 /**
- * Minimal custom line-icon set (20x20, stroke-based) used in place of emoji
- * throughout the site. Icons inherit color via currentColor.
+ * Custom line-icon set used in place of emoji throughout the site.
+ * Icons inherit color via currentColor by default, or can use the shared
+ * navy->orange gradient (#ekaGrad, defined once in includes/header.php)
+ * when $gradient is true. Each icon remembers its own viewBox/stroke-width
+ * because the approved designs draw icons on different grids (16/20/24)
+ * with different stroke weights - icon() reproduces them exactly rather
+ * than forcing one shared grid.
  */
-function icon(string $name, string $class = 'icon'): string
+function icon(string $name, string $class = 'icon', bool $gradient = false): string
 {
     // Most icons share a 20x20 viewBox; a few (added to match specific
     // reference SVGs pixel-for-pixel) use their own viewBox instead.
@@ -36,12 +41,30 @@ function icon(string $name, string $class = 'icon'): string
         'check-circle' => ['<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>', '0 0 24 24'],
         'star-badge' => ['<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>', '0 0 24 24'],
         'lightning' => ['<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>', '0 0 24 24'],
+        'eye' => ['<path d="M1.5 10S4.5 4 10 4s8.5 6 8.5 6-3 6-8.5 6-8.5-6-8.5-6z"/><circle cx="10" cy="10" r="2.6"/>'],
+        'folder' => ['<path d="M3.5 15.7A2 2 0 0 0 5.5 17.5H16"/><path d="M5.5 2.5H16v15H5.5A2 2 0 0 1 3.5 15.5V4.5a2 2 0 0 1 2-2z"/>'],
+        'bolt' => ['<polygon points="10.8 1.7 2.5 11 9.5 11 8.7 18.3 17 9 10 9 10.8 1.7"/>'],
+        'phone' => ['<path d="M17 13.4v2.4a1.6 1.6 0 0 1-1.75 1.6 15.8 15.8 0 0 1-6.9-2.45 15.6 15.6 0 0 1-4.8-4.8A15.8 15.8 0 0 1 1.1 3.25 1.6 1.6 0 0 1 2.7 1.5h2.4a1.6 1.6 0 0 1 1.6 1.38c.1.77.29 1.52.56 2.25a1.6 1.6 0 0 1-.36 1.68L5.87 7.9a12.8 12.8 0 0 0 4.8 4.8l1.09-1.03a1.6 1.6 0 0 1 1.68-.36c.72.27 1.48.46 2.25.56A1.6 1.6 0 0 1 17 13.4z"/>'],
+        'list' => ['<path d="M3 3h10M3 8h10M3 13h6"/>', '0 0 16 16'],
+        'compass' => ['<circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v3M12 18.5v3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M2.5 12h3M18.5 12h3M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1"/>', '0 0 24 24'],
+        'book-open' => ['<path d="M12 6.5C10.4 5.1 8 4.5 5.6 4.8 4.7 4.9 4 5.7 4 6.6v11c0 1 .9 1.8 1.9 1.6 2.1-.4 4.4.1 6.1 1.4 1.7-1.3 4-1.8 6.1-1.4 1-.2 1.9-.6 1.9-1.6v-11c0-.9-.7-1.7-1.6-1.8C16 4.5 13.6 5.1 12 6.5z"/><path d="M12 6.5v14"/>', '0 0 24 24'],
+        'bookmark' => ['<path d="M6 21V4"/><path d="M6 4.5c1.6-1.1 3.2-1.1 4.8 0 1.7 1.1 3.5 1.1 5.2 0v9c-1.7 1.1-3.5 1.1-5.2 0-1.6-1.1-3.2-1.1-4.8 0z"/>', '0 0 24 24'],
+        'chevron-sm' => ['<path d="M3 6l5 5 5-5"/>', '0 0 16 16'],
+        'meta-calendar' => ['<rect x="2" y="3" width="12" height="11" rx="2"/><path d="M2 6h12M5 1v3M11 1v3"/>', '0 0 16 16'],
+        'meta-person' => ['<circle cx="8" cy="5" r="3"/><path d="M2 14c1-3 3.5-4 6-4s5 1 6 4"/>', '0 0 16 16'],
+        'meta-mode' => ['<path d="M8 3c-2-1.5-5-1.5-6 0v10c1-1.5 4-1.5 6 0 2-1.5 5-1.5 6 0V3c-1-1.5-4-1.5-6 0v10"/>', '0 0 16 16'],
+        'meta-price' => ['<rect x="1" y="4" width="14" height="9" rx="2"/><path d="M1 7h14"/>', '0 0 16 16'],
+        'meta-seats' => ['<path d="M2 6a2 2 0 0 0 2-2h8a2 2 0 0 0 2 2v4a2 2 0 0 0-2 2H4a2 2 0 0 0-2-2V6z"/><path d="M8 4v8" stroke-dasharray="2 2"/>', '0 0 16 16'],
+        // Fill not stroke -- svg-level fill="none" doesn't matter since the
+        // path sets its own fill/stroke explicitly.
+        'star-sm' => ['<path d="M8 1l2.2 4.5 4.8.7-3.5 3.4.8 4.9L8 12.2 3.7 14.5l.8-4.9L1 6.2l4.8-.7L8 1z" fill="currentColor" stroke="none"/>', '0 0 16 16'],
     ];
 
     $def = $defs[$name] ?? [];
     $inner = $def[0] ?? '';
     $viewBox = $def[1] ?? '0 0 20 20';
-    return '<svg class="' . htmlspecialchars($class, ENT_QUOTES) . '" viewBox="' . $viewBox . '" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $inner . '</svg>';
+    $stroke = $gradient ? 'url(#ekaGrad)' : 'currentColor';
+    return '<svg class="' . htmlspecialchars($class, ENT_QUOTES) . '" viewBox="' . $viewBox . '" fill="none" stroke="' . $stroke . '" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $inner . '</svg>';
 }
 
 function starRow(int $count = 5, string $class = 'icon star-icon'): string
