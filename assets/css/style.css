@@ -106,10 +106,6 @@ header.site .btn { padding: 9px 18px; font-size: 14px; }
   .burger { display: flex; }
 }
 
-/* ---------- Buttons (pill shape + hover lift, from client_courses_final.html) ---------- */
-.btn {
-  display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; border-radius: 999px;
-  font-weight: 600; font-size: 15.5px; cursor: pointer; border: 1.5px solid transparent; white-space: nowrap;
 @media (max-width: 960px) {
   nav.main { display: none; }
   .burger { display: flex; }
@@ -141,14 +137,6 @@ header.site .btn { padding: 9px 18px; font-size: 14px; }
 .ar::after { content: "\2192"; margin-left: 2px; transition: transform .2s ease; }
 .ar:hover::after { transform: translateX(3px); }
 
-/* ---------- Page hero (shared by every inner page via renderPageHero(), see includes/hero.php.
-   Home's own <section class="hero"> does not use this class. Dark navy gradient +
-   floating accent shape, matching html folders/client_courses_final.html's .phero. ---------- */
-.phero {
-  background:
-    radial-gradient(700px 420px at 88% 0%, rgba(255,255,255,.08), transparent 60%),
-    linear-gradient(140deg, #26346F, #141B44 70%, #0F1533);
-  padding: 112px 0 92px; position: relative; overflow: hidden; background-size: cover; background-position: center;
 /* header "Enrol Now" - navy like the hero, glows orange on hover */
 .btn-hero-cta {
   background: var(--navy); color: #fff;
@@ -295,6 +283,7 @@ section.dark .sub { color: #b9c2de; }
 }
 .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-h); }
 .card:hover { transform: translateY(-4px); box-shadow: 0 14px 32px rgba(30,42,102,.1); }
+.card {
   background: var(--paper); border: 1px solid var(--line);
   border-radius: var(--radius); padding: 30px; box-shadow: var(--shadow);
 }
@@ -463,6 +452,7 @@ section.soft .card { background: #fff; }
 }
 .rcard:hover { transform: translateY(-4px); box-shadow: 0 14px 32px rgba(30,42,102,.1); }
 .rcard .stars { color: var(--orange); margin-bottom: 10px; }
+.rcard {
   border: 1.5px solid var(--blue); border-radius: 14px; padding: 26px 24px; background: #fff;
   display: flex; flex-direction: column; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
 }
