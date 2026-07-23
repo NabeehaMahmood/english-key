@@ -136,8 +136,18 @@ $footerProgrammes = getDb()->query("
 $chatInfo = buildChatTokens();
 ?>
 <script>window.EKA_INFO = <?= json_encode($chatInfo, JSON_UNESCAPED_SLASHES) ?>;</script>
-<?php $assetBase = $assetBase ?? (rtrim((string) parse_url(SITE_URL, PHP_URL_PATH), '/') . '/'); ?>
-<script src="<?= e($assetBase) ?>assets/js/chatbot.js" defer></script>
-<script src="<?= e($assetBase) ?>assets/js/site.js" defer></script>
+<?php
+// $assetVer/$assetBase are set in header.php; recompute defensively if footer
+// is ever rendered without it, so JS still loads on every page.
+if (!isset($assetVer)) {
+    $assetBase = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/')), '/') . '/';
+    $assetVer = static function (string $rel) use ($assetBase): string {
+        $full = __DIR__ . '/../' . $rel;
+        return $assetBase . $rel . '?v=' . (is_file($full) ? filemtime($full) : '1');
+    };
+}
+?>
+<script src="<?= e($assetVer('assets/js/chatbot.js')) ?>" defer></script>
+<script src="<?= e($assetVer('assets/js/site.js')) ?>" defer></script>
 </body>
 </html>

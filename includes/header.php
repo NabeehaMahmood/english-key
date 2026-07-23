@@ -8,12 +8,19 @@ $accentColor = getSetting('accent_color', '#EA6C1F');
 $whatsapp = getSetting('whatsapp_number');
 $currentPage = basename($_SERVER['SCRIPT_NAME']);
 
-// Root-absolute base for static assets, derived from SITE_URL's path (so it
-// works whether the site is at the domain root or a subfolder). Using an
-// absolute "/..." path means CSS/JS load correctly on deep URLs like
-// /blog/<slug> too, without needing a page-level <base> tag (which would
-// hijack the in-page #anchor jump-navs on Home/Courses).
-$assetBase = rtrim((string) parse_url(SITE_URL, PHP_URL_PATH), '/') . '/';
+// Root-absolute base for static assets, taken from the ACTUAL request path
+// (the running script's directory) rather than SITE_URL — so CSS/JS/logo load
+// correctly however the site is served: at the domain root, in a subfolder
+// (XAMPP /english-key, /academy, ...), or via `php -S`, with zero config and
+// no dependency on SITE_URL being set right. Absolute "/..." paths also work
+// on deep pretty URLs like /blog/<slug> without a page-level <base> tag (which
+// would hijack the in-page #anchor jump-navs on Home/Courses).
+$assetBase = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/')), '/') . '/';
+// Cache-buster so a browser never serves a stale style.css / site.js after edits.
+$assetVer = static function (string $rel) use ($assetBase): string {
+    $full = __DIR__ . '/../' . $rel;
+    return $assetBase . $rel . '?v=' . (is_file($full) ? filemtime($full) : '1');
+};
 
 $navItems = [
     'index.php' => 'Home',
@@ -39,7 +46,7 @@ $flash = getFlashMessage();
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="<?= e($assetBase) ?>assets/css/style.css">
+<link rel="stylesheet" href="<?= e($assetVer('assets/css/style.css')) ?>">
 <style>:root { --orange: <?= e($accentColor) ?>; }</style>
 </head>
 <body>
