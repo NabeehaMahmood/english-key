@@ -82,6 +82,7 @@ $programmeOptions = ['Full syllabus (regular)', 'Summer Intensive', 'FBISE Bootc
     <p class="sub">Tell us who's enrolling and which subjects you want. We reply within 3 hours to confirm your seat and share payment details. All classes are online, on Pakistan Standard Time.</p>
   </div>
 </div>
+<?php renderPageHero('enroll'); ?>
 
 <section id="enrol-form">
   <div class="wrap ef-wrap">

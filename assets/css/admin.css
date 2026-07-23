@@ -54,11 +54,153 @@
 .logout-link:hover { background: rgba(255,159,143,.12); color: #ffb4a3; text-decoration: none; }
 
 .admin-content { flex: 1; padding: 30px; max-width: 1000px; }
+/* Blog + Notes only (see admin/partials/header.php) -- their content is
+   wider than most admin screens (the Class Subjects matrix alone needs
+   ~1050px for 8 class columns before it has to scroll), so the shared
+   1000px cap was forcing a horizontal scrollbar inside a card that still
+   had unused space to its right on most desktop screens. */
+/* min-width: 0 overrides the flex item's default min-width:auto, which
+   otherwise sizes it to fit its widest content (the 1032px-wide Class
+   Subjects matrix) no matter how narrow the viewport actually is --
+   without this, a mid-width screen like an iPad (1024px) forced the
+   *entire page* to scroll horizontally instead of just the matrix inside
+   its own .cs-matrix-wrap/.cms-table-scroll scroll container. */
+.admin-content-wide { max-width: 1400px; min-width: 0; }
+/* Class Subjects matrix form: not admin-form-wide (900px, shared with the
+   blog editor, where a wide text column would hurt readability) -- this
+   form has no prose to read, just a grid that wants all the room
+   admin-content-wide gives it so 8 class columns need less (or no)
+   internal scrolling. */
+.admin-form.cms-matrix-form { max-width: none; }
 .admin-content h1 {
   font-family: 'Manrope', sans-serif; color: var(--navy, #1B2A4A);
   font-size: 1.7rem; font-weight: 800; margin: 0 0 6px;
 }
 .admin-content > p:first-of-type { color: var(--muted, #5D6678); font-size: 0.95rem; margin: 0 0 24px; max-width: 640px; }
+
+/* ============================================================
+   Tabbed section navigation (Homepage Content / Stats / Testimonials only).
+   Everything below is scoped under .admin-tabs-page so it cannot affect
+   any other admin screen. Clicking a tab shows only that panel; see
+   assets/js/admin.js for the activation logic.
+   ============================================================ */
+.admin-tabs-page h1 {
+  margin: 0 0 4px;
+  font-size: 1.55rem;
+  color: #111827;
+}
+.admin-page-intro {
+  color: #6b7280;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin: 0 0 22px;
+  max-width: 680px;
+}
+
+/* .admin-tabbar is the top-level segmented control (sticky);
+   .admin-tabbar-nested is the smaller variant used inside a merged
+   section (e.g. Why Us Cards, Testimonial Categories). */
+.admin-tabs-page .admin-tabbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  background: #e7e9ec;
+  border: 1px solid #dcdee2;
+  border-radius: 12px;
+  padding: 5px;
+  margin-bottom: 26px;
+  box-shadow: 0 1px 2px rgba(16, 24, 32, 0.05);
+}
+.admin-tabs-page .admin-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  appearance: none;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 14px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #5b6472;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+.admin-tabs-page .admin-tab .tab-icon { width: 15px; height: 15px; flex-shrink: 0; opacity: 0.7; }
+.admin-tabs-page .admin-tab:hover { background: #f1f2f4; color: #1f2937; }
+.admin-tabs-page .admin-tab.active {
+  background: #fff;
+  color: #1f6b45;
+  box-shadow: 0 1px 3px rgba(16, 24, 32, 0.12), 0 0 0 1px rgba(47, 111, 79, 0.15);
+}
+.admin-tabs-page .admin-tab.active .tab-icon { opacity: 1; color: #2f6f4f; }
+.admin-tabs-page .admin-tab .tab-count {
+  background: #eef0f2;
+  color: #5b6472;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: 999px;
+  line-height: 1.5;
+}
+.admin-tabs-page .admin-tab.active .tab-count { background: #e4f2ea; color: #1f6b45; }
+
+.admin-tabs-page .admin-tabbar-nested {
+  position: static;
+  background: #f2f3f5;
+  border: 1px solid #e5e7eb;
+  box-shadow: none;
+  padding: 4px;
+  gap: 4px;
+  margin: 0 0 20px;
+}
+.admin-tabs-page .admin-tabbar-nested .admin-tab { padding: 7px 13px; font-size: 0.82rem; }
+
+.admin-tabpanel[hidden], .admin-tabpanel-nested[hidden] { display: none; }
+
+.admin-tabs-page .admin-section-card {
+  background: #fff;
+  border: 1px solid #e2e2e2;
+  border-radius: 10px;
+  padding: 24px;
+  margin-bottom: 30px;
+}
+.admin-tabs-page .admin-section-card > h2:first-child { margin-top: 0; }
+
+.admin-tabs-page .admin-tabpanel h2,
+.admin-tabs-page .admin-tabpanel-nested h2,
+.admin-tabs-page .admin-section-card h2 {
+  font-size: 1.15rem;
+  color: #1f2937;
+  margin-top: 0;
+}
+
+/* Instructional callouts inside a tab (e.g. "managed elsewhere" hints),
+   replacing plain <p> notes with a more scannable, on-brand box. */
+.admin-note {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: #f3f8f5;
+  border: 1px solid #dcebe3;
+  border-left: 3px solid #2f6f4f;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 0 0 18px;
+  font-size: 0.86rem;
+  color: #374151;
+  line-height: 1.55;
+  max-width: 640px;
+}
+.admin-note .note-icon { width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px; color: #2f6f4f; }
+.admin-note a { font-weight: 600; }
+.admin-note p { margin: 0; }
+.admin-note p + p { margin-top: 6px; }
 
 .admin-form {
   display: flex;
@@ -78,6 +220,8 @@
   border-bottom: 1px solid #edf0f5;
 }
 .admin-form label { display: flex; flex-direction: column; gap: 6px; font-weight: 600; font-size: 0.9rem; color: var(--navy, #1B2A4A); }
+.admin-fieldset { border: 1.5px solid #d8dce6; border-radius: 10px; padding: 14px 16px 16px; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.admin-fieldset legend { font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 0.9rem; color: var(--navy, #1B2A4A); padding: 0 6px; }
 .admin-form input[type="text"],
 .admin-form input[type="email"],
 .admin-form input[type="tel"],
@@ -166,20 +310,117 @@
 .admin-table td a { font-weight: 600; }
 .admin-table td a:focus-visible { outline: 2px solid var(--orange, #EA6C1F); outline-offset: 2px; border-radius: 3px; }
 
-.inline-form { display: inline-block; margin: 0 0 0 10px; }
-.admin-tabs { display: flex; gap: 24px; margin-bottom: 20px; border-bottom: 1px solid #e2e2e2; }
-.admin-tab-btn {
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  padding: 10px 2px;
-  font: inherit;
-  font-weight: 600;
-  color: #666;
-  cursor: pointer;
+/* Class Subjects matrix: subjects x classes grid instead of one fieldset
+   per class, so the whole assignment is scannable in one view. Every class
+   is a column and every cell is a plain checkbox, no distinction between
+   classes -- a class with nothing checked just has no subjects yet. */
+.cs-matrix-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid #e2e6ee; border-radius: 12px; box-shadow: 0 4px 16px rgba(30,42,102,.05); max-width: 100%; }
+.cs-matrix { width: 100%; border-collapse: collapse; background: #fff; }
+.cs-matrix th, .cs-matrix td { padding: 10px 14px; border-bottom: 1px solid #eef0f5; text-align: center; font-size: 0.85rem; white-space: nowrap; }
+.cs-matrix thead th {
+  background: var(--bg, #f4f5f8); color: var(--c, var(--navy, #1B2A4A));
+  font-weight: 700; font-size: 0.75rem; letter-spacing: .03em; text-transform: uppercase;
+  border-bottom: 2px solid var(--c, #e2e6ee); position: sticky; top: 0; z-index: 1;
 }
-.admin-tab-btn:hover { color: #2f6f4f; }
-.admin-tab-btn.active { color: #2f6f4f; border-bottom-color: #2f6f4f; }
+.cs-matrix thead th small { text-transform: none; font-weight: 600; color: #999; }
+.cs-matrix-corner { text-align: left !important; background: var(--bg, #f4f5f8); }
+.cs-matrix-row-label {
+  text-align: left !important; font-weight: 700; font-size: 0.85rem; color: var(--c, var(--navy, #1B2A4A));
+  background: #fff; position: sticky; left: 0; box-shadow: 1px 0 0 #eef0f5;
+  border-left: 3px solid var(--c, transparent);
+}
+.cs-matrix tbody tr:hover td { background: color-mix(in srgb, var(--orange, #EA6C1F) 4%, white); }
+.cs-matrix tbody tr:hover .cs-matrix-row-label { background: color-mix(in srgb, var(--orange, #EA6C1F) 6%, white); }
+.cs-matrix-cell input[type="checkbox"] { width: 18px; height: 18px; cursor: pointer; }
+.cs-matrix tbody tr:last-child td, .cs-matrix tbody tr:last-child th { border-bottom: none; }
+
+.inline-form { display: inline-block; margin: 0 0 0 10px; }
+
+/* ============================================================
+   CMS admin (Blog + Notes only). Everything below is scoped under
+   .cms-admin so it cannot affect any other admin screen -- see
+   admin/blog.php and admin/notes.php, the only two pages that carry
+   this wrapper class.
+   ============================================================ */
+/* Segmented pill tab bar. Unlike the old .admin-tabs underline style,
+   tabs never text-wrap (white-space: nowrap) and the bar scrolls
+   horizontally instead of stacking once there isn't room for every
+   tab -- matters here since Notes has 5 top-level tabs plus a nested
+   pair, easily more than a phone width can show at once. */
+.cms-tabbar {
+  display: flex; flex-wrap: nowrap; gap: 4px; align-items: center;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; -ms-overflow-style: none;
+  background: #e7e9ec; border: 1px solid #dcdee2; border-radius: 12px;
+  padding: 5px; margin-bottom: 22px;
+  box-shadow: 0 1px 2px rgba(16, 24, 32, 0.05);
+}
+.cms-tabbar::-webkit-scrollbar { display: none; }
+.cms-tab {
+  appearance: none; background: transparent; border: none; border-radius: 8px;
+  padding: 9px 14px; font: inherit; font-size: 0.85rem; font-weight: 600;
+  color: #5b6472; cursor: pointer; white-space: nowrap; flex: none;
+  transition: background .15s ease, color .15s ease, box-shadow .15s ease;
+}
+.cms-tab:hover { background: #f1f2f4; color: #1f2937; }
+.cms-tab.active {
+  background: #fff; color: var(--navy, #1B2A4A);
+  box-shadow: 0 1px 3px rgba(16, 24, 32, 0.12), 0 0 0 1px rgba(234,108,31,.2);
+}
+.cms-tab:focus-visible { outline: 2px solid var(--orange, #EA6C1F); outline-offset: 1px; }
+
+.cms-tabbar-nested {
+  background: #f2f3f5; border-color: #e5e7eb; box-shadow: none;
+  padding: 4px; gap: 4px; margin: 0 0 20px;
+}
+.cms-tabbar-nested .cms-tab { padding: 7px 13px; font-size: 0.82rem; }
+
+/* Table horizontal-scroll: a wrapper div (not `display:block` on the
+   table itself) so <tr>/<td> keep real table layout -- setting
+   display:block directly on <table> breaks column alignment and
+   inflates row height, since each row becomes its own anonymous table
+   with no shared column grid. The shared .admin-table mobile rule
+   (display:block) is overridden back to normal table layout here,
+   scoped to .cms-admin only. */
+.cms-admin .cms-table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; }
+@media (max-width: 760px) {
+  .cms-admin .admin-table { display: table; }
+  /* The shared .admin-table sets width:100%, which on a table-layout:auto
+     table fights with white-space:nowrap cells for space instead of
+     cleanly deferring to the scroll wrapper -- columns like Actions can
+     end up starved of room and wrap internally, inflating row height even
+     though the table nominally "fits". width:auto (floored at 100% so a
+     short table still fills the wrapper) lets every column claim its
+     natural nowrap width instead. */
+  .cms-admin .admin-table { width: auto; min-width: 100%; }
+  /* .actions-cell is a flex-wrap:wrap container so it can wrap on a
+     genuinely narrow column (used elsewhere without a scroll wrapper) --
+     but that same flex-wrap lets the table's auto-layout treat this
+     column's min-content as just its widest single button, sizing it far
+     too narrow and stacking the 2-3 action buttons into a tall column
+     instead of ever reaching for the horizontal scrollbar. Forcing nowrap
+     here makes the column (and so the table) claim its true full width. */
+  .cms-admin .cms-table-scroll .actions-cell { flex-wrap: nowrap; }
+  .cms-admin .cms-table-scroll { box-shadow: inset -10px 0 10px -10px rgba(30,42,102,.18); }
+}
+
+/* .link-button (Hide/Show, Publish/Unpublish) was rendering as a loud
+   solid-orange button on Notes/Blog -- the shared, sitewide
+   `.admin-body button[type="submit"]` rule (0,2,1 specificity) beat
+   `.actions-cell .link-button` (0,2,0), so the plain-text pill look
+   only ever won for `.link-button-danger` (0,3,0). Recreating it here
+   at higher specificity restores the intended subtle pill for every
+   action, scoped to Blog/Notes only. */
+.cms-admin .actions-cell .link-button {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 5px 12px; border-radius: 6px; border: 1px solid transparent;
+  font: inherit; font-size: 0.82rem; font-weight: 600; line-height: 1.4;
+  text-decoration: none; white-space: nowrap; cursor: pointer;
+  background: #eef6f1; color: #2f6f4f; box-shadow: none; transform: none;
+}
+.cms-admin .actions-cell .link-button:hover { background: #dcefe4; box-shadow: none; transform: none; }
+.cms-admin .actions-cell .link-button.link-button-danger { background: #fdecea; color: #a1352a; }
+.cms-admin .actions-cell .link-button.link-button-danger:hover { background: #f9d9d5; }
 
 .admin-form-wide { max-width: 900px; }
 .admin-form textarea { resize: vertical; font-family: inherit; }

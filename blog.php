@@ -23,6 +23,7 @@ $posts = $db->query(
 )->fetchAll();
 ?>
 
+<?php renderPageHero('blog'); ?>
 <?php /* ── Hero ─────────────────────────────────────────────────────────────── */ ?>
 <div class="phero phero-navy">
   <div class="wrap reveal">

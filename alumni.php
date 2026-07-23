@@ -83,6 +83,19 @@ $captchaQuestion = enrolCaptchaQuestion();
           <span class="acard-year">Batch <?= e($a['passing_year'] ?: substr($a['batch_info'], -4)) ?></span>
           <?php if ($a['achievement']): ?><p class="acard-achv"><?= e($a['achievement']) ?></p><?php endif; ?>
         </div>
+$trackRecords = getTrackRecords();
+$stories = $db->query("SELECT * FROM alumni WHERE is_active = 1 AND story IS NOT NULL AND story != '' ORDER BY sort_order DESC")->fetchAll();
+$humanQuestion = humanCheckQuestion();
+?>
+
+<?php renderPageHero('alumni'); ?>
+
+<?php if ($trackRecords): ?>
+<section class="dark" style="padding:64px 0">
+  <div class="wrap">
+    <div class="g3 reveal">
+      <?php foreach ($trackRecords as $i => $r): ?>
+        <?= renderTrackRecordCard($r, 'tcard reveal', revealDelay($i)) ?>
       <?php endforeach; ?>
     </div>
   </div>

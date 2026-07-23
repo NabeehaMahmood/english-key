@@ -408,5 +408,101 @@ $tabCounts = [
   });
 })();
 </script>
+<p>Student-submitted alumni stories for the Alumni Stories wall. Public story submissions land here as pending, unpublished entries. The achiever band shown on Home, Testimonials and this page is now managed under <a href="home-track-record.php">Homepage Track Record</a>.</p>
+
+<?php if ($pending): ?>
+<h2>Pending Story Submissions</h2>
+<table class="admin-table">
+  <thead><tr><th>Name</th><th>Batch</th><th>Story</th><th>Private Contact</th><th>Actions</th></tr></thead>
+  <tbody>
+    <?php foreach ($pending as $p): ?>
+      <tr class="unread-row">
+        <td><?= e($p['name']) ?></td>
+        <td><?= e($p['batch_info']) ?></td>
+        <td><?= e(mb_strimwidth((string)$p['story'], 0, 100, '...')) ?></td>
+        <td><?= e($p['contact']) ?></td>
+        <td>
+          <form method="post" class="inline-form">
+            <?= csrfField() ?>
+            <input type="hidden" name="action" value="approve">
+            <input type="hidden" name="id" value="<?= (int)$p['id'] ?>">
+            <button type="submit" class="link-button">Approve &amp; Publish</button>
+          </form>
+          <a href="alumni.php?edit=<?= (int)$p['id'] ?>">Edit</a>
+          <form method="post" class="inline-form" onsubmit="return confirm('Delete this submission?');">
+            <?= csrfField() ?>
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="id" value="<?= (int)$p['id'] ?>">
+            <button type="submit" class="link-button">Delete</button>
+          </form>
+        </td>
+      </tr>
+    <?php endforeach; ?>
+  </tbody>
+</table>
+<?php endif; ?>
+
+<form method="post" enctype="multipart/form-data" class="admin-form">
+  <?= csrfField() ?>
+  <input type="hidden" name="action" value="save">
+  <input type="hidden" name="id" value="<?= (int)($editing['id'] ?? 0) ?>">
+
+  <h2><?= $editing ? 'Edit Entry' : 'Add Alumni Story' ?></h2>
+
+  <label>Name
+    <input type="text" name="name" value="<?= e($editing['name'] ?? '') ?>" required>
+  </label>
+  <label>Achievement (e.g. "HSSC 1st Position - Federal Board"), shown next to the batch on the story card
+    <input type="text" name="achievement" value="<?= e($editing['achievement'] ?? '') ?>">
+  </label>
+  <label>Batch / Class (e.g. "Class of 2025")
+    <input type="text" name="batch_info" value="<?= e($editing['batch_info'] ?? '') ?>">
+  </label>
+  <label>Story
+    <textarea name="story" rows="5"><?= e($editing['story'] ?? '') ?></textarea>
+  </label>
+  <label>Private Contact (not shown publicly)
+    <input type="text" name="contact" value="<?= e($editing['contact'] ?? '') ?>">
+  </label>
+  <label>Sort Order
+    <input type="number" name="sort_order" value="<?= (int)($editing['sort_order'] ?? 0) ?>">
+  </label>
+  <label class="checkbox-label">
+    <input type="checkbox" name="is_active" <?= (!isset($editing) || $editing['is_active']) ? 'checked' : '' ?>>
+    Published
+  </label>
+  <label>Photo
+    <?php if (!empty($editing['photo'])): ?>
+      <div><img src="../<?= e($editing['photo']) ?>" style="max-height:80px;"></div>
+    <?php endif; ?>
+    <input type="file" name="photo" accept=".jpg,.jpeg,.png,.webp">
+  </label>
+
+  <button type="submit"><?= $editing ? 'Update' : 'Add Entry' ?></button>
+  <?php if ($editing): ?><a href="alumni.php" class="button-secondary">Cancel</a><?php endif; ?>
+</form>
+
+<h2>Published</h2>
+<table class="admin-table">
+  <thead><tr><th>Name</th><th>Batch</th><th>Status</th><th>Actions</th></tr></thead>
+  <tbody>
+    <?php foreach ($published as $p): ?>
+      <tr>
+        <td><?= e($p['name']) ?></td>
+        <td><?= e($p['batch_info']) ?></td>
+        <td><?= $p['story'] ? 'Shown on Stories wall' : 'No story (not shown)' ?></td>
+        <td>
+          <a href="alumni.php?edit=<?= (int)$p['id'] ?>">Edit</a>
+          <form method="post" class="inline-form" onsubmit="return confirm('Delete this entry?');">
+            <?= csrfField() ?>
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="id" value="<?= (int)$p['id'] ?>">
+            <button type="submit" class="link-button">Delete</button>
+          </form>
+        </td>
+      </tr>
+    <?php endforeach; ?>
+  </tbody>
+</table>
 
 <?php require_once __DIR__ . '/partials/footer.php'; ?>

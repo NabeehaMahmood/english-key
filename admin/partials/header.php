@@ -10,6 +10,9 @@ $navItems = [
     'index.php' => 'Dashboard',
     'settings.php' => 'Site Settings',
     'home-content.php' => 'Homepage Content',
+    'home-stats.php' => 'Homepage Stats',
+    'home-track-record.php' => 'Homepage Track Record',
+    'page-heroes.php' => 'Page Heroes',
     'page-content.php' => 'Page Content',
     'courses.php' => 'Courses',
     'student-course-handout.php' => 'Student Course Handout',
@@ -20,7 +23,6 @@ $navItems = [
     'notes.php' => 'Notes',
     'alumni.php' => 'Alumni',
     'enrollments.php' => 'Enrollments',
-    'messages.php' => 'Messages',
 ];
 ?>
 <!DOCTYPE html>
@@ -45,7 +47,7 @@ $navItems = [
     </nav>
     <a href="logout.php" class="logout-link">Log Out</a>
   </aside>
-  <div class="admin-content">
+  <div class="admin-content<?= in_array($currentPage, ['blog.php', 'notes.php'], true) ? ' admin-content-wide' : '' ?>">
     <?php if ($flash): ?>
       <div class="flash flash-<?= e($flash['type']) ?>"><?= e($flash['message']) ?></div>
     <?php endif; ?>
