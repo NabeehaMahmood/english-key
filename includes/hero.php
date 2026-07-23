@@ -1,10 +1,10 @@
 <?php
 /**
  * Reusable inner-page Hero banner (page_heroes table). Every inner page
- * (About, Courses, Testimonials, Alumni, Blog, Notes, Contact, Enroll)
- * renders the same markup/CSS via renderPageHero(); only the text/image
- * differ per page. The Home page's own <section class="hero"> does not
- * use this component.
+ * (About, Courses, Testimonials, Alumni, Blog, Notes, Contact) renders the
+ * same markup/CSS via renderPageHero(); only the text/image differ per
+ * page. The Home page's own <section class="hero"> does not use this
+ * component.
  */
 
 function getPageHero(string $slug): array

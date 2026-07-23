@@ -9,7 +9,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
     if ($action === 'delete') {
+        $oldPhoto = $db->prepare('SELECT photo FROM teachers WHERE id = ?');
+        $oldPhoto->execute([(int)$_POST['id']]);
+        $oldPhoto = $oldPhoto->fetchColumn();
         $db->prepare('DELETE FROM teachers WHERE id = ?')->execute([(int)$_POST['id']]);
+        if ($oldPhoto && !in_array($oldPhoto, STOCK_AVATARS, true)) {
+            deleteUploadedImage($oldPhoto);
+        }
         redirectWithMessage('teachers.php#faculty', 'Team member deleted.');
     }
 

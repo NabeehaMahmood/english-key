@@ -9,7 +9,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
     if ($action === 'delete') {
+        $oldImage = $db->prepare('SELECT image FROM track_records WHERE id = ?');
+        $oldImage->execute([(int)$_POST['id']]);
+        $oldImage = $oldImage->fetchColumn();
         $db->prepare('DELETE FROM track_records WHERE id = ?')->execute([(int)$_POST['id']]);
+        if ($oldImage && !in_array($oldImage, STOCK_AVATARS, true)) {
+            deleteUploadedImage($oldImage);
+        }
         redirectWithMessage('home-track-record.php#all-records', 'Record deleted.');
     }
 

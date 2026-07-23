@@ -1823,8 +1823,8 @@ html:not(.js) .nmore-toggle { display: none; }
 
 /* ============================================================
    MERGED FROM COURSES/ALUMNI BUILD (talha) - FAQ accordion,
-   Alumni story wall + share form, course handout panel,
-   refreshable captcha. Appended during the site merge.
+   Alumni story wall + share form, refreshable captcha.
+   Appended during the site merge.
    ============================================================ */
 /* ---------- Courses FAQ accordion (reuses .pgroup/.pgchev conventions) ---------- */
 .faq-list { display: flex; flex-direction: column; gap: 14px; }

@@ -11,7 +11,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $returnTab = in_array($_POST['tab'] ?? '', $validTabs, true) ? $_POST['tab'] : 'stories';
 
     if ($action === 'delete') {
+        $oldPhoto = $db->prepare('SELECT photo FROM alumni WHERE id = ?');
+        $oldPhoto->execute([(int)$_POST['id']]);
+        $oldPhoto = $oldPhoto->fetchColumn();
         $db->prepare('DELETE FROM alumni WHERE id = ?')->execute([(int)$_POST['id']]);
+        if ($oldPhoto && !in_array($oldPhoto, STOCK_AVATARS, true)) {
+            deleteUploadedImage($oldPhoto);
+        }
         redirectWithMessage('alumni.php?tab=' . $returnTab, 'Story deleted.');
     }
 

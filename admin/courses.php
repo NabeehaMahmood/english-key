@@ -28,7 +28,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($action === 'delete') {
         $redirectCategory = in_array($_POST['category'] ?? '', $validCategories, true) ? $_POST['category'] : 'featured';
+        $oldImage = $db->prepare('SELECT image FROM courses WHERE id = ?');
+        $oldImage->execute([(int)$_POST['id']]);
+        $oldImage = $oldImage->fetchColumn();
         $db->prepare('DELETE FROM courses WHERE id = ?')->execute([(int)$_POST['id']]);
+        if ($oldImage) {
+            deleteUploadedImage($oldImage);
+        }
         redirectWithMessage('courses.php?category=' . $redirectCategory, 'Course deleted.');
     }
 

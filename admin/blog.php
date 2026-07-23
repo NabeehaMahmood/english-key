@@ -9,7 +9,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
     if ($action === 'delete') {
+        $oldImage = $db->prepare('SELECT image FROM blog_posts WHERE id = ?');
+        $oldImage->execute([(int)$_POST['id']]);
+        $oldImage = $oldImage->fetchColumn();
         $db->prepare('DELETE FROM blog_posts WHERE id = ?')->execute([(int)$_POST['id']]);
+        if ($oldImage) {
+            deleteUploadedImage($oldImage);
+        }
         redirectWithMessage('blog.php', 'Blog post deleted.');
     }
 
