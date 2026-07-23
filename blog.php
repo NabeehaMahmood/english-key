@@ -24,14 +24,6 @@ $posts = $db->query(
 ?>
 
 <?php renderPageHero('blog'); ?>
-<?php /* ── Hero ─────────────────────────────────────────────────────────────── */ ?>
-<div class="phero phero-dark">
-  <div class="wrap reveal">
-    <div class="kick">Blog</div>
-    <h1>Exam tips, study routines &amp; <span class="hl">board updates.</span></h1>
-    <p class="sub">Short, practical articles on exam technique and grammar, written to help FBISE students score higher. New pieces published through the term.</p>
-  </div>
-</div>
 
 <section>
   <div class="wrap">

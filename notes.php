@@ -159,13 +159,6 @@ $visibleLimit = 6;
 ?>
 
 <?php renderPageHero('notes'); ?>
-<div class="phero phero-dark">
-  <div class="wrap reveal">
-    <div class="kick">Free Resources</div>
-    <h1>Notes that <span class="hl">open doors.</span></h1>
-    <p class="sub">Free sample notes for FBISE English, Urdu and more, Classes 9 to 12. No login required, pick a class and subject below. Full-length notes, model papers and MCQ banks are included free for enrolled students.</p>
-  </div>
-</div>
 
 <?php if ($blocks): ?>
 
