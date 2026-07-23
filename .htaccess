@@ -1,0 +1,20 @@
+RewriteEngine On
+
+# Pretty URLs for the blog module: /blog and /blog/<slug>
+RewriteRule ^blog/?$ blog.php [L,QSA]
+RewriteRule ^blog/([A-Za-z0-9-]+)/?$ blog-post.php?slug=$1 [L,QSA]
+
+# Application internals are never served directly.
+RewriteRule ^(includes|sql|vendor)(/|$) - [F,L]
+
+# Configuration/build files are never served.
+<FilesMatch "\.(sql|lock|yml|sh|md)$|^composer\.json$|^\.gitignore$|^\.dockerignore$">
+  Require all denied
+</FilesMatch>
+
+# Basic hardening headers.
+<IfModule mod_headers.c>
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
