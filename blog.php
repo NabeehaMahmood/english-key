@@ -4,16 +4,16 @@ require_once __DIR__ . '/config.php';
 $pageTitle = 'Blog';
 $pageDescription = 'Exam tips, study routines and FBISE board updates from EnglishKeys Academy.';
 
-// header.php's nav/logo/CSS links are relative (e.g. "assets/css/style.css"),
-// which only resolve correctly against a one-path-segment URL. This page is
-// also reachable at /blog/ (trailing slash, via .htaccess), so a <base> tag
-// pointing back at the site root is injected here to keep those links
-// working from either URL, without changing header.php itself.
+// This page is also reachable at /blog/ (trailing slash, via .htaccess), a
+// two-segment URL, so relative hrefs in the markup (nav links, "courses.php",
+// etc.) need a <base> tag pointing back at the site root or the browser
+// resolves them against /blog/ instead. CSS/JS/logo don't need this (they're
+// root-absolute, see $assetBase in header.php) -- only the plain relative
+// links throughout the markup do.
 ob_start();
 require_once __DIR__ . '/includes/header.php';
 $headerHtml = ob_get_clean();
-$basePath = rtrim((string)parse_url(SITE_URL, PHP_URL_PATH), '/') . '/';
-echo str_replace('<head>', '<head><base href="' . e($basePath) . '">', $headerHtml);
+echo str_replace('<head>', '<head><base href="' . e($assetBase) . '">', $headerHtml);
 
 $db = getDb();
 

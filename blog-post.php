@@ -27,17 +27,16 @@ if ($post) {
     ], fn($v) => trim((string)$v) !== '')));
 }
 
-// header.php's nav/logo/CSS links are relative (e.g. "assets/css/style.css"),
-// which only resolve correctly when the browser's URL has one path segment
-// (blog-post.php). This page is also reachable at /blog/<slug> (two
-// segments, via .htaccess), so a <base> tag pointing back at the site root
-// is injected here to keep those relative links working either way, without
-// changing header.php itself.
+// This page is also reachable at /blog/<slug> (two segments, via .htaccess),
+// so relative hrefs in the markup (nav links, "courses.php", etc.) need a
+// <base> tag pointing back at the site root or the browser resolves them
+// against /blog/<slug> instead. CSS/JS/logo don't need this (they're
+// root-absolute, see $assetBase in header.php) -- only the plain relative
+// links throughout the markup do.
 ob_start();
 require_once __DIR__ . '/includes/header.php';
 $headerHtml = ob_get_clean();
-$basePath = rtrim((string)parse_url(SITE_URL, PHP_URL_PATH), '/') . '/';
-echo str_replace('<head>', '<head><base href="' . e($basePath) . '">', $headerHtml);
+echo str_replace('<head>', '<head><base href="' . e($assetBase) . '">', $headerHtml);
 
 // ── 2. Hard 404 if not found ─────────────────────────────────────────────────
 if (!$post) {
