@@ -8,6 +8,13 @@ $accentColor = getSetting('accent_color', '#EA6C1F');
 $whatsapp = getSetting('whatsapp_number');
 $currentPage = basename($_SERVER['SCRIPT_NAME']);
 
+// Root-absolute base for static assets, derived from SITE_URL's path (so it
+// works whether the site is at the domain root or a subfolder). Using an
+// absolute "/..." path means CSS/JS load correctly on deep URLs like
+// /blog/<slug> too, without needing a page-level <base> tag (which would
+// hijack the in-page #anchor jump-navs on Home/Courses).
+$assetBase = rtrim((string) parse_url(SITE_URL, PHP_URL_PATH), '/') . '/';
+
 $navItems = [
     'index.php' => 'Home',
     'courses.php' => 'Courses',
@@ -32,7 +39,7 @@ $flash = getFlashMessage();
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="<?= e($assetBase) ?>assets/css/style.css">
 <style>:root { --orange: <?= e($accentColor) ?>; }</style>
 </head>
 <body>
@@ -43,7 +50,7 @@ $flash = getFlashMessage();
   <div class="wrap nav-in">
     <a class="logo" href="index.php">
       <?php if ($logoPath): ?>
-        <img class="logo-img" src="<?= e($logoPath) ?>" alt="<?= e($siteName) ?>">
+        <img class="logo-img" src="<?= e($assetBase . $logoPath) ?>" alt="<?= e($siteName) ?>">
       <?php else: ?>
         <span style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;color:var(--navy)"><?= e($siteName) ?></span>
       <?php endif; ?>

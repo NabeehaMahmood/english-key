@@ -22,7 +22,7 @@ $footerProgrammes = getDb()->query("
   <div class="wrap">
     <div class="fg">
       <div class="fb">
-        <?php if ($logoPath): ?><img class="flogo" src="<?= e($logoPath) ?>" alt="<?= e($siteName) ?>"><?php endif; ?>
+        <?php if ($logoPath): ?><img class="flogo" src="<?= e($assetBase . $logoPath) ?>" alt="<?= e($siteName) ?>"><?php endif; ?>
         <b><?= e(getSetting('tagline', 'Where Words Build Futures')) ?>.</b>
         <p>Online coaching in English, Urdu, Islamiat &amp; Tarjuma-tul-Quran for FBISE students, Classes 9-12, taught live across Pakistan.</p>
         <div class="fsoc">
@@ -63,7 +63,7 @@ $footerProgrammes = getDb()->query("
     <div class="footer-links reveal">
       <div>
         <div class="footer-brand-mark">
-          <?php if ($logoPath): ?><img src="<?= e($logoPath) ?>" alt="<?= e($siteName) ?>"><?php endif; ?>
+          <?php if ($logoPath): ?><img src="<?= e($assetBase . $logoPath) ?>" alt="<?= e($siteName) ?>"><?php endif; ?>
         </div>
         <h4><?= e(getSetting('tagline', 'Where Words Build Futures')) ?>.</h4>
         <p class="fdesc">Online coaching in English, Urdu, Islamiat &amp; Tarjuma-tul-Quran for FBISE students, Classes 9-12, taught live across Pakistan.</p>
@@ -136,7 +136,8 @@ $footerProgrammes = getDb()->query("
 $chatInfo = buildChatTokens();
 ?>
 <script>window.EKA_INFO = <?= json_encode($chatInfo, JSON_UNESCAPED_SLASHES) ?>;</script>
-<script src="assets/js/chatbot.js" defer></script>
-<script src="assets/js/site.js" defer></script>
+<?php $assetBase = $assetBase ?? (rtrim((string) parse_url(SITE_URL, PHP_URL_PATH), '/') . '/'); ?>
+<script src="<?= e($assetBase) ?>assets/js/chatbot.js" defer></script>
+<script src="<?= e($assetBase) ?>assets/js/site.js" defer></script>
 </body>
 </html>
